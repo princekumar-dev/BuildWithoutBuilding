@@ -3,7 +3,7 @@ import { motion } from 'framer-motion'
 import {
   ArrowRight, Lightbulb, PenTool, Cpu,
   Presentation, Calendar, Clock, MapPin,
-  Play, Shield, Users, Radio, Globe, Trophy
+  Play, Shield, Users, Globe, Trophy
 } from 'lucide-react'
 
 import { PageLayout } from '../../components/layout/PageLayout'

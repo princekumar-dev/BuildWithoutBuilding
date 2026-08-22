@@ -476,7 +476,7 @@ export default function JoinPage() {
                           </label>
                           <input
                             type="email"
-                            placeholder="e.g. teamlead@college.edu"
+                            placeholder="e.g. teamlead@gmail.com"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             className="w-full px-3.5 py-2.5 rounded-xl bg-bwb-bg/70 border border-bwb-border text-bwb-text text-sm font-medium placeholder:text-bwb-muted/60 focus:border-bwb-accent outline-none"

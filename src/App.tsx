@@ -36,6 +36,12 @@ function ProtectedHost({ children }: { children: React.ReactNode }) {
 
 function GlobalGamifiedSync() {
   usePhaseNavigation()
+  const location = useLocation()
+  const path = location.pathname
+  const isPublicPage = path === '/' || path === '/join' || path === '/how-to-play' || path === '/host/login' || path === '/judge/login'
+
+  if (isPublicPage) return null
+
   return (
     <>
       <PhaseTransitionOverlay />

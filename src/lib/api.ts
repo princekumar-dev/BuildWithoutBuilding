@@ -2,7 +2,9 @@ import type { Game, GamePhase, ParticipantSession, Problem, Submission, ScoreBre
 
 const API_BASE = (import.meta.env.VITE_API_URL || '').replace(/\/+$/, '')
 
-function getToken(): string | null { return localStorage.getItem('host_token') }
+function getToken(): string | null {
+  return localStorage.getItem('host_token') || localStorage.getItem('judge_token')
+}
 
 async function request<T>(path: string, options?: RequestInit, auth = false): Promise<T> {
   const headers: Record<string, string> = { 'Content-Type': 'application/json' }
@@ -30,6 +32,7 @@ async function request<T>(path: string, options?: RequestInit, auth = false): Pr
 
 export const api = {
   login: (email: string, password: string) => request<{ token: string }>('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) }),
+  judgeLogin: (pin: string) => request<{ token: string }>('/auth/judge/login', { method: 'POST', body: JSON.stringify({ pin }) }),
   listGames: () => request<Game[]>('/games', undefined, true),
   getGame: (idOrCode: string) => request<Game>(`/games/${encodeURIComponent(idOrCode)}`),
   createGame: (name: string, scheduledStartTime?: string | null, maxTeams?: number) => request<Game>('/games', { method: 'POST', body: JSON.stringify({ name, scheduledStartTime, maxTeams }) }, true),

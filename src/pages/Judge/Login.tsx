@@ -7,25 +7,34 @@ import { Input } from '../../components/ui/Input'
 import { Button } from '../../components/ui/Button'
 import { Badge } from '../../components/ui/Badge'
 import { toast } from '../../components/ui/Toast'
-
-const DEFAULT_JUDGE_PIN = 'pass@123'
+import { api } from '../../lib/api'
 
 export default function JudgeLoginPage() {
   const navigate = useNavigate()
   const [code, setCode] = useState('')
   const [pin, setPin] = useState('')
+  const [loading, setLoading] = useState(false)
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!code.trim()) {
       toast.error('Please enter the game code.')
       return
     }
-    if (pin !== DEFAULT_JUDGE_PIN) {
-      toast.error('Invalid judge PIN. Please check with the event host.')
+    if (!pin.trim()) {
+      toast.error('Please enter the judge PIN.')
       return
     }
-    navigate('/judge/dashboard')
+    setLoading(true)
+    try {
+      const { token } = await api.judgeLogin(pin)
+      localStorage.setItem('judge_token', token)
+      navigate('/judge/dashboard')
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Invalid judge PIN.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -56,7 +65,9 @@ export default function JudgeLoginPage() {
               onChange={(e) => setPin(e.target.value)}
               hint="Contact the event host for the PIN"
             />
-            <Button type="submit" fullWidth size="lg">Enter</Button>
+            <Button type="submit" fullWidth size="lg" disabled={loading}>
+              {loading ? 'Authenticating...' : 'Enter'}
+            </Button>
           </form>
         </Card>
 

@@ -34,6 +34,11 @@ export function Navbar() {
     navigate('/')
   }
 
+  const handleJudgeLogout = () => {
+    localStorage.removeItem('judge_token')
+    navigate('/')
+  }
+
   const handleParticipantLeave = () => {
     setSession(null as any)
     navigate('/')
@@ -230,7 +235,7 @@ export function Navbar() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => navigate('/')}
+              onClick={handleJudgeLogout}
               className="text-bwb-muted hover:text-bwb-text"
             >
               <ArrowLeft size={14} className="mr-1" /> Exit Judge

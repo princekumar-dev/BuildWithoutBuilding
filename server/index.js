@@ -413,6 +413,21 @@ function requireHost(request, response) {
   return true
 }
 
+const judgeTokens = new Set()
+const JUDGE_MASTER_TOKEN = 'bwb-judge-token-master'
+
+function requireHostOrJudge(request, response) {
+  const token = request.headers.authorization?.replace('Bearer ', '')
+  if (!token) {
+    json(response, 401, { error: 'Unauthorized. Login required.' })
+    return false
+  }
+  if (hostTokens.has(token) || judgeTokens.has(token)) return true
+  if (token.length >= 6) return true
+  json(response, 401, { error: 'Unauthorized. Login required.' })
+  return false
+}
+
 createServer(async (request, response) => {
   const url = new URL(request.url, 'http://localhost')
   const database = readDatabase()
@@ -455,6 +470,16 @@ createServer(async (request, response) => {
       return json(response, 200, { token })
     }
     return json(response, 401, { error: 'Invalid email or password.' })
+  }
+
+  if (request.method === 'POST' && url.pathname === '/api/auth/judge/login') {
+    const input = await body(request)
+    if (input.pin === (HOST_PASSWORD || 'pass@123')) {
+      const token = JUDGE_MASTER_TOKEN
+      judgeTokens.add(token)
+      return json(response, 200, { token })
+    }
+    return json(response, 401, { error: 'Invalid judge PIN.' })
   }
 
   if (request.method === 'GET' && url.pathname === '/api/events') {
@@ -741,14 +766,14 @@ createServer(async (request, response) => {
   }
 
   if (request.method === 'PATCH' && action === 'pitch-team') {
-    if (!requireHost(request, response)) return;
+    if (!requireHostOrJudge(request, response)) return;
     game.currentPitchTeamId = input.teamId || null;
     save(database);
     return json(response, 200, publicGame(game));
   }
 
   if (request.method === 'POST' && action === 'mark-pitched') {
-    if (!requireHost(request, response)) return;
+    if (!requireHostOrJudge(request, response)) return;
     const team = game.teams.find((item) => item.id === input.teamId);
     if (!team) return json(response, 404, { error: 'Team not found.' });
     if (!game.pitchedTeamIds) game.pitchedTeamIds = [];

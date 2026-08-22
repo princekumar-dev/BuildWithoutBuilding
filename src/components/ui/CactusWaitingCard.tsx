@@ -265,33 +265,6 @@ export function CactusWaitingCard({
           ))}
         </AnimatePresence>
 
-        {/* Floating Animated Zzz Sleep Bubbles directly above Cactus Head */}
-        {isSleeping && (
-          <div className="absolute top-0 right-4 sm:right-8 pointer-events-none z-30 select-none flex flex-col items-center">
-            <motion.span
-              animate={{ y: [0, -18, -32], x: [0, 8, 16], opacity: [0, 1, 0], scale: [0.6, 1.1, 1.35] }}
-              transition={{ duration: 2.2, repeat: Infinity, ease: 'easeOut', delay: 0 }}
-              className="text-cyan-300 font-display font-black text-lg drop-shadow-[0_2px_8px_rgba(6,182,212,0.8)]"
-            >
-              Z
-            </motion.span>
-            <motion.span
-              animate={{ y: [0, -14, -25], x: [0, 6, 12], opacity: [0, 1, 0], scale: [0.6, 0.9, 1.15] }}
-              transition={{ duration: 2.2, repeat: Infinity, ease: 'easeOut', delay: 0.7 }}
-              className="text-teal-300 font-display font-bold text-sm -mt-1 drop-shadow-[0_2px_6px_rgba(20,184,166,0.8)]"
-            >
-              z
-            </motion.span>
-            <motion.span
-              animate={{ y: [0, -10, -18], x: [0, 4, 8], opacity: [0, 1, 0], scale: [0.5, 0.8, 1] }}
-              transition={{ duration: 2.2, repeat: Infinity, ease: 'easeOut', delay: 1.4 }}
-              className="text-emerald-300 font-display font-semibold text-xs -mt-1 drop-shadow-[0_2px_4px_rgba(16,185,129,0.8)]"
-            >
-              z
-            </motion.span>
-          </div>
-        )}
-
         <motion.div
           onClick={handleCactusClick}
           title={isSleeping ? 'Tap to wake Spike up!' : 'Tap Spike for happy vibes and tournament tips!'}
@@ -322,7 +295,35 @@ export function CactusWaitingCard({
 
           {/* Stylized Ultra-Kawaii 3D SVG Cactus (Spike 2.0) */}
           <div className="w-36 h-40 relative flex items-center justify-center filter drop-shadow-[0_14px_32px_rgba(16,185,129,0.45)] group-hover:scale-105 transition-transform will-change-transform">
+            {/* Floating Animated Zzz Sleep Bubbles directly attached to Cactus Head */}
+            {isSleeping && (
+              <div className="absolute top-1 right-2 pointer-events-none z-30 select-none flex flex-col items-center">
+                <motion.span
+                  animate={{ y: [0, -18, -32], x: [0, 6, 14], opacity: [0, 1, 0], scale: [0.6, 1.1, 1.3] }}
+                  transition={{ duration: 2.2, repeat: Infinity, ease: 'easeOut', delay: 0 }}
+                  className="text-cyan-300 font-display font-black text-base drop-shadow-[0_2px_8px_rgba(6,182,212,0.8)]"
+                >
+                  Z
+                </motion.span>
+                <motion.span
+                  animate={{ y: [0, -14, -25], x: [0, 4, 10], opacity: [0, 1, 0], scale: [0.6, 0.9, 1.1] }}
+                  transition={{ duration: 2.2, repeat: Infinity, ease: 'easeOut', delay: 0.7 }}
+                  className="text-teal-300 font-display font-bold text-xs -mt-1 drop-shadow-[0_2px_6px_rgba(20,184,166,0.8)]"
+                >
+                  z
+                </motion.span>
+                <motion.span
+                  animate={{ y: [0, -10, -18], x: [0, 3, 6], opacity: [0, 1, 0], scale: [0.5, 0.8, 0.95] }}
+                  transition={{ duration: 2.2, repeat: Infinity, ease: 'easeOut', delay: 1.4 }}
+                  className="text-emerald-300 font-display font-semibold text-[10px] -mt-1 drop-shadow-[0_2px_4px_rgba(16,185,129,0.8)]"
+                >
+                  z
+                </motion.span>
+              </div>
+            )}
+
             <svg viewBox="0 0 100 134" className="w-full h-full overflow-visible">
+
               <defs>
                 <linearGradient id="potGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
                   <stop offset="0%" stopColor="#FDBA74" />

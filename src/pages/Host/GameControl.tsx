@@ -19,30 +19,32 @@ import { useGameStore } from '../../store/gameStore'
 import { PHASE_LABELS } from '../../data/mockData'
 import type { GamePhase, Problem } from '../../types'
 import { api } from '../../lib/api'
+import { getPhaseDuration, setPhaseDuration, TIMER_CHANGE_EVENT, type TimedPhase } from '../../lib/phaseTimers'
 
 import { useRealtimeGame } from '../../hooks/useRealtimeGame'
 
-type Stage = { phase: GamePhase; step: number; title: string; desc: string; icon: string }
+type Stage = { phase: GamePhase; title: string; desc: string; icon: string }
 
-const ROUND_ONE_STAGES: Stage[] = [
-  { phase: 'LOBBY', step: 1, title: 'Lobby', desc: 'Waiting for teams to join', icon: '🚪' },
-  { phase: 'PROBLEM_REVEAL', step: 2, title: 'Problem Reveal', desc: 'Teams select 1 of 8 challenges', icon: '💡' },
-  { phase: 'CARD_REVEAL', step: 3, title: 'Card Reveal', desc: 'Teams draft 3 random tech cards', icon: '🎴' },
-  { phase: 'BUILDING', step: 4, title: 'Build Phase', desc: '15m Solution Formulation', icon: '⚡' },
-  { phase: 'PITCHING', step: 5, title: 'Pitching', desc: '60s live pitches & defense', icon: '🎤' },
-  { phase: 'JUDGING', step: 6, title: 'Judging', desc: 'Deliberation & rubric scoring', icon: '⚖️' },
-  { phase: 'LEADERBOARD', step: 7, title: 'Leaderboard', desc: 'Rank reveal & podium honors', icon: '🏆' },
-]
-
-const LATER_ROUND_STAGES: Stage[] = [
-  { phase: 'LOBBY', step: 1, title: 'Round Lobby', desc: 'Announce the round and confirm eligible teams', icon: '🚪' },
-  { phase: 'BUILDING', step: 2, title: 'Build Phase', desc: 'Teams formulate their next-round solution', icon: '⚡' },
-  { phase: 'PITCHING', step: 3, title: 'Pitching', desc: 'Live pitches and defense', icon: '🎤' },
-  { phase: 'JUDGING', step: 4, title: 'Judging', desc: 'Deliberation and rubric scoring', icon: '⚖️' },
-  { phase: 'LEADERBOARD', step: 5, title: 'Leaderboard', desc: 'Round standings and advancement', icon: '🏆' },
-]
-
-const stagesForRound = (round: number) => round === 1 ? ROUND_ONE_STAGES : LATER_ROUND_STAGES
+const stagesForRound = (round: number, buildMin: number, pitchSec: number) => {
+  const buildLabel = buildMin >= 60 ? `${buildMin / 60}h` : `${buildMin}m`
+  const pitchLabel = pitchSec >= 60 ? `${pitchSec / 60}m` : `${pitchSec}s`
+  if (round === 1) return [
+    { phase: 'LOBBY' as GamePhase, title: 'Lobby', desc: 'Waiting for teams to join', icon: '🚪' },
+    { phase: 'PROBLEM_REVEAL' as GamePhase, title: 'Problem Reveal', desc: 'Teams select 1 of 8 challenges', icon: '💡' },
+    { phase: 'CARD_REVEAL' as GamePhase, title: 'Card Reveal', desc: 'Teams draft 3 random tech cards', icon: '🎴' },
+    { phase: 'BUILDING' as GamePhase, title: 'Build Phase', desc: `${buildLabel} Solution Formulation`, icon: '⚡' },
+    { phase: 'PITCHING' as GamePhase, title: 'Pitching', desc: `${pitchLabel} live pitches & defense`, icon: '🎤' },
+    { phase: 'JUDGING' as GamePhase, title: 'Judging', desc: 'Deliberation & rubric scoring', icon: '⚖️' },
+    { phase: 'LEADERBOARD' as GamePhase, title: 'Leaderboard', desc: 'Rank reveal & podium honors', icon: '🏆' },
+  ]
+  return [
+    { phase: 'LOBBY' as GamePhase, title: 'Round Lobby', desc: 'Announce the round and confirm eligible teams', icon: '🚪' },
+    { phase: 'BUILDING' as GamePhase, title: 'Build Phase', desc: `${buildLabel} solution formulation`, icon: '⚡' },
+    { phase: 'PITCHING' as GamePhase, title: 'Pitching', desc: `${pitchLabel} live pitches & defense`, icon: '🎤' },
+    { phase: 'JUDGING' as GamePhase, title: 'Judging', desc: 'Deliberation and rubric scoring', icon: '⚖️' },
+    { phase: 'LEADERBOARD' as GamePhase, title: 'Leaderboard', desc: 'Round standings and advancement', icon: '🏆' },
+  ]
+}
 
 
 export default function HostGameControlPage() {
@@ -50,6 +52,7 @@ export default function HostGameControlPage() {
   const { game, setGame } = useGameStore()
   const [problems, setProblems] = useState<Problem[]>([])
   const [error, setError] = useState('')
+  const [timerRevision, setTimerRevision] = useState(0)
   const [copied, setCopied] = useState(false)
 
   // Schedule state & input ref
@@ -60,6 +63,11 @@ export default function HostGameControlPage() {
   // Max Teams Capacity state
   const [isEditingMaxTeams, setIsEditingMaxTeams] = useState(false)
   const [maxTeamsInput, setMaxTeamsInput] = useState<number>(game.maxTeams || 32)
+
+  // Phase Timer Duration editing
+  const [isEditingTimer, setIsEditingTimer] = useState(false)
+  const [buildMinutes, setBuildMinutes] = useState(15)
+  const [pitchSeconds, setPitchSeconds] = useState(180)
 
   useRealtimeGame()
 
@@ -119,16 +127,46 @@ export default function HostGameControlPage() {
     }
   }
 
+  const handleSavePhaseTimers = () => {
+    if (!game.id) return
+    if (buildMinutes < 1 || buildMinutes > 120) {
+      toast.error('Build duration must be between 1 and 120 minutes.')
+      return
+    }
+    if (pitchSeconds < 30 || pitchSeconds > 900) {
+      toast.error('Pitch duration must be between 0.5 and 15 minutes.')
+      return
+    }
+    setPhaseDuration(game.id, currentRound, 'BUILDING', buildMinutes * 60)
+    setPhaseDuration(game.id, currentRound, 'PITCHING', pitchSeconds)
+    setIsEditingTimer(false)
+    toast.success(`Round ${currentRound} timers updated: Build ${buildMinutes}m, Pitch ${pitchSeconds / 60}m.`)
+  }
 
-  const timerActive = game.phase !== 'LOBBY'
+
+  useEffect(() => {
+    const refreshTimer = () => setTimerRevision((revision) => revision + 1)
+    window.addEventListener(TIMER_CHANGE_EVENT, refreshTimer)
+    return () => window.removeEventListener(TIMER_CHANGE_EVENT, refreshTimer)
+  }, [])
+
+  const phaseChangeInFlight = useRef(false)
+  const phaseTimer = game.phase === 'BUILDING'
+    ? { label: 'Build Phase Timer', seconds: getPhaseDuration(game.id, game.currentRound, 'BUILDING', game.buildDurationMinutes) }
+    : game.phase === 'PITCHING'
+    ? { label: 'Pitch Phase Timer', seconds: getPhaseDuration(game.id, game.currentRound, 'PITCHING', game.buildDurationMinutes) }
+    : null
 
   const changePhase = async (phase: GamePhase, problemId?: string) => {
-    if (!game.id) return
+    if (!game.id || phase === game.phase || phaseChangeInFlight.current) return
+    phaseChangeInFlight.current = true
     try {
       setGame(await api.setPhase(game.id, phase, problemId))
       toast.success(`Phase advanced to ${PHASE_LABELS[phase]}`)
     } catch (reason) {
       toast.error(reason instanceof Error ? reason.message : 'Unable to update phase.')
+    } finally {
+      phaseChangeInFlight.current = false
     }
   }
 
@@ -200,9 +238,18 @@ export default function HostGameControlPage() {
   }
 
   const currentRound = game.currentRound || (game.isFinalRound ? 3 : 1)
-  const stages = stagesForRound(currentRound)
+  const stages = stagesForRound(currentRound, buildMinutes, pitchSeconds)
   const currentStageIndex = stages.findIndex((s) => s.phase === game.phase)
   const nextStage = currentStageIndex >= 0 && currentStageIndex < stages.length - 1 ? stages[currentStageIndex + 1] : null
+
+  useEffect(() => {
+    if (game.id) {
+      const buildDur = getPhaseDuration(game.id, currentRound, 'BUILDING', game.buildDurationMinutes)
+      const pitchDur = getPhaseDuration(game.id, currentRound, 'PITCHING', game.buildDurationMinutes)
+      setBuildMinutes(Math.round(buildDur / 60))
+      setPitchSeconds(pitchDur)
+    }
+  }, [game.id, currentRound, game.buildDurationMinutes, game.phase])
 
   const advanceStage = async () => {
     if (nextStage) return changePhase(nextStage.phase)
@@ -236,7 +283,7 @@ export default function HostGameControlPage() {
               </Link>
               <Link to="/host/round">
                 <Button variant="ghost" size="sm">
-                  <Eye size={14} className="mr-1" /> Round View
+                  <Eye size={14} className="mr-1" /> Participants
                 </Button>
               </Link>
             </div>
@@ -268,19 +315,28 @@ export default function HostGameControlPage() {
                 </div>
               </div>
 
-              {/* Countdown / Build Phase Timer */}
+              {/* Countdown timer is tied to the active timed phase. */}
               <div className="flex items-center gap-4 bg-bwb-surface-2/80 p-3.5 rounded-2xl border border-white/5 shadow-inner">
-                <div className={`p-2.5 rounded-xl border ${timerActive ? 'bg-bwb-accent/10 border-bwb-accent/30 text-bwb-accent' : 'bg-bwb-surface border-bwb-border text-bwb-muted'}`}>
+                <div className={`p-2.5 rounded-xl border ${phaseTimer ? 'bg-bwb-accent/10 border-bwb-accent/30 text-bwb-accent' : 'bg-bwb-surface border-bwb-border text-bwb-muted'}`}>
                   <Timer size={20} />
                 </div>
                 <div>
-                  <p className="text-[10px] uppercase font-bold tracking-widest text-bwb-muted">Build Phase Timer</p>
-                  <CountdownTimer
-                    initialSeconds={game.buildDurationMinutes * 60}
-                    running={timerActive}
-                    size="sm"
-                    showExpired={false}
-                  />
+                  <p className="text-[10px] uppercase font-bold tracking-widest text-bwb-muted">{phaseTimer?.label ?? 'Stage Timer'}</p>
+                  {phaseTimer ? (
+                    <CountdownTimer
+                      key={`${game.currentRound}-${game.phase}-${timerRevision}`}
+                      initialSeconds={phaseTimer.seconds}
+                      running
+                      size="sm"
+                      showExpired={false}
+                      onComplete={() => {
+                        toast.success(`${phaseTimer.label} finished. Moving to the next stage.`)
+                        void advanceStage()
+                      }}
+                    />
+                  ) : (
+                    <p className="font-display font-bold text-xl sm:text-2xl text-bwb-muted">STANDBY</p>
+                  )}
                 </div>
               </div>
             </div>
@@ -627,6 +683,127 @@ export default function HostGameControlPage() {
               </div>
             </div>
 
+            {/* Phase Timer Duration Controls */}
+            <div className="mt-4 pt-4 border-t border-white/5 flex flex-wrap items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 rounded-xl bg-bwb-accent/10 border border-bwb-accent/20 text-bwb-accent">
+                  <Timer size={18} />
+                </div>
+                <div>
+                  <p className="text-[10px] font-mono uppercase text-bwb-muted font-bold tracking-wider">
+                    Phase Timer Settings · Round {currentRound}
+                  </p>
+                  <p className="text-xs font-mono font-bold text-bwb-text mt-0.5">
+                    Build: <span className="text-bwb-accent">{buildMinutes}m</span>
+                    <span className="text-bwb-muted mx-2">·</span>
+                    Pitch: <span className="text-bwb-accent">{pitchSeconds / 60}m</span>
+                  </p>
+                </div>
+              </div>
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={() => setIsEditingTimer(!isEditingTimer)}
+                className="text-xs border-white/10"
+              >
+                <Edit3 size={13} className="mr-1.5 text-bwb-accent" />
+                {isEditingTimer ? 'Close Timer Editor' : 'Edit Phase Timers'}
+              </Button>
+            </div>
+
+            {/* Inline Phase Timer Editor */}
+            <AnimatePresence>
+              {isEditingTimer && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="mt-4 p-5 rounded-2xl bg-bwb-bg border border-bwb-accent/40 overflow-hidden shadow-2xl"
+                >
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <label className="text-xs font-mono uppercase text-bwb-accent font-bold block mb-1.5 flex items-center gap-1.5">
+                        <Zap size={13} /> Build Phase Duration (minutes)
+                      </label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="number"
+                          min={1}
+                          max={120}
+                          value={buildMinutes}
+                          onChange={(e) => setBuildMinutes(Math.max(1, Math.min(120, Number(e.target.value) || 15)))}
+                          className="flex-1 px-4 py-2.5 rounded-xl bg-bwb-surface border border-bwb-border text-bwb-text text-sm font-mono focus:border-bwb-accent outline-none"
+                        />
+                        <span className="text-xs text-bwb-muted font-mono">min</span>
+                      </div>
+                      <div className="flex flex-wrap gap-1.5 mt-2">
+                        {[10, 15, 20, 30, 45, 60].map((m) => (
+                          <button
+                            key={m}
+                            type="button"
+                            onClick={() => setBuildMinutes(m)}
+                            className={`px-2.5 py-1 rounded-lg text-[11px] font-mono font-bold border transition-all ${
+                              buildMinutes === m
+                                ? 'bg-bwb-accent text-bwb-bg border-bwb-accent'
+                                : 'bg-bwb-surface border-white/10 text-bwb-muted hover:text-bwb-text hover:border-white/20'
+                            }`}
+                          >
+                            {m}m
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-xs font-mono uppercase text-bwb-accent font-bold block mb-1.5 flex items-center gap-1.5">
+                        <Timer size={13} /> Pitch Phase Duration (minutes)
+                      </label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="number"
+                          min={0.5}
+                          max={15}
+                          step={0.5}
+                          value={pitchSeconds / 60}
+                          onChange={(e) => setPitchSeconds(Math.max(30, Math.min(900, Math.round(Number(e.target.value) * 60) || 180)))}
+                          className="flex-1 px-4 py-2.5 rounded-xl bg-bwb-surface border border-bwb-border text-bwb-text text-sm font-mono focus:border-bwb-accent outline-none"
+                        />
+                        <span className="text-xs text-bwb-muted font-mono">min</span>
+                      </div>
+                      <div className="flex flex-wrap gap-1.5 mt-2">
+                        {[0.5, 1, 1.5, 2, 3, 5].map((m) => (
+                          <button
+                            key={m}
+                            type="button"
+                            onClick={() => setPitchSeconds(m * 60)}
+                            className={`px-2.5 py-1 rounded-lg text-[11px] font-mono font-bold border transition-all ${
+                              pitchSeconds === m * 60
+                                ? 'bg-bwb-accent text-bwb-bg border-bwb-accent'
+                                : 'bg-bwb-surface border-white/10 text-bwb-muted hover:text-bwb-text hover:border-white/20'
+                            }`}
+                          >
+                            {m}m
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 pt-2 border-t border-white/5">
+                    <Button
+                      size="md"
+                      onClick={handleSavePhaseTimers}
+                      className="text-xs font-bold bg-bwb-accent text-bwb-bg hover:bg-bwb-accent/90 shadow-md"
+                    >
+                      <CheckCircle2 size={14} className="mr-1" />
+                      Save Timer Settings for Round {currentRound}
+                    </Button>
+                    <p className="text-[11px] text-bwb-muted ml-2">
+                      Settings apply per-round and take effect on next phase start.
+                    </p>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
             {/* RICH ANIMATED ROUND TRANSITION & MISSION ANNOUNCEMENT CARD */}
             <AnimatePresence mode="wait">
               <motion.div
@@ -771,8 +948,15 @@ export default function HostGameControlPage() {
             </div>
 
             {/* Stepper Pipeline Grid */}
-            <div className={`grid grid-cols-2 sm:grid-cols-4 gap-2.5 ${stages.length === 5 ? 'lg:grid-cols-5' : 'lg:grid-cols-7'}`}>
-              {stages.map((stg) => {
+            {(() => {
+              const visibleStages = stages.filter(s => s.phase !== 'JUDGING')
+              const colCount = visibleStages.length
+              const gridClass = colCount <= 4
+                ? 'grid-cols-2 sm:grid-cols-4'
+                : 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-6'
+              return (
+                <div className={`grid gap-2.5 ${gridClass}`}>
+                  {visibleStages.map((stg, idx) => {
                 const isActive = game.phase === stg.phase
                 return (
                   <motion.button
@@ -793,7 +977,7 @@ export default function HostGameControlPage() {
                         <span className={`text-[10px] font-mono font-bold px-1.5 py-0.2 rounded-md ${
                           isActive ? 'bg-bwb-bg text-bwb-accent' : 'bg-bwb-surface text-bwb-muted'
                         }`}>
-                          Step {stg.step}
+                          Step {idx + 1}
                         </span>
                       </div>
                       <p className={`font-display font-bold text-sm leading-snug ${isActive ? 'text-bwb-bg' : 'text-bwb-text'}`}>
@@ -807,7 +991,9 @@ export default function HostGameControlPage() {
                   </motion.button>
                 )
               })}
-            </div>
+              </div>
+              )
+            })()}
 
             {/* Stage status is intentionally omitted: the highlighted stage card is the live status. */}
             {false && (

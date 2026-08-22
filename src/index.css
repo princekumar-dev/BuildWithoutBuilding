@@ -46,6 +46,10 @@ button, a, input, select, textarea {
   touch-action: manipulation;
 }
 
+button, a {
+  touch-action: auto;
+}
+
 /* Small screens are the primary participant and control surface. */
 @media (max-width: 639px) {
   html {
@@ -53,7 +57,7 @@ button, a, input, select, textarea {
   }
 
   body {
-    overscroll-behavior-y: none;
+    overscroll-behavior-y: auto;
   }
 
   button, a, input, select, textarea {

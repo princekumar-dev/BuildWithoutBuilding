@@ -110,7 +110,7 @@ export function Navbar() {
                   : 'text-bwb-muted hover:text-bwb-text hover:bg-bwb-surface-2'
               }`}
             >
-              Round View
+              Participants
             </Link>
 
             <Link
@@ -318,7 +318,7 @@ export function Navbar() {
                 onClick={() => setOpen(false)}
                 className="block px-3 py-2 text-sm rounded-xl text-bwb-muted hover:text-bwb-text hover:bg-bwb-surface-2"
               >
-                Round Control
+                Participants
               </Link>
               <Link
                 to="/host/leaderboard"

@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
-import { motion } from 'framer-motion'
-import { Users, CheckCircle2 } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Users, CheckCircle2, Mic } from 'lucide-react'
 import { PageLayout } from '../../components/layout/PageLayout'
 import { Badge } from '../../components/ui/Badge'
 import { PhaseIndicator } from '../../components/ui/PhaseIndicator'
@@ -54,6 +54,32 @@ export default function LobbyPage() {
           gameName={game.name}
           gameCode={game.code}
         />
+
+        {/* PITCH CALL ALERT */}
+        <AnimatePresence>
+          {game.currentPitchTeamId && game.currentPitchTeamId === session?.teamId && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: -20 }}
+              className="mb-6 p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-amber-500/20 via-bwb-accent/15 to-bwb-surface border-2 border-amber-400/60 shadow-2xl shadow-amber-500/20 text-center relative overflow-hidden"
+            >
+              <div className="absolute inset-0 bg-amber-400/5 animate-pulse" />
+              <div className="relative">
+                <div className="w-16 h-16 rounded-2xl bg-amber-400/20 border border-amber-400/40 flex items-center justify-center mx-auto mb-4">
+                  <Mic size={32} className="text-amber-400 animate-bounce" />
+                </div>
+                <Badge variant="accent" className="mb-3 text-sm">YOU&apos;RE UP!</Badge>
+                <h2 className="font-display font-black text-3xl sm:text-4xl text-bwb-text mb-2">
+                  Time to Pitch!
+                </h2>
+                <p className="text-sm text-bwb-muted max-w-md mx-auto">
+                  You&apos;ve been called to the stage. Head to the presentation area now!
+                </p>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ClipboardList, ArrowRight, CheckCircle2, Sparkles, Trophy } from 'lucide-react'
+import { ClipboardList, ArrowRight, CheckCircle2, Sparkles, Trophy, Mic, Check } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { PageLayout } from '../../components/layout/PageLayout'
 import { Card } from '../../components/ui/Card'
@@ -9,6 +9,7 @@ import { Badge } from '../../components/ui/Badge'
 import { PhaseIndicator } from '../../components/ui/PhaseIndicator'
 import { LeaderboardTable } from '../../components/leaderboard/LeaderboardTable'
 import { useGameStore } from '../../store/gameStore'
+import { toast } from '../../components/ui/Toast'
 import { TECHNOLOGIES } from '../../data/mockData'
 import { api } from '../../lib/api'
 import type { Problem } from '../../types'
@@ -27,6 +28,37 @@ export default function JudgeDashboardPage() {
   const currentRound = game.currentRound || (game.isFinalRound ? 3 : 1)
   const scoredTeamsCount = game.teams.filter((t) => (t.score ?? 0) > 0).length
   const allScored = game.teams.length > 0 && scoredTeamsCount === game.teams.length
+  const pitchedTeamIds = game.pitchedTeamIds || []
+
+  const handleCallToPitch = async (teamId: string, teamName: string) => {
+    if (!game.id) return
+    try {
+      const updated = await api.setCurrentPitchTeam(game.id, teamId)
+      setGame(updated)
+      toast.success(`${teamName} has been called to pitch!`)
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Unable to call team to pitch.')
+    }
+  }
+
+  const handleMarkPitched = async (teamId: string, teamName: string) => {
+    if (!game.id) return
+    try {
+      const updated = await api.markTeamPitched(game.id, teamId)
+      setGame(updated)
+      toast.success(`${teamName} marked as pitched.`)
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Unable to mark team as pitched.')
+    }
+  }
+
+  const handleDismissPitch = async () => {
+    if (!game.id) return
+    try {
+      const updated = await api.setCurrentPitchTeam(game.id, null)
+      setGame(updated)
+    } catch {}
+  }
 
   return (
     <PageLayout>
@@ -208,18 +240,71 @@ export default function JudgeDashboardPage() {
                     </div>
 
                     {/* Action */}
-                    <Link to={`/judge/score/${team.id}`} className="block">
-                      <Button
-                        fullWidth
-                        size="md"
-                        variant={isScored ? 'secondary' : 'primary'}
-                        className={!isScored ? 'bg-purple-600 hover:bg-purple-500 shadow-lg shadow-purple-500/20' : ''}
-                      >
-                        <ClipboardList size={15} className="mr-1.5" />
-                        {isScored ? 'Edit Submitted Score' : 'Score This Team'}
-                        <ArrowRight size={14} className="ml-1.5" />
-                      </Button>
-                    </Link>
+                    <div className="space-y-2">
+                      {game.currentPitchTeamId === team.id ? (
+                        <div className="p-3 rounded-2xl bg-bwb-accent/15 border border-bwb-accent/40 text-center">
+                          <p className="text-xs font-mono font-bold text-bwb-accent flex items-center justify-center gap-1.5 mb-2">
+                            <Mic size={14} className="animate-pulse" /> NOW PITCHING
+                          </p>
+                          <div className="flex items-center gap-2">
+                            <Button
+                              fullWidth
+                              size="sm"
+                              onClick={() => handleMarkPitched(team.id, team.name)}
+                              className="bg-bwb-success hover:bg-bwb-success/80 text-bwb-bg font-bold"
+                            >
+                              <Check size={14} className="mr-1" /> Mark as Pitched
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={handleDismissPitch}
+                              className="text-bwb-muted"
+                            >
+                              Dismiss
+                            </Button>
+                          </div>
+                        </div>
+                      ) : pitchedTeamIds.includes(team.id) ? (
+                        <div className="flex items-center gap-2">
+                          <Link to={`/judge/score/${team.id}`} className="flex-1 block">
+                            <Button
+                              fullWidth
+                              size="sm"
+                              variant={isScored ? 'secondary' : 'primary'}
+                              className={!isScored ? 'bg-purple-600 hover:bg-purple-500 shadow-lg shadow-purple-500/20' : ''}
+                            >
+                              <ClipboardList size={15} className="mr-1.5" />
+                              {isScored ? 'Edit Score' : 'Score Team'}
+                              <ArrowRight size={14} className="ml-1.5" />
+                            </Button>
+                          </Link>
+                          <span className="px-2.5 py-1.5 rounded-xl text-[10px] font-mono font-bold bg-bwb-success/15 text-bwb-success border border-bwb-success/30 flex items-center gap-1 whitespace-nowrap">
+                            <CheckCircle2 size={11} /> Pitched
+                          </span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <Button
+                            fullWidth
+                            size="sm"
+                            onClick={() => handleCallToPitch(team.id, team.name)}
+                            className="bg-amber-500 hover:bg-amber-400 text-bwb-bg font-bold shadow-lg shadow-amber-500/20"
+                          >
+                            <Mic size={14} className="mr-1.5" /> Call to Pitch
+                          </Button>
+                          <Link to={`/judge/score/${team.id}`} className="block">
+                            <Button
+                              size="sm"
+                              variant="secondary"
+                              className={!isScored ? 'border-purple-500/40 text-purple-300' : ''}
+                            >
+                              <ClipboardList size={14} />
+                            </Button>
+                          </Link>
+                        </div>
+                      )}
+                    </div>
                   </motion.div>
                 )
               })}

@@ -59,6 +59,8 @@ export const api = {
   setFinalists: (gameId: string, teamIds: string[]) => request<Game>(`/games/${gameId}/finalists`, { method: 'POST', body: JSON.stringify({ teamIds }) }, true),
   updateSchedule: (gameId: string, scheduledStartTime: string | null) => request<Game>(`/games/${gameId}/schedule`, { method: 'PATCH', body: JSON.stringify({ scheduledStartTime }) }, true),
   updateConfig: (gameId: string, config: { maxTeams?: number; scheduledStartTime?: string | null; name?: string }) => request<Game>(`/games/${gameId}/config`, { method: 'PATCH', body: JSON.stringify(config) }, true),
+  setCurrentPitchTeam: (gameId: string, teamId: string | null) => request<Game>(`/games/${gameId}/pitch-team`, { method: 'PATCH', body: JSON.stringify({ teamId }) }, true),
+  markTeamPitched: (gameId: string, teamId: string) => request<Game>(`/games/${gameId}/mark-pitched`, { method: 'POST', body: JSON.stringify({ teamId }) }, true),
 }
 
 

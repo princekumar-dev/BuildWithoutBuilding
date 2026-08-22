@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react'
 import { useCountdown } from '../../hooks/useCountdown'
 
 interface CountdownTimerProps {
@@ -6,6 +7,7 @@ interface CountdownTimerProps {
   size?: 'sm' | 'md' | 'lg' | 'xl'
   label?: string
   showExpired?: boolean
+  onComplete?: () => void
 }
 
 const sizeClasses = {
@@ -22,8 +24,20 @@ export function CountdownTimer({
   size = 'md',
   label,
   showExpired = true,
+  onComplete,
 }: CountdownTimerProps) {
   const { formatted, isUrgent, isExpired } = useCountdown(initialSeconds, running)
+  const completedRef = useRef(false)
+
+  useEffect(() => {
+    completedRef.current = false
+  }, [initialSeconds])
+
+  useEffect(() => {
+    if (!isExpired || !running || completedRef.current) return
+    completedRef.current = true
+    onComplete?.()
+  }, [isExpired, onComplete, running])
 
   return (
     <div className="flex flex-col items-center gap-1">

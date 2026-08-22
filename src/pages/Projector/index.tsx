@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   Users, Sparkles, Trophy, Play, Pause,
   ChevronLeft, ChevronRight, CheckCircle2, Radio, Activity,
-  Crown, Clock, Layers, Zap
+  Crown, Clock, Layers, Zap, Mic
 } from 'lucide-react'
 import { CountdownTimer } from '../../components/timer/CountdownTimer'
 import { LeaderboardTable } from '../../components/leaderboard/LeaderboardTable'
@@ -176,7 +176,8 @@ export default function ProjectorPage() {
   const currentPhase: GamePhase = manualOverridePhase ?? game.phase ?? 'LOBBY'
   const activeProblem = catalog.problems[activeProblemIndex] ?? game.currentProblem ?? catalog.problems[0]
   const activeProblemTheme = activeProblem ? categoryThemes[activeProblem.category] : null
-  const pitchTeam = game.teams.find((t) => t.id === game.currentPitchTeamId) ?? game.teams[0]
+  const pitchTeam = game.teams.find((t) => t.id === game.currentPitchTeamId) ?? null
+  const pitchedTeamIds = game.pitchedTeamIds || []
 
   const totalParticipants = game.teams.reduce((acc, t) => acc + (t.members?.length ?? 0), 0)
   const totalCardsRevealed = game.teams.reduce((acc, t) => acc + (t.revealedCards?.length ?? 0), 0)
@@ -1161,7 +1162,7 @@ export default function ProjectorPage() {
             </div>
 
             {/* Active Pitching Stage Hero */}
-            {pitchTeam && (
+            {pitchTeam ? (
               <motion.div
                 key={pitchTeam.id}
                 initial={{ opacity: 0, scale: 0.96 }}
@@ -1246,6 +1247,18 @@ export default function ProjectorPage() {
                   </div>
                 )}
               </motion.div>
+            ) : (
+              <div className="w-full stereo-card rounded-3xl p-10 sm:p-16 border-2 border-bwb-accent/20 shadow-2xl text-center bg-gradient-to-br from-bwb-surface-2/95 to-bwb-surface mb-6">
+                <div className="w-20 h-20 rounded-2xl bg-bwb-accent/10 border border-bwb-accent/30 flex items-center justify-center mx-auto mb-5">
+                  <Mic size={36} className="text-bwb-accent animate-pulse" />
+                </div>
+                <h3 className="font-display font-black text-3xl sm:text-4xl text-bwb-text mb-2">
+                  WAITING FOR NEXT PITCH
+                </h3>
+                <p className="text-sm text-bwb-muted max-w-md mx-auto">
+                  The judge will call the next team to the stage. Please standby.
+                </p>
+              </div>
             )}
 
             {/* Team Presentation Queue Bar */}
@@ -1253,12 +1266,15 @@ export default function ProjectorPage() {
               <span className="text-xs font-mono text-bwb-muted mr-1 shrink-0">Stage Queue:</span>
               {game.teams.map((team, idx) => {
                 const isCurrent = team.id === (pitchTeam?.id ?? '')
+                const isPitched = pitchedTeamIds.includes(team.id)
                 return (
                   <div
                     key={team.id}
                     className={`shrink-0 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 border ${
                       isCurrent
                         ? 'bg-bwb-accent text-bwb-bg border-bwb-accent shadow-md'
+                        : isPitched
+                        ? 'bg-bwb-success/15 text-bwb-success border-bwb-success/30'
                         : 'bg-bwb-surface-2 text-bwb-muted border-bwb-border'
                     }`}
                   >

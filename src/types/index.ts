@@ -91,6 +91,7 @@ export interface Game {
   currentProblem?: Problem
   buildDurationMinutes: number
   currentPitchTeamId?: string
+  pitchedTeamIds?: string[]
   isFinalRound: boolean
   finalistTeamIds?: string[]
   problemTeamCounts?: Record<string, number>

@@ -22,7 +22,7 @@ export function LeaderboardTable({
   const sorted = [...teams].sort((a, b) => (a.rank ?? 99) - (b.rank ?? 99))
 
   return (
-    <div className="rounded-2xl border border-bwb-border bg-bwb-surface shadow-xl">
+    <div className="rounded-2xl border border-bwb-border bg-bwb-surface shadow-xl overflow-hidden">
       <table className="w-full">
         <thead>
           <tr className="bg-bwb-surface-2 text-left">

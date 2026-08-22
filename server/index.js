@@ -388,6 +388,8 @@ function publicGame(game) {
 
   game.currentRound = game.currentRound || (game.isFinalRound ? 3 : 1);
   game.finalistTeamIds = game.finalistTeamIds || [];
+  game.pitchedTeamIds = game.pitchedTeamIds || [];
+  game.currentPitchTeamId = game.currentPitchTeamId || null;
   game.problemTeamCounts = counts;
   game.maxTeams = Number(game.maxTeams) || 32;
 
@@ -528,7 +530,7 @@ createServer(async (request, response) => {
     }
   }
 
-  const match = url.pathname.match(/^\/api\/games\/([^/]+)(?:\/(join|phase|round|finalists|schedule|config|assign-cards|select-problem|reveal-card|submissions|scores|ping))?$/)
+  const match = url.pathname.match(/^\/api\/games\/([^/]+)(?:\/(join|phase|round|finalists|schedule|config|assign-cards|select-problem|reveal-card|submissions|scores|ping|pitch-team|mark-pitched))?$/)
   if (!match) return json(response, 404, { error: 'API route not found.' })
   const game = gameFor(database, decodeURIComponent(match[1])); if (!game) return json(response, 404, { error: 'Game not found.' })
   if (request.method === 'GET' && !match[2]) return json(response, 200, publicGame(game))
@@ -736,6 +738,28 @@ createServer(async (request, response) => {
       team.isOnline = true;
     }
     return json(response, 200, { ok: true, isOnline: true });
+  }
+
+  if (request.method === 'PATCH' && action === 'pitch-team') {
+    if (!requireHost(request, response)) return;
+    game.currentPitchTeamId = input.teamId || null;
+    save(database);
+    return json(response, 200, publicGame(game));
+  }
+
+  if (request.method === 'POST' && action === 'mark-pitched') {
+    if (!requireHost(request, response)) return;
+    const team = game.teams.find((item) => item.id === input.teamId);
+    if (!team) return json(response, 404, { error: 'Team not found.' });
+    if (!game.pitchedTeamIds) game.pitchedTeamIds = [];
+    if (!game.pitchedTeamIds.includes(input.teamId)) {
+      game.pitchedTeamIds.push(input.teamId);
+    }
+    if (game.currentPitchTeamId === input.teamId) {
+      game.currentPitchTeamId = null;
+    }
+    save(database);
+    return json(response, 200, publicGame(game));
   }
 
   return json(response, 405, { error: 'Method not allowed.' })

@@ -1,6 +1,6 @@
 import { createServer } from 'node:http'
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
-import { dirname, join } from 'node:path'
+import { existsSync, mkdirSync, readFileSync, writeFileSync, createReadStream } from 'node:fs'
+import { dirname, join, extname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import dns from 'node:dns'
 import { MongoClient } from 'mongodb'
@@ -14,21 +14,37 @@ try {
 } catch {}
 
 const root = dirname(fileURLToPath(import.meta.url))
+const distDir = join(root, '..', 'dist')
 const databaseFile = join(root, 'database.json')
 const MAX_TEAMS = 32
 const PROBLEM_MAX_TEAMS = 2
 const MAX_MEMBERS_PER_TEAM = 3
 const clients = new Set()
 
-const HOST_EMAIL = 'host@event.com'
-const HOST_PASSWORD = 'pass@123'
-const HOST_MASTER_TOKEN = 'bwb-host-token-master'
+const PORT = Number(process.env.PORT) || 3001
+const HOST_EMAIL = process.env.HOST_EMAIL || 'host@event.com'
+const HOST_PASSWORD = process.env.HOST_PASSWORD || 'pass@123'
+const HOST_MASTER_TOKEN = process.env.HOST_MASTER_TOKEN || 'bwb-host-token-master'
 const hostTokens = new Set([HOST_MASTER_TOKEN])
 
 // MongoDB Atlas Configuration
-const MONGO_URI = 'mongodb+srv://prince:prince55833@cluster1.niqvdam.mongodb.net/?appName=Cluster1'
-const DB_NAME = 'buildwithoutbuilding'
-const COLLECTION_NAME = 'buildwithoutbuilding'
+const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://prince:prince55833@cluster1.niqvdam.mongodb.net/?appName=Cluster1'
+const DB_NAME = process.env.DB_NAME || 'buildwithoutbuilding'
+const COLLECTION_NAME = process.env.COLLECTION_NAME || 'buildwithoutbuilding'
+
+const MIME_TYPES = {
+  '.html': 'text/html; charset=utf-8',
+  '.js': 'application/javascript; charset=utf-8',
+  '.css': 'text/css; charset=utf-8',
+  '.json': 'application/json; charset=utf-8',
+  '.png': 'image/png',
+  '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
+  '.svg': 'image/svg+xml',
+  '.ico': 'image/x-icon',
+  '.woff2': 'font/woff2',
+}
+
 
 let mongoClient = null
 let dbCollection = null
@@ -397,7 +413,25 @@ createServer(async (request, response) => {
   const url = new URL(request.url, 'http://localhost')
   const database = readDatabase()
 
+  // Serve static assets and SPA routes in production (Render)
+  if (!url.pathname.startsWith('/api')) {
+    const filePath = join(distDir, url.pathname === '/' ? 'index.html' : url.pathname)
+    if (existsSync(filePath) && extname(filePath)) {
+      const ext = extname(filePath)
+      const contentType = MIME_TYPES[ext] || 'application/octet-stream'
+      response.writeHead(200, { 'Content-Type': contentType })
+      return createReadStream(filePath).pipe(response)
+    }
+
+    const spaIndex = join(distDir, 'index.html')
+    if (existsSync(spaIndex)) {
+      response.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' })
+      return createReadStream(spaIndex).pipe(response)
+    }
+  }
+
   if (request.method === 'POST' && url.pathname === '/api/auth/login') {
+
     const input = await body(request)
     if (input.email === HOST_EMAIL && input.password === HOST_PASSWORD) {
       const token = HOST_MASTER_TOKEN
@@ -667,9 +701,10 @@ createServer(async (request, response) => {
   }
 
   return json(response, 405, { error: 'Method not allowed.' })
-}).listen(3001, '127.0.0.1', () => {
+}).listen(PORT, '0.0.0.0', () => {
   console.log(`\n======================================================`)
   console.log(`  ⚡ BUILD WITHOUT BUILDING — BACKEND API SERVER`)
-  console.log(`  🌐 Listening on: http://127.0.0.1:3001`)
+  console.log(`  🌐 Listening on: http://0.0.0.0:${PORT}`)
   console.log(`======================================================`)
 })
+

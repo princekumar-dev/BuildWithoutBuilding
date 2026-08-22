@@ -61,7 +61,6 @@ export function CactusWaitingCard({
 
 
   const [showAllTips, setShowAllTips] = useState(false)
-  const [particles, setParticles] = useState<{ id: number; emoji: string; x: number; y: number; vx: number; vy: number; rot: number }[]>([])
   const [activeTab, setActiveTab] = useState<'passcode' | 'playbook' | 'checklist'>(currentPasscode ? 'passcode' : 'playbook')
 
 
@@ -108,24 +107,6 @@ export function CactusWaitingCard({
     const timer = setInterval(calculateTime, 1000)
     return () => clearInterval(timer)
   }, [scheduledStartTime])
-
-  const spawnParticlesAt = (x: number, y: number) => {
-    const emojiList = isSleeping ? ['💤', '✨', '🌙', '⭐', '💫', '🌸'] : ['💖', '✨', '⚡', '🌟', '🎉', '🌸', '🌵', '🚀', '🔥', '👑', '💫', '🎶']
-    const newBurst = Array.from({ length: 5 }).map((_, i) => ({
-      id: Date.now() + i + Math.random(),
-      emoji: emojiList[Math.floor(Math.random() * emojiList.length)],
-      x: x + (Math.random() * 40 - 20),
-      y: y + (Math.random() * 20 - 10),
-      vx: (Math.random() - 0.5) * 80,
-      vy: -45 - Math.random() * 55,
-      rot: (Math.random() - 0.5) * 70,
-    }))
-
-    setParticles((prev) => [...prev, ...newBurst])
-    setTimeout(() => {
-      setParticles((prev) => prev.filter((p) => !newBurst.some((nb) => nb.id === p.id)))
-    }, 1200)
-  }
 
   const handleCactusClick = (e: React.MouseEvent) => {
     if (isSleeping) {
@@ -242,29 +223,6 @@ export function CactusWaitingCard({
 
       {/* CUTE ANIMATED 3D-STYLE KAWAII CACTUS MASCOT */}
       <div className="relative inline-block my-1">
-        {/* Floating Multi-Particle Bursts */}
-        <AnimatePresence>
-          {particles.map((p) => (
-            <motion.div
-              key={p.id}
-              initial={{ opacity: 1, scale: 0.5, x: 0, y: 0, rotate: 0 }}
-              animate={{
-                opacity: 0,
-                scale: [0.6, 1.5, 1.2],
-                x: p.vx,
-                y: p.vy,
-                rotate: p.rot,
-              }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 1.1, ease: 'easeOut' }}
-              className="absolute pointer-events-none z-30 font-bold text-lg select-none drop-shadow-md"
-              style={{ left: p.x, top: p.y }}
-            >
-              {p.emoji}
-            </motion.div>
-          ))}
-        </AnimatePresence>
-
         <motion.div
           onClick={handleCactusClick}
           title={isSleeping ? 'Tap to wake Spike up!' : 'Tap Spike for happy vibes and tournament tips!'}

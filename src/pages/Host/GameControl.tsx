@@ -19,11 +19,9 @@ import { useGameStore } from '../../store/gameStore'
 import { PHASE_LABELS } from '../../data/mockData'
 import type { GamePhase, Problem } from '../../types'
 import { api } from '../../lib/api'
-import { getPhaseDuration, setPhaseDuration, TIMER_CHANGE_EVENT, type TimedPhase } from '../../lib/phaseTimers'
+import { getPhaseDuration, setPhaseDuration, TIMER_CHANGE_EVENT } from '../../lib/phaseTimers'
 
 import { useRealtimeGame } from '../../hooks/useRealtimeGame'
-
-type Stage = { phase: GamePhase; title: string; desc: string; icon: string }
 
 const stagesForRound = (round: number, buildMin: number, pitchSec: number) => {
   const buildLabel = buildMin >= 60 ? `${buildMin / 60}h` : `${buildMin}m`

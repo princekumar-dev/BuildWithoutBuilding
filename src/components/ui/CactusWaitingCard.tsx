@@ -281,16 +281,16 @@ export function CactusWaitingCard({
       </div>
 
       {/* Main Title & Description */}
-      <h2 className="font-display text-3xl sm:text-4xl font-black mb-2 text-bwb-text tracking-tight mt-2">
+      <h2 className="font-display text-2xl sm:text-4xl font-black mb-2 text-bwb-text tracking-tight mt-1 sm:mt-2">
         The Event Has Not Started Yet
       </h2>
-      <p className="text-bwb-muted text-xs sm:text-sm mb-6 max-w-lg mx-auto leading-relaxed">
+      <p className="text-bwb-muted text-xs sm:text-sm mb-5 sm:mb-6 max-w-xl mx-auto leading-relaxed">
         Your squad is securely registered and connected! When the host launches the tournament, this room will instantly and automatically begin for your entire team.
       </p>
 
       {/* COUNTDOWN TIMER / STANDBY BOX */}
       {timeLeft.hasSchedule && !timeLeft.isPast ? (
-        <div className="max-w-lg mx-auto mb-7 p-5 rounded-2xl bg-bwb-bg/90 border border-bwb-accent/30 shadow-inner relative overflow-hidden">
+        <div className="w-full max-w-xl mx-auto mb-6 p-3.5 sm:p-5 rounded-2xl bg-bwb-bg/90 border border-bwb-accent/30 shadow-inner relative overflow-hidden">
           <div className="absolute inset-0 bg-radial from-bwb-accent/5 via-transparent to-transparent pointer-events-none" />
 
           <div className="flex items-center justify-between mb-3 text-xs font-mono font-bold text-bwb-accent uppercase tracking-wider">
@@ -305,30 +305,30 @@ export function CactusWaitingCard({
             )}
           </div>
 
-          <div className="grid grid-cols-4 gap-2.5 text-center font-mono">
-            <div className="p-3 rounded-xl bg-bwb-surface border border-white/5 shadow-md">
-              <span className="block text-2xl sm:text-3xl font-black text-bwb-text">
+          <div className="grid grid-cols-4 gap-1.5 sm:gap-2.5 text-center font-mono">
+            <div className="p-2 sm:p-3 rounded-xl bg-bwb-surface border border-white/5 shadow-md">
+              <span className="block text-xl sm:text-3xl font-black text-bwb-text">
                 {String(timeLeft.days).padStart(2, '0')}
               </span>
-              <span className="text-[10px] text-bwb-muted uppercase font-bold tracking-widest">Days</span>
+              <span className="text-[9px] sm:text-[10px] text-bwb-muted uppercase font-bold tracking-widest">Days</span>
             </div>
-            <div className="p-3 rounded-xl bg-bwb-surface border border-white/5 shadow-md">
-              <span className="block text-2xl sm:text-3xl font-black text-bwb-text">
+            <div className="p-2 sm:p-3 rounded-xl bg-bwb-surface border border-white/5 shadow-md">
+              <span className="block text-xl sm:text-3xl font-black text-bwb-text">
                 {String(timeLeft.hours).padStart(2, '0')}
               </span>
-              <span className="text-[10px] text-bwb-muted uppercase font-bold tracking-widest">Hours</span>
+              <span className="text-[9px] sm:text-[10px] text-bwb-muted uppercase font-bold tracking-widest">Hours</span>
             </div>
-            <div className="p-3 rounded-xl bg-bwb-surface border border-white/5 shadow-md">
-              <span className="block text-2xl sm:text-3xl font-black text-bwb-text">
+            <div className="p-2 sm:p-3 rounded-xl bg-bwb-surface border border-white/5 shadow-md">
+              <span className="block text-xl sm:text-3xl font-black text-bwb-text">
                 {String(timeLeft.minutes).padStart(2, '0')}
               </span>
-              <span className="text-[10px] text-bwb-muted uppercase font-bold tracking-widest">Mins</span>
+              <span className="text-[9px] sm:text-[10px] text-bwb-muted uppercase font-bold tracking-widest">Mins</span>
             </div>
-            <div className="p-3 rounded-xl bg-bwb-surface border border-bwb-accent/30 shadow-md">
-              <span className="block text-2xl sm:text-3xl font-black text-bwb-accent">
+            <div className="p-2 sm:p-3 rounded-xl bg-bwb-surface border border-bwb-accent/30 shadow-md">
+              <span className="block text-xl sm:text-3xl font-black text-bwb-accent">
                 {String(timeLeft.seconds).padStart(2, '0')}
               </span>
-              <span className="text-[10px] text-bwb-accent uppercase font-bold tracking-widest">Secs</span>
+              <span className="text-[9px] sm:text-[10px] text-bwb-accent uppercase font-bold tracking-widest">Secs</span>
             </div>
           </div>
 
@@ -350,8 +350,8 @@ export function CactusWaitingCard({
           )}
         </div>
       ) : (
-        <div className="max-w-lg mx-auto mb-7 p-4 rounded-2xl bg-bwb-bg/80 border border-emerald-500/30 shadow-inner flex items-center justify-center gap-3">
-          <span className="relative flex h-3 w-3">
+        <div className="w-full max-w-xl mx-auto mb-6 p-3.5 sm:p-4 rounded-2xl bg-bwb-bg/80 border border-emerald-500/30 shadow-inner flex items-center justify-center gap-3">
+          <span className="relative flex h-3 w-3 shrink-0">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
             <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500" />
           </span>
@@ -362,11 +362,11 @@ export function CactusWaitingCard({
       )}
 
       {/* INTERACTIVE NAVIGATION TABS */}
-      <div className="max-w-lg mx-auto mb-4 flex rounded-xl bg-bwb-bg p-1 border border-white/5 text-xs font-mono font-bold">
+      <div className="w-full max-w-xl mx-auto mb-4 flex rounded-xl bg-bwb-bg p-1 border border-white/5 text-xs font-mono font-bold">
         <button
           type="button"
           onClick={() => setActiveTab('passcode')}
-          className={`flex-1 py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 ${
+          className={`flex-1 py-2 sm:py-2.5 rounded-lg transition-all flex items-center justify-center gap-1.5 ${
             activeTab === 'passcode'
               ? 'bg-amber-400/20 text-amber-300 border border-amber-400/40 shadow-sm'
               : 'text-bwb-muted hover:text-bwb-text'
@@ -379,7 +379,7 @@ export function CactusWaitingCard({
         <button
           type="button"
           onClick={() => setActiveTab('playbook')}
-          className={`flex-1 py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 ${
+          className={`flex-1 py-2 sm:py-2.5 rounded-lg transition-all flex items-center justify-center gap-1.5 ${
             activeTab === 'playbook'
               ? 'bg-bwb-accent/20 text-bwb-accent border border-bwb-accent/40 shadow-sm'
               : 'text-bwb-muted hover:text-bwb-text'
@@ -395,7 +395,7 @@ export function CactusWaitingCard({
         <motion.div
           initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
-          className="max-w-lg mx-auto p-5 rounded-2xl bg-gradient-to-br from-bwb-bg via-bwb-bg to-bwb-surface border border-amber-400/35 mb-6 shadow-xl text-left"
+          className="w-full max-w-xl mx-auto p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-bwb-bg via-bwb-bg to-bwb-surface border border-amber-400/35 mb-6 shadow-xl text-left"
         >
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
@@ -429,7 +429,7 @@ export function CactusWaitingCard({
                 {myTeam.members.map((member, idx) => (
                   <span
                     key={idx}
-                    className={`px-3 py-1 rounded-xl text-xs font-semibold border flex items-center gap-1.5 ${
+                    className={`px-2.5 sm:px-3 py-1 rounded-xl text-xs font-semibold border flex items-center gap-1.5 ${
                       idx === 0
                         ? 'bg-amber-400/10 border-amber-400/30 text-amber-300'
                         : 'bg-cyan-500/10 border-cyan-500/30 text-cyan-300'
@@ -446,53 +446,100 @@ export function CactusWaitingCard({
         </motion.div>
       )}
 
-      {/* TAB 2: TOURNAMENT PLAYBOOK */}
+      {/* TAB 2: TOURNAMENT PLAYBOOK (3-ROUND TOURNAMENT & 7-STAGE PIPELINE) */}
       {activeTab === 'playbook' && (
         <motion.div
           initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
-          className="max-w-lg mx-auto p-4 rounded-2xl bg-bwb-bg border border-white/10 mb-6 text-left space-y-2.5"
+          className="w-full max-w-xl mx-auto p-3.5 sm:p-4 rounded-2xl bg-bwb-bg border border-white/10 mb-6 text-left space-y-3"
         >
-          <div className="p-2.5 rounded-xl bg-bwb-surface border border-white/5 flex items-start gap-2.5">
-            <span className="w-6 h-6 rounded-lg bg-bwb-accent/15 text-bwb-accent flex items-center justify-center text-xs font-mono font-bold shrink-0">
-              1
+          {/* Round 1 */}
+          <div className="p-3 rounded-xl bg-bwb-surface border border-purple-500/20 flex items-start gap-3">
+            <span className="w-7 h-7 rounded-lg bg-purple-500/20 text-purple-300 border border-purple-500/40 flex items-center justify-center text-xs font-mono font-bold shrink-0">
+              R1
             </span>
             <div>
-              <p className="text-xs font-bold text-bwb-text">Problem Selection</p>
-              <p className="text-[11px] text-bwb-muted">Choose 1 of 8 high-impact real-world challenge tracks.</p>
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <p className="text-xs font-bold text-bwb-text">Round 1: Open Qualifier</p>
+                <span className="text-[10px] font-mono font-bold px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                  No Elimination
+                </span>
+              </div>
+              <p className="text-[11px] text-bwb-muted mt-0.5 leading-relaxed">
+                Choose from 8 problem statements, draft 3 surprise tech cards, and formulate a 15-minute system architecture. All registered squads advance to Round 2!
+              </p>
             </div>
           </div>
 
-          <div className="p-2.5 rounded-xl bg-bwb-surface border border-white/5 flex items-start gap-2.5">
-            <span className="w-6 h-6 rounded-lg bg-purple-500/15 text-purple-400 flex items-center justify-center text-xs font-mono font-bold shrink-0">
-              2
+          {/* Round 2 */}
+          <div className="p-3 rounded-xl bg-bwb-surface border border-bwb-accent/20 flex items-start gap-3">
+            <span className="w-7 h-7 rounded-lg bg-bwb-accent/20 text-bwb-accent border border-bwb-accent/40 flex items-center justify-center text-xs font-mono font-bold shrink-0">
+              R2
             </span>
             <div>
-              <p className="text-xs font-bold text-bwb-text">Surprise Tech Card Reveal</p>
-              <p className="text-[11px] text-bwb-muted">Draw 3 tailored AI & tech cards that your solution must incorporate.</p>
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <p className="text-xs font-bold text-bwb-text">Round 2: Problem Showdown</p>
+                <span className="text-[10px] font-mono font-bold px-1.5 py-0.2 rounded bg-bwb-accent/20 text-bwb-accent border border-bwb-accent/30">
+                  Top 8 Qualify
+                </span>
+              </div>
+              <p className="text-[11px] text-bwb-muted mt-0.5 leading-relaxed">
+                8 distinct challenge tracks with strictly max 2 teams per problem statement. The Top 8 squads advance to the Grand Finals.
+              </p>
             </div>
           </div>
 
-          <div className="p-2.5 rounded-xl bg-bwb-surface border border-white/5 flex items-start gap-2.5">
-            <span className="w-6 h-6 rounded-lg bg-amber-400/15 text-amber-400 flex items-center justify-center text-xs font-mono font-bold shrink-0">
-              3
+          {/* Round 3 */}
+          <div className="p-3 rounded-xl bg-bwb-surface border border-amber-500/20 flex items-start gap-3">
+            <span className="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center justify-center text-xs font-mono font-bold shrink-0">
+              R3
             </span>
             <div>
-              <p className="text-xs font-bold text-bwb-text">15-Minute Sprint & 60s Live Pitch</p>
-              <p className="text-[11px] text-bwb-muted">Formulate your solution architecture, then defend it against judge attacks!</p>
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <p className="text-xs font-bold text-bwb-text">Round 3: Grand Finals & Prize Podium</p>
+                <span className="text-[10px] font-mono font-bold px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                  Top 4 Prized
+                </span>
+              </div>
+              <p className="text-[11px] text-bwb-muted mt-0.5 leading-relaxed">
+                Top 8 Finalists defend live on stage. Top 4 teams receive championship prizes: 🥇 1st Place (Champion), 🥈 2nd Place (Runner-Up), and 🥉 3rd Place (Dual Bronze Winners).
+              </p>
+            </div>
+          </div>
+
+          {/* 7-Stage Flow */}
+          <div className="pt-2 border-t border-white/5">
+            <p className="text-[10px] font-mono uppercase text-bwb-muted font-bold mb-1.5">
+              ⚡ 7-Stage Live Event Pipeline:
+            </p>
+            <div className="flex flex-wrap items-center gap-1 text-[10px] font-mono text-bwb-text">
+              <span className="px-1.5 py-0.5 rounded bg-white/5">1. Lobby</span>
+              <span>➔</span>
+              <span className="px-1.5 py-0.5 rounded bg-white/5">2. Problem Reveal</span>
+              <span>➔</span>
+              <span className="px-1.5 py-0.5 rounded bg-white/5">3. Card Draft</span>
+              <span>➔</span>
+              <span className="px-1.5 py-0.5 rounded bg-white/5">4. Build</span>
+              <span>➔</span>
+              <span className="px-1.5 py-0.5 rounded bg-white/5">5. Pitch</span>
+              <span>➔</span>
+              <span className="px-1.5 py-0.5 rounded bg-white/5 text-purple-300">6. Judging</span>
+              <span>➔</span>
+              <span className="px-1.5 py-0.5 rounded bg-bwb-gold/20 text-bwb-gold">7. Podium</span>
             </div>
           </div>
         </motion.div>
       )}
 
       {/* Footer Meta */}
-      <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-bwb-muted font-mono pt-2">
-        <span className="flex items-center gap-1 text-emerald-400">
+      <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-xs text-bwb-muted font-mono pt-2">
+        <span className="flex items-center gap-1 text-emerald-400 font-bold">
           <ShieldCheck size={14} /> Pre-Registration Confirmed
         </span>
         <span>·</span>
         <span>Event: <strong className="text-bwb-text">{gameName}</strong></span>
       </div>
+
     </motion.div>
   )
 }

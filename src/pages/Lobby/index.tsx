@@ -30,7 +30,8 @@ export default function LobbyPage() {
 
   return (
     <PageLayout>
-      <div className="max-w-4xl mx-auto px-2 sm:px-4">
+      <div className="max-w-4xl mx-auto px-1 sm:px-4">
+
         <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
           <div>
             <Badge variant="accent" className="mb-2">{game.code}</Badge>

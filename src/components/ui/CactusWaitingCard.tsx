@@ -7,7 +7,9 @@ import {
 } from 'lucide-react'
 import { Button } from './Button'
 import { toast } from './Toast'
+import { SoundFX } from '../../lib/soundEffects'
 import type { Team } from '../../types'
+
 
 interface CactusWaitingCardProps {
   scheduledStartTime?: string | null
@@ -112,32 +114,6 @@ export function CactusWaitingCard({
     return () => clearInterval(timer)
   }, [scheduledStartTime])
 
-  // Play a soft cute synthesized chime pop on interaction
-  const playCuteChime = () => {
-    try {
-      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)()
-      const osc = ctx.createOscillator()
-      const gain = ctx.createGain()
-      const now = ctx.currentTime
-
-      const pitches = [523.25, 587.33, 659.25, 783.99, 880.0, 1046.5, 1174.66]
-      const note = pitches[petCount % pitches.length]
-
-      osc.type = 'sine'
-      osc.frequency.setValueAtTime(note, now)
-      osc.frequency.exponentialRampToValueAtTime(note * 1.6, now + 0.12)
-
-      gain.gain.setValueAtTime(0.14, now)
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.28)
-
-      osc.connect(gain)
-      gain.connect(ctx.destination)
-
-      osc.start(now)
-      osc.stop(now + 0.28)
-    } catch {}
-  }
-
   const spawnParticlesAt = (x: number, y: number) => {
     const emojiList = ['💖', '✨', '⚡', '🌟', '🎉', '🌸', '🌵', '🚀', '🔥', '👑', '💫', '🎶']
     const newBurst = Array.from({ length: 5 }).map((_, i) => ({
@@ -160,10 +136,11 @@ export function CactusWaitingCard({
     setIsWiggling(true)
     setFlowerSpin(true)
     setIsBlushing(true)
-    setPetCount((prev) => prev + 1)
+    const newCount = petCount + 1
+    setPetCount(newCount)
     setSlideDirection(1)
     setQuoteIndex((prev) => (prev + 1) % FUN_QUOTES.length)
-    playCuteChime()
+    SoundFX.playCutePop(newCount)
 
     setTimeout(() => setIsWiggling(false), 900)
     setTimeout(() => setFlowerSpin(false), 850)
@@ -176,22 +153,23 @@ export function CactusWaitingCard({
   const handleNextTip = () => {
     setSlideDirection(1)
     setQuoteIndex((prev) => (prev + 1) % FUN_QUOTES.length)
-    playCuteChime()
+    SoundFX.playCutePop(petCount + 1)
   }
 
   const handlePrevTip = () => {
     setSlideDirection(-1)
     setQuoteIndex((prev) => (prev - 1 + FUN_QUOTES.length) % FUN_QUOTES.length)
-    playCuteChime()
+    SoundFX.playCutePop(petCount)
   }
 
   const toggleDance = () => {
     setIsDancing((prev) => !prev)
     setIsWiggling(true)
     setFlowerSpin(true)
-    playCuteChime()
+    SoundFX.playCutePop(petCount)
     setTimeout(() => setIsWiggling(false), 1200)
   }
+
 
   // Mascot Tamagotchi Evolution System
   const getEvolutionInfo = () => {

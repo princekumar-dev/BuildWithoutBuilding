@@ -156,4 +156,28 @@ export const SoundFX = {
       osc.stop(now + 0.08)
     } catch {}
   },
+
+  // 7. Cute Mascot Pop / Chime (Zero-leakage, safe singleton)
+  playCutePop: (index: number = 0) => {
+    if (!soundEnabled) return
+    try {
+      const ctx = getAudioContext()
+      if (!ctx || ctx.state === 'closed') return
+      const now = ctx.currentTime
+      const pitches = [523.25, 587.33, 659.25, 783.99, 880.0, 1046.5, 1174.66]
+      const note = pitches[Math.abs(index) % pitches.length]
+      const osc = ctx.createOscillator()
+      const gain = ctx.createGain()
+      osc.type = 'sine'
+      osc.frequency.setValueAtTime(note, now)
+      osc.frequency.exponentialRampToValueAtTime(note * 1.5, now + 0.1)
+      gain.gain.setValueAtTime(0.12, now)
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22)
+      osc.connect(gain)
+      gain.connect(ctx.destination)
+      osc.start(now)
+      osc.stop(now + 0.22)
+    } catch {}
+  },
 }
+

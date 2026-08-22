@@ -43,12 +43,8 @@ body {
   padding-bottom: env(safe-area-inset-bottom);
 }
 
-button, a, input, select, textarea {
+button {
   touch-action: manipulation;
-}
-
-button, a {
-  touch-action: auto;
 }
 
 /* Small screens are the primary participant and control surface. */

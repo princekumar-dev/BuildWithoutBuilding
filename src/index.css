@@ -27,6 +27,7 @@
 html {
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
+  overflow-x: clip;
 }
 
 body {
@@ -53,7 +54,7 @@ button, a {
 /* Small screens are the primary participant and control surface. */
 @media (max-width: 639px) {
   html {
-    overflow-x: hidden;
+    overflow-x: clip;
   }
 
   body {

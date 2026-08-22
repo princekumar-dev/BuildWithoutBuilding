@@ -135,7 +135,7 @@ export function TechnologyCard({
   const sizeClasses = {
     sm: 'h-[230px]',
     md: 'h-[300px]',
-    lg: 'h-[380px] sm:h-[400px]',
+    lg: 'h-[340px] sm:h-[360px]',
   }
 
   return (
@@ -224,26 +224,26 @@ export function TechnologyCard({
 
           {/* Hero Tech Showcase */}
           <div className="my-auto relative z-10 py-2">
-            <div className="flex items-center gap-4 mb-4">
-              <div className="w-16 h-16 sm:w-18 sm:h-18 rounded-2xl bg-bwb-bg/70 border border-white/10 flex items-center justify-center text-4xl sm:text-5xl shadow-inner shrink-0">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-bwb-bg/70 border border-white/10 flex items-center justify-center text-3xl sm:text-4xl shadow-inner shrink-0">
                 {technology?.icon ?? '⚡'}
               </div>
-              <div>
-                <span className="text-[10px] uppercase font-mono tracking-widest text-bwb-muted font-bold block mb-0.5">
+              <div className="min-w-0">
+                <span className="text-[9px] sm:text-[10px] uppercase font-mono tracking-widest text-bwb-muted font-bold block mb-0.5">
                   TECH COMPONENT
                 </span>
-                <h3 className="font-display font-black text-2xl sm:text-3xl text-bwb-text leading-tight tracking-tight">
+                <h3 className="font-display font-black text-lg sm:text-xl text-bwb-text leading-tight tracking-tight truncate">
                   {technology?.name ?? 'Technology'}
                 </h3>
               </div>
             </div>
 
             {/* Architecture Role & Function Box */}
-            <div className="p-3.5 rounded-2xl bg-bwb-bg/50 border border-white/5 backdrop-blur-sm">
-              <p className="text-[10px] uppercase tracking-wider text-bwb-accent font-bold mb-1 flex items-center gap-1">
+            <div className="p-3 rounded-2xl bg-bwb-bg/50 border border-white/5 backdrop-blur-sm">
+              <p className="text-[9px] sm:text-[10px] uppercase tracking-wider text-bwb-accent font-bold mb-1 flex items-center gap-1">
                 <Layers size={11} /> Architecture Function:
               </p>
-              <p className="text-xs sm:text-sm text-bwb-text/90 leading-relaxed font-medium">
+              <p className="text-[11px] sm:text-xs text-bwb-text/90 leading-relaxed font-medium line-clamp-3">
                 {technology?.description ?? 'Must be integrated into your core solution design.'}
               </p>
             </div>

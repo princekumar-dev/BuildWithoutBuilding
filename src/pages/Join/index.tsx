@@ -293,36 +293,52 @@ export default function JoinPage() {
         {/* REGISTRATION & JOIN CARD */}
         {!registeredSession && (
           <Card glow padding="md" className="border-bwb-border/80 shadow-2xl bg-gradient-to-b from-bwb-surface-2 to-bwb-surface">
-            {/* Locked Active Event Room Header with Live Capacity Status */}
-            <div className="mb-5 p-3 sm:p-4 rounded-2xl bg-bwb-bg/80 border border-white/10 flex flex-wrap items-center justify-between gap-3 shadow-inner">
-              <div className="truncate">
-                <div className="flex items-center gap-2 mb-0.5">
-                  <span className={`inline-block w-2 h-2 rounded-full ${isRoomFull ? 'bg-rose-400' : 'bg-bwb-success'} animate-pulse shrink-0`} />
-                  <label className="text-[10px] font-mono uppercase text-bwb-muted font-bold tracking-widest truncate">
-                    ACTIVE EVENT ROOM
-                  </label>
-                  {/* Live Capacity Tag */}
-                  {isRoomFull ? (
-                    <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-rose-500/20 text-rose-300 border border-rose-500/40 flex items-center gap-1">
-                      <AlertTriangle size={11} className="shrink-0" /> Capacity Full ({roomRegisteredCount}/{roomMaxTeams})
-                    </span>
-                  ) : (
-                    <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-md bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 flex items-center gap-1">
-                      <Users size={11} className="shrink-0" /> {roomRegisteredCount}/{roomMaxTeams} Teams ({slotsRemaining} slots left)
-                    </span>
-                  )}
+            {/* Active Event Room Header with Clean Capacity & Room Code Badges */}
+            <div className="mb-6 p-4 rounded-2xl bg-bwb-bg/90 border border-white/10 shadow-lg relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-48 h-full bg-gradient-to-l from-bwb-accent/5 to-transparent pointer-events-none" />
 
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 relative z-10">
+                <div className="space-y-0.5 truncate">
+                  <div className="flex items-center gap-2">
+                    <span className={`inline-block w-2 h-2 rounded-full ${isRoomFull ? 'bg-rose-400' : 'bg-bwb-success'} animate-pulse shrink-0`} />
+                    <span className="text-[10px] font-mono uppercase text-bwb-muted font-bold tracking-widest">
+                      Active Event Room
+                    </span>
+                  </div>
+                  <h3 className="font-display text-sm sm:text-base font-bold text-bwb-text tracking-tight truncate">
+                    {currentTargetGame?.name || 'Live Competition Room'}
+                  </h3>
                 </div>
-                <p className="text-xs font-semibold text-bwb-text truncate">
-                  {currentTargetGame?.name || 'Live Competition Room'}
-                </p>
-              </div>
 
-              <div className="px-3 sm:px-4 py-2 rounded-xl bg-bwb-surface-2 border border-bwb-accent/40 font-mono text-sm sm:text-base tracking-widest font-black text-bwb-accent shadow-sm flex items-center gap-1.5 shrink-0 select-all">
-                <Radio size={13} className="text-bwb-accent animate-pulse shrink-0" />
-                <span>{code || currentTargetGame?.code || 'BWB-LIVE'}</span>
+                {/* Right side: Capacity Quota Pill & Game Code */}
+                <div className="flex items-center gap-2 shrink-0 self-start sm:self-center">
+                  <div className={`px-2.5 py-1.5 rounded-xl border font-mono text-xs font-bold flex items-center gap-1.5 shadow-sm ${
+                    isRoomFull
+                      ? 'bg-rose-500/15 text-rose-300 border-rose-500/30'
+                      : 'bg-bwb-surface-2 border-white/10 text-bwb-muted'
+                  }`}>
+                    {isRoomFull ? (
+                      <>
+                        <AlertTriangle size={12} className="text-rose-400 shrink-0" />
+                        <span className="text-rose-300">Full ({roomRegisteredCount}/{roomMaxTeams})</span>
+                      </>
+                    ) : (
+                      <>
+                        <Users size={12} className="text-bwb-accent shrink-0" />
+                        <span className="text-bwb-text font-bold">{roomRegisteredCount}/{roomMaxTeams}</span>
+                        <span className="text-bwb-muted text-[11px] font-normal">({slotsRemaining} left)</span>
+                      </>
+                    )}
+                  </div>
+
+                  <div className="px-3 py-1.5 rounded-xl bg-bwb-surface-2 border border-bwb-accent/40 font-mono text-xs sm:text-sm tracking-wider font-black text-bwb-accent shadow-sm flex items-center gap-1.5 select-all">
+                    <Radio size={12} className="text-bwb-accent animate-pulse shrink-0" />
+                    <span>{code || currentTargetGame?.code || 'BWB-LIVE'}</span>
+                  </div>
+                </div>
               </div>
             </div>
+
 
             {/* Mode Switcher Tabs with Spring Sliding Pill */}
             <div className="relative grid grid-cols-2 gap-2 p-1.5 bg-bwb-bg rounded-2xl mb-6 border border-white/10 shadow-inner">

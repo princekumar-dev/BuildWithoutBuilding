@@ -17,11 +17,26 @@ interface CactusWaitingCardProps {
 }
 
 const FUN_QUOTES = [
-  '🌵 Hope to see you! Stay hydrated and get your strategy ready!',
-  '⚡ Your spot is 100% reserved in the arena! Get ready to build without building!',
-  '🃏 3 surprise technologies will drop the moment host starts Round 1!',
-  '👑 Teamwork wins tournaments. Review your roles with your squad!',
-  '🚀 Ready to pitch your masterpiece? The judges are waiting!',
+  { icon: '🌵', tag: 'MASCOT HYPE', text: "Spike the Cactus says: You're 100% ready to build without building! Own that stage!" },
+  { icon: '🧠', tag: 'PITCH TIMING', text: "Pitch Blueprint (60s): 15s Problem Hook ➔ 30s Architecture & Tech Synergy ➔ 15s Real-World Impact!" },
+  { icon: '⚡', tag: 'TECH SYNERGY', text: "Drawing IoT + Edge AI? Emphasize on-device inferencing to eliminate cloud round-trip latency!" },
+  { icon: '🛡️', tag: 'JUDGE DEFENSE', text: "Judges love attacking offline edge failure. Always explain local cache fallback & offline sync!" },
+  { icon: '👑', tag: '1ST PLACE HACK', text: "Grand Champions don't just solve the problem — they quantify cost reduction and scale to 1M users!" },
+  { icon: '🃏', tag: 'CARD STRATEGY', text: "Never fight your 3 surprise constraint cards — turn them into unique architectural superpowers!" },
+  { icon: '🚀', tag: 'ROUND 1 RULES', text: "Round 1 has ZERO elimination! Use it to test your pitch chemistry and calibrate judge feedback!" },
+  { icon: '⏱️', tag: 'SPRINT PROTOCOL', text: "Spend the first 3 minutes aligning on system flow before writing a single line of solution text!" },
+  { icon: '💡', tag: 'DATA FLOW', text: "A crystal-clear telemetry data pipeline diagram beats 500 lines of complex technical jargon every time!" },
+  { icon: '🔥', tag: 'STAGE PRESENCE', text: "Confidence is infectious! Speak clearly, maintain eye contact, and let your team chemistry shine!" },
+  { icon: '🎯', tag: 'RUBRIC MASTERY', text: "Technology Integration is worth 20 points! Make sure all 3 cards are cohesively integrated!" },
+  { icon: '🤖', tag: 'EDGE COMPUTE', text: "Explain edge-to-cloud handshakes: sensor ingest ➔ local filtering ➔ cloud aggregation ➔ real-time alert!" },
+  { icon: '💎', tag: 'FEASIBILITY TIP', text: "Technical Feasibility is worth 20 points — mention existing open standards and realistic hardware BOM!" },
+  { icon: '🏆', tag: 'GRAND FINALS', text: "Round 2 sends only the Top 8 squads to Round 3 — every rubric point matters for cut-off qualification!" },
+  { icon: '🥉', tag: 'PRIZE PODIUM', text: "Top 4 teams win prizes in the Grand Finals: 1st Champion, 2nd Runner-Up, and Dual 3rd Bronze Winners!" },
+  { icon: '✨', tag: 'TEAM ROLES', text: "Divide and conquer: 1 squad member leads architecture, 1 handles presentation, 1 leads Q&A defense!" },
+  { icon: '🎪', tag: 'DEFENSE HACK', text: "When asked a tough judge question, pause for 2 seconds, acknowledge the constraint, and give a structured answer!" },
+  { icon: '🔒', tag: 'SECURITY & PRIVACY', text: "Security bonus: Mention end-to-end payload encryption (TLS 1.3) and anonymized edge telemetry!" },
+  { icon: '🌊', tag: 'ADAPTABILITY', text: "The greatest engineers adapt to surprise constraints under time pressure — stay calm and innovate!" },
+  { icon: '💖', tag: 'MASCOT LOVE', text: "Spike loves your team spirit! Click me again for more secret tournament wisdom!" },
 ]
 
 export function CactusWaitingCard({
@@ -34,7 +49,10 @@ export function CactusWaitingCard({
   const [copied, setCopied] = useState(false)
   const [quoteIndex, setQuoteIndex] = useState(0)
   const [isWiggling, setIsWiggling] = useState(false)
-  const [hearts, setHearts] = useState<{ id: number; x: number; y: number }[]>([])
+  const [petCount, setPetCount] = useState(0)
+  const [flowerSpin, setFlowerSpin] = useState(false)
+  const [isBlushing, setIsBlushing] = useState(false)
+  const [particles, setParticles] = useState<{ id: number; emoji: string; x: number; y: number; vx: number; vy: number; rot: number }[]>([])
   const [activeTab, setActiveTab] = useState<'passcode' | 'playbook' | 'checklist'>('passcode')
 
   const [timeLeft, setTimeLeft] = useState<{
@@ -80,23 +98,64 @@ export function CactusWaitingCard({
     return () => clearInterval(timer)
   }, [scheduledStartTime])
 
+  // Play a soft cute synthesized chime pop on interaction
+  const playCuteChime = () => {
+    try {
+      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)()
+      const osc = ctx.createOscillator()
+      const gain = ctx.createGain()
+      const now = ctx.currentTime
+
+      const pitches = [523.25, 587.33, 659.25, 783.99, 880.0, 1046.5]
+      const note = pitches[petCount % pitches.length]
+
+      osc.type = 'sine'
+      osc.frequency.setValueAtTime(note, now)
+      osc.frequency.exponentialRampToValueAtTime(note * 1.5, now + 0.12)
+
+      gain.gain.setValueAtTime(0.12, now)
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25)
+
+      osc.connect(gain)
+      gain.connect(ctx.destination)
+
+      osc.start(now)
+      osc.stop(now + 0.25)
+    } catch {}
+  }
+
   const handleCactusClick = (e: React.MouseEvent) => {
     setIsWiggling(true)
+    setFlowerSpin(true)
+    setIsBlushing(true)
+    setPetCount((prev) => prev + 1)
     setQuoteIndex((prev) => (prev + 1) % FUN_QUOTES.length)
-    setTimeout(() => setIsWiggling(false), 800)
+    playCuteChime()
 
-    // Spawn cute heart particle
+    setTimeout(() => setIsWiggling(false), 900)
+    setTimeout(() => setFlowerSpin(false), 800)
+    setTimeout(() => setIsBlushing(false), 1400)
+
+    // Spawn 4-5 colorful burst particles
     const rect = e.currentTarget.getBoundingClientRect()
-    const newHeart = {
-      id: Date.now(),
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
-    }
-    setHearts((prev) => [...prev, newHeart])
+    const emojiList = ['💖', '✨', '⚡', '🌟', '🎉', '🌸', '🌵', '🚀', '🔥', '🏆', '💫', '🎶']
+    const newBurst = Array.from({ length: 4 }).map((_, i) => ({
+      id: Date.now() + i + Math.random(),
+      emoji: emojiList[Math.floor(Math.random() * emojiList.length)],
+      x: e.clientX - rect.left + (Math.random() * 40 - 20),
+      y: e.clientY - rect.top + (Math.random() * 20 - 10),
+      vx: (Math.random() - 0.5) * 70,
+      vy: -40 - Math.random() * 50,
+      rot: (Math.random() - 0.5) * 60,
+    }))
+
+    setParticles((prev) => [...prev, ...newBurst])
     setTimeout(() => {
-      setHearts((prev) => prev.filter((h) => h.id !== newHeart.id))
+      setParticles((prev) => prev.filter((p) => !newBurst.some((nb) => nb.id === p.id)))
     }, 1200)
   }
+
+  const currentTip = FUN_QUOTES[quoteIndex]
 
   const copyPasscode = () => {
     if (currentPasscode) {
@@ -113,7 +172,6 @@ export function CactusWaitingCard({
       animate={{ opacity: 1, y: 0 }}
       className="relative rounded-3xl p-4 sm:p-9 text-center mb-8 border border-white/15 shadow-2xl overflow-hidden bg-gradient-to-b from-bwb-surface-2/95 via-bwb-surface/95 to-bwb-bg/95 backdrop-blur-2xl"
     >
-
       {/* Dynamic Ambient Neon Mesh Glows */}
       <div className="absolute -top-24 -left-20 w-72 h-72 rounded-full bg-emerald-500/15 blur-[90px] pointer-events-none" />
       <div className="absolute top-1/2 -right-20 w-80 h-80 rounded-full bg-amber-500/15 blur-[100px] pointer-events-none" />
@@ -139,45 +197,58 @@ export function CactusWaitingCard({
         </div>
       </div>
 
-      {/* CUTE ANIMATED 3D-STYLE CACTUS MASCOT */}
+      {/* CUTE ANIMATED 3D-STYLE KAWAII CACTUS MASCOT */}
       <div className="relative inline-block my-2">
-        {/* Heart Particles */}
+        {/* Floating Multi-Particle Bursts */}
         <AnimatePresence>
-          {hearts.map((h) => (
+          {particles.map((p) => (
             <motion.div
-              key={h.id}
-              initial={{ opacity: 1, scale: 0.6, y: 0 }}
-              animate={{ opacity: 0, scale: 1.4, y: -45 }}
+              key={p.id}
+              initial={{ opacity: 1, scale: 0.5, x: 0, y: 0, rotate: 0 }}
+              animate={{
+                opacity: 0,
+                scale: [0.6, 1.4, 1.1],
+                x: p.vx,
+                y: p.vy,
+                rotate: p.rot,
+              }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 1 }}
-              className="absolute text-pink-400 pointer-events-none z-30 font-bold text-sm"
-              style={{ left: h.x, top: h.y }}
+              transition={{ duration: 1.1, ease: 'easeOut' }}
+              className="absolute pointer-events-none z-30 font-bold text-base sm:text-lg select-none drop-shadow-md"
+              style={{ left: p.x, top: p.y }}
             >
-              💖✨
+              {p.emoji}
             </motion.div>
           ))}
         </AnimatePresence>
 
         <motion.div
           onClick={handleCactusClick}
-          title="Click the Cactus for happy vibes!"
+          title="Tap Spike for happy energy and pro tournament tips!"
           animate={
             isWiggling
-              ? { scale: [1, 1.25, 0.95, 1.15, 1], rotate: [0, -12, 12, -8, 8, 0] }
-              : { y: [0, -8, 0], rotate: [-2, 2, -2] }
+              ? {
+                  scale: [1, 1.3, 0.88, 1.18, 0.96, 1],
+                  y: [0, -28, 4, -14, 2, 0],
+                  rotate: [0, -14, 14, -8, 8, 0],
+                }
+              : {
+                  y: [0, -7, 0],
+                  rotate: [-1.5, 1.5, -1.5],
+                }
           }
           transition={{
-            duration: isWiggling ? 0.7 : 3.5,
+            duration: isWiggling ? 0.85 : 3.5,
             repeat: isWiggling ? 0 : Infinity,
             ease: 'easeInOut',
           }}
-          className="relative inline-flex flex-col items-center cursor-pointer group select-none"
+          className="relative inline-flex flex-col items-center cursor-pointer group select-none touch-manipulation active:scale-95"
         >
-          {/* Subtle Pedestal Aura */}
-          <div className="absolute bottom-2 w-28 h-6 bg-emerald-500/20 rounded-full blur-md group-hover:bg-emerald-400/35 transition-all" />
+          {/* Pulsing Mascot Aura Pedestal */}
+          <div className="absolute bottom-1 w-32 h-7 bg-emerald-500/25 rounded-full blur-lg group-hover:bg-emerald-400/40 transition-all animate-pulse" />
 
-          {/* Stylized Kawaii SVG Cactus */}
-          <div className="w-28 h-32 relative flex items-center justify-center filter drop-shadow-[0_12px_24px_rgba(16,185,129,0.35)] group-hover:scale-105 transition-transform">
+          {/* Stylized Ultra-Kawaii SVG Cactus */}
+          <div className="w-32 h-36 relative flex items-center justify-center filter drop-shadow-[0_12px_28px_rgba(16,185,129,0.45)] group-hover:scale-105 transition-transform">
             <svg viewBox="0 0 100 120" className="w-full h-full">
               <defs>
                 <linearGradient id="potGrad" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -186,8 +257,8 @@ export function CactusWaitingCard({
                 </linearGradient>
                 <linearGradient id="cactusGrad" x1="0%" y1="0%" x2="100%" y2="100%">
                   <stop offset="0%" stopColor="#34D399" />
-                  <stop offset="50%" stopColor="#10B981" />
-                  <stop offset="100%" stopColor="#059669" />
+                  <stop offset="45%" stopColor="#10B981" />
+                  <stop offset="100%" stopColor="#047857" />
                 </linearGradient>
                 <linearGradient id="armGrad" x1="0%" y1="0%" x2="100%" y2="100%">
                   <stop offset="0%" stopColor="#6EE7B7" />
@@ -206,49 +277,85 @@ export function CactusWaitingCard({
                 fill="url(#cactusGrad)"
               />
               {/* Highlight Ridge */}
-              <path d="M48 14 Q52 14 52 87 L48 87 Z" fill="#A7F3D0" opacity="0.4" />
+              <path d="M48 14 Q52 14 52 87 L48 87 Z" fill="#A7F3D0" opacity="0.45" />
 
-              {/* Left Cute Arm */}
-              <path
+              {/* Left Cute Arm (Bouncing) */}
+              <motion.path
+                animate={isWiggling ? { rotate: [-18, 22, -18] } : { rotate: [0, -6, 0] }}
+                transition={{ repeat: isWiggling ? 2 : Infinity, duration: isWiggling ? 0.35 : 2.5, ease: 'easeInOut' }}
+                style={{ transformOrigin: '38px 56px' }}
                 d="M38 48 Q20 48 20 32 Q20 25 26 25 Q32 25 32 32 L32 54 Q32 60 38 60 Z"
                 fill="url(#armGrad)"
               />
 
-              {/* Right Waving Arm */}
+              {/* Right Waving Arm (Excited Wave) */}
               <motion.path
-                animate={{ rotate: [-8, 14, -8] }}
-                transition={{ repeat: Infinity, duration: 2.2, ease: 'easeInOut' }}
-                style={{ transformOrigin: '62px 58px' }}
+                animate={isWiggling ? { rotate: [25, -20, 25] } : { rotate: [-10, 16, -10] }}
+                transition={{ repeat: isWiggling ? 3 : Infinity, duration: isWiggling ? 0.3 : 2 }}
+                style={{ transformOrigin: '62px 56px' }}
                 d="M62 44 Q80 44 80 28 Q80 21 74 21 Q68 21 68 28 L68 50 Q68 56 62 56 Z"
                 fill="url(#armGrad)"
               />
 
-              {/* Top Flower with Bloom Glow */}
-              <circle cx="50" cy="12" r="6" fill="#F43F5E" />
-              <circle cx="45" cy="10" r="4" fill="#FB7185" />
-              <circle cx="55" cy="10" r="4" fill="#FB7185" />
-              <circle cx="50" cy="7" r="4" fill="#FDA4AF" />
-              <circle cx="50" cy="12" r="2.5" fill="#FEF08A" />
+              {/* Top Spinning Kawaii Flower */}
+              <motion.g
+                animate={flowerSpin ? { rotate: 360, scale: [1, 1.35, 1] } : { scale: [1, 1.08, 1] }}
+                transition={{ duration: flowerSpin ? 0.75 : 2.5, repeat: flowerSpin ? 0 : Infinity }}
+                style={{ transformOrigin: '50px 12px' }}
+              >
+                <circle cx="50" cy="12" r="6.5" fill="#F43F5E" />
+                <circle cx="44" cy="9" r="4.5" fill="#FB7185" />
+                <circle cx="56" cy="9" r="4.5" fill="#FB7185" />
+                <circle cx="50" cy="6" r="4.5" fill="#FDA4AF" />
+                <circle cx="45" cy="15" r="4" fill="#FDA4AF" />
+                <circle cx="55" cy="15" r="4" fill="#FDA4AF" />
+                <circle cx="50" cy="12" r="3" fill="#FEF08A" />
+              </motion.g>
 
-              {/* Cute Sparkly Eyes */}
-              <circle cx="45" cy="36" r="3" fill="#064E3B" />
-              <circle cx="55" cy="36" r="3" fill="#064E3B" />
-              <circle cx="44" cy="35" r="1.2" fill="#FFFFFF" />
-              <circle cx="54" cy="35" r="1.2" fill="#FFFFFF" />
-              <circle cx="46.5" cy="37.5" r="0.5" fill="#FFFFFF" />
-              <circle cx="56.5" cy="37.5" r="0.5" fill="#FFFFFF" />
+              {/* Cute Sparkly Blinking Eyes */}
+              {isWiggling ? (
+                // Happy Arc Eyes (^ ◡ ^)
+                <g>
+                  <path d="M42 37 Q45 32 48 37" stroke="#064E3B" strokeWidth="2" strokeLinecap="round" fill="none" />
+                  <path d="M52 37 Q55 32 58 37" stroke="#064E3B" strokeWidth="2" strokeLinecap="round" fill="none" />
+                </g>
+              ) : (
+                // Twinkling Kawaii Eyes
+                <g>
+                  <circle cx="45" cy="36" r="3.2" fill="#064E3B" />
+                  <circle cx="55" cy="36" r="3.2" fill="#064E3B" />
+                  <circle cx="44" cy="35" r="1.3" fill="#FFFFFF" />
+                  <circle cx="54" cy="35" r="1.3" fill="#FFFFFF" />
+                  <circle cx="46.5" cy="37.5" r="0.6" fill="#FFFFFF" />
+                  <circle cx="56.5" cy="37.5" r="0.6" fill="#FFFFFF" />
+                </g>
+              )}
 
-              {/* Blushing Cheeks */}
-              <ellipse cx="41" cy="42" rx="3" ry="1.8" fill="#FB7185" opacity="0.75" />
-              <ellipse cx="59" cy="42" rx="3" ry="1.8" fill="#FB7185" opacity="0.75" />
+              {/* Animated Blushing Cheeks */}
+              <ellipse
+                cx="41"
+                cy="42"
+                rx={isBlushing ? 3.8 : 3}
+                ry={isBlushing ? 2.4 : 1.8}
+                fill={isBlushing ? '#F43F5E' : '#FB7185'}
+                opacity={isBlushing ? 0.95 : 0.75}
+              />
+              <ellipse
+                cx="59"
+                cy="42"
+                rx={isBlushing ? 3.8 : 3}
+                ry={isBlushing ? 2.4 : 1.8}
+                fill={isBlushing ? '#F43F5E' : '#FB7185'}
+                opacity={isBlushing ? 0.95 : 0.75}
+              />
 
-              {/* Kawaii Open Smile */}
+              {/* Kawaii Open Happy Smile */}
               <path
-                d="M47 41 Q50 46 53 41"
+                d={isWiggling ? 'M45 40 Q50 48 55 40 Z' : 'M46 41 Q50 46 54 41'}
                 stroke="#064E3B"
-                strokeWidth="1.8"
+                strokeWidth={isWiggling ? '1.5' : '1.8'}
                 strokeLinecap="round"
-                fill="none"
+                fill={isWiggling ? '#F43F5E' : 'none'}
               />
 
               {/* Needles & Spines */}
@@ -260,25 +367,36 @@ export function CactusWaitingCard({
             </svg>
           </div>
 
-          {/* Click Me Badge */}
-          <span className="text-[10px] font-mono text-emerald-400/80 group-hover:text-emerald-300 transition-colors mt-0.5">
-            ✨ Click me for tips!
-          </span>
+          {/* Interactive Mascot Tap Badge */}
+          <div className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-[10px] font-mono font-black uppercase tracking-wider mt-1.5 shadow-lg group-hover:scale-105 group-hover:bg-emerald-500/30 transition-all">
+            <Sparkles size={11} className="animate-spin text-emerald-400" />
+            <span>Tap Spike for Tips! {petCount > 0 && `(x${petCount})`}</span>
+          </div>
         </motion.div>
 
-        {/* Dynamic Cute Speech Bubble */}
+        {/* Dynamic Cute Speech Bubble with Tag Badge */}
         <AnimatePresence mode="wait">
           <motion.div
             key={quoteIndex}
-            initial={{ opacity: 0, y: 6, scale: 0.95 }}
+            initial={{ opacity: 0, y: 10, scale: 0.92 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -6, scale: 0.95 }}
-            className="mt-2.5 max-w-sm mx-auto px-4 py-2 rounded-2xl bg-emerald-500/15 border border-emerald-500/35 text-emerald-300 font-mono text-xs font-semibold shadow-lg shadow-emerald-500/5 flex items-center justify-center gap-2"
+            exit={{ opacity: 0, y: -8, scale: 0.92 }}
+            transition={{ duration: 0.35, ease: 'easeOut' }}
+            className="mt-3.5 w-full max-w-lg mx-auto p-3 sm:p-4 rounded-2xl bg-gradient-to-r from-emerald-950/40 via-bwb-surface-2 to-emerald-950/40 border border-emerald-500/40 text-emerald-200 font-mono text-xs font-semibold shadow-xl shadow-emerald-500/10 flex flex-col sm:flex-row items-center gap-2.5 text-left"
           >
-            <span>{FUN_QUOTES[quoteIndex]}</span>
+            <div className="flex items-center gap-2 shrink-0">
+              <span className="text-xl">{currentTip.icon}</span>
+              <span className="px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                {currentTip.tag}
+              </span>
+            </div>
+            <p className="text-xs sm:text-sm text-bwb-text font-medium leading-relaxed">
+              {currentTip.text}
+            </p>
           </motion.div>
         </AnimatePresence>
       </div>
+
 
       {/* Main Title & Description */}
       <h2 className="font-display text-2xl sm:text-4xl font-black mb-2 text-bwb-text tracking-tight mt-1 sm:mt-2">

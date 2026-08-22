@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { Mic, Radio, Flame, Users, Sparkles, Trophy, Lightbulb, Target, Crown, Zap } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { PageLayout } from '../../components/layout/PageLayout'
@@ -9,7 +10,8 @@ import { LeaderboardTable } from '../../components/leaderboard/LeaderboardTable'
 import { useGameStore } from '../../store/gameStore'
 import { useRealtimeGame } from '../../hooks/useRealtimeGame'
 import { PHASE_LABELS } from '../../data/mockData'
-import type { GamePhase } from '../../types'
+import { api } from '../../lib/api'
+import type { GamePhase, Problem } from '../../types'
 
 const PHASE_CONFIG: Record<string, { icon: typeof Mic; color: string; bgColor: string; borderColor: string; label: string; description: string }> = {
   LOBBY: { icon: Users, color: 'text-bwb-muted', bgColor: 'bg-bwb-surface-2', borderColor: 'border-bwb-border', label: 'Waiting for Teams', description: 'Teams are joining the arena. The host will start the round shortly.' },
@@ -26,6 +28,11 @@ const PHASE_CONFIG: Record<string, { icon: typeof Mic; color: string; bgColor: s
 export default function PitchPage() {
   useRealtimeGame()
   const { game, session } = useGameStore()
+  const [problems, setProblems] = useState<Problem[]>([])
+
+  useEffect(() => {
+    api.getCatalog().then((c) => setProblems(c.problems)).catch(() => {})
+  }, [])
 
   const currentRound = game.currentRound ?? 1
   const phase = game.phase as GamePhase
@@ -34,6 +41,9 @@ export default function PitchPage() {
   const isPitching = phase === 'PITCHING'
   const isLeaderboard = phase === 'LEADERBOARD'
   const isResults = phase === 'RESULTS'
+  const isProblemReveal = phase === 'PROBLEM_REVEAL'
+  const isCardReveal = phase === 'CARD_REVEAL'
+  const isBuilding = phase === 'BUILDING'
 
   const myTeam = game.teams.find((t) => t.id === session?.teamId)
   const pitchTeam = game.teams.find((t) => t.id === game.currentPitchTeamId)
@@ -85,6 +95,21 @@ export default function PitchPage() {
           >
             JUDGES ARE EVALUATING ALL SUBMISSIONS
           </motion.div>
+        ) : isProblemReveal ? (
+          <div className="mb-6 text-xs text-amber-400 font-mono flex items-center justify-center gap-1.5">
+            <Lightbulb size={14} />
+            <span>8 problem statements revealed. Select your challenge track.</span>
+          </div>
+        ) : isCardReveal ? (
+          <div className="mb-6 text-xs text-cyan-400 font-mono flex items-center justify-center gap-1.5">
+            <Zap size={14} />
+            <span>3 surprise tech cards assigned. Review your tech stack.</span>
+          </div>
+        ) : isBuilding ? (
+          <div className="mb-6 text-xs text-emerald-400 font-mono flex items-center justify-center gap-1.5">
+            <Target size={14} />
+            <span>Build sprint active. Formulate and submit your solution.</span>
+          </div>
         ) : (
           <div className="mb-6 text-xs text-bwb-muted font-mono flex items-center justify-center gap-1.5">
             <PhaseIcon size={14} className={config.color} />
@@ -169,6 +194,76 @@ export default function PitchPage() {
                 <p className="text-sm text-bwb-muted font-mono">Waiting for judge to call a team...</p>
               </div>
             )
+          ) : isProblemReveal ? (
+            <div className="py-2">
+              <div className="flex items-center justify-center gap-2 mb-4">
+                <Lightbulb size={20} className="text-amber-400" />
+                <p className="font-display font-bold text-base text-bwb-text">Select Your Challenge</p>
+              </div>
+              {myTeam?.selectedProblemId ? (
+                <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-center">
+                  <p className="text-[10px] font-mono uppercase text-amber-400 mb-1">Your Selected Challenge</p>
+                  <p className="font-display font-bold text-lg text-bwb-text">{game.currentProblem?.title || 'Challenge Locked'}</p>
+                  <p className="text-xs text-bwb-muted mt-1">{game.currentProblem?.category}</p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {problems.map((p) => {
+                    const isSelected = game.currentProblem?.id === p.id
+                    return (
+                      <div key={p.id} className={`p-3 rounded-xl border text-left flex items-center gap-3 ${isSelected ? 'bg-amber-500/15 border-amber-500/40' : 'bg-bwb-surface-2/50 border-white/5'}`}>
+                        <div className="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center text-sm font-bold shrink-0">{p.id.replace('p', '')}</div>
+                        <div className="min-w-0">
+                          <p className="font-display font-bold text-sm text-bwb-text truncate">{p.title}</p>
+                          <p className="text-[10px] text-bwb-muted">{p.category}</p>
+                        </div>
+                        {isSelected && <span className="ml-auto text-[10px] font-mono font-bold text-amber-400 shrink-0">ACTIVE</span>}
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+              <p className="text-[10px] text-bwb-muted mt-3 text-center font-mono">Problem statements revealed. Go to the Problem Select page to choose your track.</p>
+            </div>
+          ) : isCardReveal ? (
+            <div className="py-2">
+              <div className="flex items-center justify-center gap-2 mb-4">
+                <Zap size={20} className="text-cyan-400" />
+                <p className="font-display font-bold text-base text-bwb-text">Your Tech Card Stack</p>
+              </div>
+              {myTeam && myTeam.technologies && myTeam.technologies.length > 0 ? (
+                <div className="grid grid-cols-3 gap-3">
+                  {myTeam.technologies.map((tech, i) => (
+                    <div key={tech.id || i} className="p-3 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 text-center">
+                      <span className="text-2xl block mb-1">{tech.icon}</span>
+                      <p className="font-display font-bold text-xs text-bwb-text">{tech.name}</p>
+                      <p className="text-[9px] text-bwb-muted mt-0.5">{tech.category}</p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-bwb-muted font-mono">Cards are being dealt. Go to Card Reveal to flip your cards.</p>
+              )}
+            </div>
+          ) : isBuilding ? (
+            <div className="py-2">
+              <div className="flex items-center justify-center gap-2 mb-4">
+                <Target size={20} className="text-emerald-400" />
+                <p className="font-display font-bold text-base text-bwb-text">Build Sprint</p>
+              </div>
+              {myTeam?.submission ? (
+                <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-left">
+                  <p className="text-[10px] font-mono uppercase text-emerald-400 mb-1">Your Submission</p>
+                  <p className="font-display font-bold text-sm text-bwb-text">{myTeam.submission.solutionName || 'Untitled Solution'}</p>
+                  <p className="text-xs text-bwb-muted mt-1 line-clamp-2">{myTeam.submission.whatItDoes || myTeam.submission.howItWorks}</p>
+                </div>
+              ) : (
+                <div className="text-center py-4">
+                  <CountdownTimer initialSeconds={900} size="xl" label="BUILD TIME" />
+                  <p className="text-xs text-bwb-muted mt-3 font-mono">Formulate your architecture and submit before time runs out.</p>
+                </div>
+              )}
+            </div>
           ) : isLeaderboard || isResults ? (
             <div className="flex flex-col items-center py-4">
               <Trophy size={36} className="text-bwb-gold mb-3" />

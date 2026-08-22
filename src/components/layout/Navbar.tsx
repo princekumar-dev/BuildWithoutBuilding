@@ -41,16 +41,16 @@ export function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-bwb-border/60 bg-bwb-bg/90 backdrop-blur-xl">
-      <nav className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <nav className="max-w-7xl mx-auto px-3 sm:px-6 h-16 flex items-center justify-between gap-2">
         {/* BRAND / LOGO SECTION */}
-        <div className="flex items-center gap-3">
-          <Link to="/" className="flex items-center gap-2.5 group">
-            <BulbCodeLogo size={30} className="w-8 h-8 group-hover:scale-105 transition-transform" />
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+          <Link to="/" className="flex items-center gap-2 group shrink-0">
+            <BulbCodeLogo size={28} className="w-7 h-7 sm:w-8 sm:h-8 group-hover:scale-105 transition-transform" />
             <div className="flex items-center">
-              <span className="font-display font-black text-sm sm:text-base tracking-tight text-bwb-text">
+              <span className="font-display font-black text-xs sm:text-base tracking-tight text-bwb-text">
                 BUILD WITHOUT
               </span>
-              <span className="font-display font-black text-sm sm:text-base tracking-tight text-bwb-accent ml-1">
+              <span className="font-display font-black text-xs sm:text-base tracking-tight text-bwb-accent ml-1">
                 BUILDING
               </span>
             </div>
@@ -58,21 +58,22 @@ export function Navbar() {
 
           {/* Role Badges */}
           {isHost && (
-            <span className="px-2.5 py-0.5 rounded-lg text-[11px] font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30 flex items-center gap-1">
+            <span className="hidden sm:flex px-2 py-0.5 rounded-lg text-[10px] sm:text-[11px] font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30 items-center gap-1 shrink-0">
               <Shield size={11} /> HOST OPS
             </span>
           )}
           {isJudge && (
-            <span className="px-2.5 py-0.5 rounded-lg text-[11px] font-bold bg-purple-500/15 text-purple-300 border border-purple-500/30 flex items-center gap-1">
+            <span className="hidden sm:flex px-2 py-0.5 rounded-lg text-[10px] sm:text-[11px] font-bold bg-purple-500/15 text-purple-300 border border-purple-500/30 items-center gap-1 shrink-0">
               <Sparkles size={11} /> JUDGE PANEL
             </span>
           )}
           {isParticipant && game.code && (
-            <Badge variant="accent" className="font-mono text-xs">
+            <Badge variant="accent" className="font-mono text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 shrink-0">
               {game.code}
             </Badge>
           )}
         </div>
+
 
         {/* HOST NAVIGATION */}
         {isHost && (

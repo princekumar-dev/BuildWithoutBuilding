@@ -54,7 +54,7 @@ export default function LandingPage() {
   return (
     <PageLayout fullWidth className="overflow-x-hidden">
       {/* HERO SECTION WITH DEPARTMENT & MICROSOFT AI CLUB BRANDING */}
-      <section className="relative pt-3 sm:pt-14 pb-4 sm:pb-14 px-4 sm:px-6 overflow-hidden">
+      <section className="relative pt-6 sm:pt-14 pb-8 sm:pb-14 px-4 sm:px-6 overflow-hidden">
         {/* Background Atmospheric Glows */}
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[700px] h-[500px] bg-gradient-to-tr from-bwb-accent/15 via-purple-600/10 to-transparent blur-[120px] pointer-events-none" />
         <div className="absolute top-10 right-10 w-96 h-96 bg-cyan-500/10 blur-[100px] pointer-events-none" />
@@ -65,44 +65,44 @@ export default function LandingPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            {/* Department Title Header */}
-            <div className="flex items-center justify-center gap-2 sm:gap-6 mb-3 sm:mb-7">
-              <div className="h-px w-6 sm:w-28 bg-gradient-to-r from-transparent via-amber-400/50 to-amber-400/80" />
-              <span className="font-display font-black text-[9px] sm:text-sm md:text-base tracking-[0.15em] sm:tracking-[0.3em] uppercase text-amber-400/90 drop-shadow-md text-center leading-tight">
+            {/* Department Title Header (Directly above Presenter Badge) */}
+            <div className="flex items-center justify-center gap-3 sm:gap-6 mb-7">
+              <div className="h-px w-10 sm:w-28 bg-gradient-to-r from-transparent via-amber-400/50 to-amber-400/80" />
+              <span className="font-display font-black text-xs sm:text-sm md:text-base tracking-[0.2em] sm:tracking-[0.3em] uppercase text-amber-400/90 drop-shadow-md text-center">
                 DEPARTMENT OF ARTIFICIAL INTELLIGENCE AND DATA SCIENCE
               </span>
-              <div className="h-px w-6 sm:w-28 bg-gradient-to-l from-transparent via-amber-400/50 to-amber-400/80" />
+              <div className="h-px w-10 sm:w-28 bg-gradient-to-l from-transparent via-amber-400/50 to-amber-400/80" />
             </div>
 
             {/* Microsoft AI Club Emblem Badge */}
-            <div className="inline-flex items-center gap-2.5 p-1.5 pr-5 rounded-full bg-bwb-surface-2/90 border border-amber-400/30 shadow-2xl backdrop-blur-xl mb-4 sm:mb-8 group hover:border-amber-400/60 transition-colors">
+            <div className="inline-flex items-center gap-3.5 p-2 pr-6 rounded-full bg-bwb-surface-2/90 border border-amber-400/30 shadow-2xl backdrop-blur-xl mb-8 group hover:border-amber-400/60 transition-colors">
               <img
                 src="/images/microsoft_ai_club_logo.jpg"
                 alt="Microsoft AI Club"
-                className="w-8 h-8 sm:w-11 sm:h-11 rounded-full object-cover border-2 border-amber-400/60 shadow-lg"
+                className="w-11 h-11 rounded-full object-cover border-2 border-amber-400/60 shadow-lg"
                 onError={(e) => {
                   (e.target as HTMLElement).style.display = 'none'
                 }}
               />
               <div className="text-left">
-                <p className="text-[9px] sm:text-[11px] font-mono uppercase tracking-widest text-amber-400 font-black">
+                <p className="text-[11px] font-mono uppercase tracking-widest text-amber-400 font-black">
                   MICROSOFT AI CLUB
                 </p>
-                <p className="text-[10px] sm:text-xs font-bold text-bwb-text tracking-wider">
+                <p className="text-xs font-bold text-bwb-text tracking-wider">
                   PROUDLY PRESENTS
                 </p>
               </div>
             </div>
 
             {/* Main Event Title */}
-            <h1 className="font-display font-black text-4xl sm:text-7xl md:text-8xl tracking-tight leading-none mb-3 sm:mb-6 text-center">
+            <h1 className="font-display font-black text-5xl sm:text-7xl md:text-8xl tracking-tight leading-none mb-6 text-center">
               BUILD <span className="text-gradient">WITHOUT</span>
               <br />
               <span className="text-bwb-text drop-shadow-2xl">BUILDING</span>
             </h1>
 
             {/* Official Tagline Pills */}
-            <div className="inline-flex flex-wrap items-center justify-center gap-1.5 sm:gap-4 px-3 sm:px-5 py-1.5 sm:py-2 rounded-2xl bg-bwb-surface/80 border border-amber-400/30 text-amber-300 font-mono text-[10px] sm:text-sm font-black tracking-widest uppercase mb-4 sm:mb-8 shadow-lg">
+            <div className="inline-flex flex-wrap items-center justify-center gap-2 sm:gap-4 px-5 py-2 rounded-2xl bg-bwb-surface/80 border border-amber-400/30 text-amber-300 font-mono text-xs sm:text-sm font-black tracking-widest uppercase mb-8 shadow-lg">
               <span>THINK</span>
               <span className="text-bwb-muted">·</span>
               <span>DESIGN</span>
@@ -113,8 +113,8 @@ export default function LandingPage() {
             </div>
 
             {/* Event Motto Quote Box */}
-            <div className="max-w-2xl mx-auto mb-5 sm:mb-10 p-3 sm:p-6 rounded-2xl sm:rounded-3xl stereo-card border border-bwb-accent/30 bg-gradient-to-r from-cyan-950/30 via-bwb-surface to-purple-950/30 shadow-2xl relative text-center">
-              <p className="font-display font-black text-xs sm:text-xl text-bwb-text uppercase tracking-wide leading-relaxed">
+            <div className="max-w-2xl mx-auto mb-10 p-5 sm:p-6 rounded-3xl stereo-card border border-bwb-accent/30 bg-gradient-to-r from-cyan-950/30 via-bwb-surface to-purple-950/30 shadow-2xl relative text-center">
+              <p className="font-display font-black text-base sm:text-xl text-bwb-text uppercase tracking-wide leading-relaxed">
                 &ldquo;You don&apos;t need to build it to solve it.
                 <br />
                 <span className="text-gradient">All you need is an idea that can.</span>&rdquo;
@@ -122,7 +122,7 @@ export default function LandingPage() {
             </div>
 
             {/* Primary Calls to Action */}
-            <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mb-2 sm:mb-8">
+            <div className="flex flex-wrap items-center justify-center gap-4 mb-6 sm:mb-8">
               <Link to="/join" className="w-full sm:w-auto">
                 <Button size="lg" className="w-full sm:min-w-[200px] shadow-xl shadow-bwb-accent/25 hover:scale-105 transition-transform text-sm font-bold">
                   <Users size={18} className="mr-2" /> Enter Live Event <ArrowRight size={16} className="ml-1.5" />

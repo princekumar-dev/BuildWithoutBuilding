@@ -191,18 +191,18 @@ export default function ProjectorPage() {
   return (
     <div className="projector-mobile-view min-h-screen bg-bwb-bg grid-bg text-bwb-text flex flex-col select-none overflow-x-hidden font-sans">
       {/* Top HUD & Projectionist Bar */}
-      <header className="px-6 py-3 bg-bwb-surface/80 backdrop-blur-xl border-b border-bwb-border flex flex-wrap items-center justify-between gap-4 z-50">
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
+      <header className="px-4 sm:px-6 py-3 bg-bwb-surface/80 backdrop-blur-xl border-b border-bwb-border flex flex-col sm:flex-row sm:flex-wrap items-start sm:items-center justify-between gap-2 sm:gap-4 z-50">
+        <div className="flex items-center gap-3 w-full sm:w-auto">
+          <div className="flex items-center gap-2 shrink-0">
             <Radio className="text-bwb-accent animate-pulse" size={18} />
-            <span className="font-display font-bold text-base tracking-wider uppercase text-gradient">
+            <span className="font-display font-bold text-sm sm:text-base tracking-wider uppercase text-gradient whitespace-nowrap">
               Build Without Building
             </span>
           </div>
 
           <div className="h-4 w-px bg-bwb-border hidden sm:block" />
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 min-w-0">
             {allGames.length > 1 ? (
               <select
                 value={game.id}
@@ -219,13 +219,13 @@ export default function ProjectorPage() {
                 ))}
               </select>
             ) : (
-              <span className="text-xs font-mono font-bold text-bwb-text">{game.name || 'Arena Broadcast'}</span>
+              <span className="text-xs font-mono font-bold text-bwb-text truncate">{game.name || 'Arena Broadcast'}</span>
             )}
           </div>
         </div>
 
         {/* Manual Phase Switcher for Stage Director */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto justify-end">
           <div className="hidden xl:flex items-center gap-1 bg-bwb-surface-2/60 p-1 rounded-xl border border-white/5 text-[11px] font-mono font-bold">
             {(['LOBBY', 'PROBLEM_REVEAL', 'CARD_REVEAL', 'BUILDING', 'PITCHING', 'JUDGING', 'LEADERBOARD', 'RESULTS'] as GamePhase[]).map((p) => (
               <button

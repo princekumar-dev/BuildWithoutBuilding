@@ -285,14 +285,19 @@ export default function JudgeDashboardPage() {
                         </div>
                       ) : (
                         <div className="flex items-center gap-2">
-                          <Button
-                            fullWidth
-                            size="sm"
-                            onClick={() => handleCallToPitch(team.id, team.name)}
-                            className="bg-amber-500 hover:bg-amber-400 text-bwb-bg font-bold shadow-lg shadow-amber-500/20"
-                          >
-                            <Mic size={14} className="mr-1.5" /> Call to Pitch
-                          </Button>
+                          {game.phase === 'PITCHING' && (
+                            <Button
+                              fullWidth
+                              size="sm"
+                              onClick={() => handleCallToPitch(team.id, team.name)}
+                              className="bg-amber-500 hover:bg-amber-400 text-bwb-bg font-bold shadow-lg shadow-amber-500/20"
+                            >
+                              <Mic size={14} className="mr-1.5" /> Call to Pitch
+                            </Button>
+                          )}
+                          {game.phase !== 'PITCHING' && (
+                            <span className="text-xs text-bwb-muted font-mono">Waiting for Pitching Phase</span>
+                          )}
                           <Link to={`/judge/score/${team.id}`} className="block">
                             <Button
                               size="sm"

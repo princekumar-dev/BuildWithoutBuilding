@@ -1,5 +1,7 @@
 import type { Game, GamePhase, ParticipantSession, Problem, Submission, ScoreBreakdown, Technology } from '../types'
 
+const API_BASE = (import.meta.env.VITE_API_URL || '').replace(/\/+$/, '')
+
 function getToken(): string | null { return localStorage.getItem('host_token') }
 
 async function request<T>(path: string, options?: RequestInit, auth = false): Promise<T> {
@@ -10,10 +12,11 @@ async function request<T>(path: string, options?: RequestInit, auth = false): Pr
   }
   let response: Response
   try {
-    response = await fetch(`/api${path}`, { headers, ...options })
+    response = await fetch(`${API_BASE}/api${path}`, { headers, ...options })
   } catch {
-    throw new Error('Cannot connect to backend server. Please make sure "npm run dev:full" or "npm run server" is running.')
+    throw new Error('Cannot connect to backend server. Please check your network connection.')
   }
+
   let data: any = {}
   try {
     const text = await response.text()

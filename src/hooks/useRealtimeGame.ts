@@ -33,8 +33,12 @@ export function useRealtimeGame() {
     syncGame()
 
     // Real-time SSE Stream
-    const streamUrl = session?.teamId ? `/api/events?teamId=${encodeURIComponent(session.teamId)}` : '/api/events'
+    const API_BASE = (import.meta.env.VITE_API_URL || '').replace(/\/+$/, '')
+    const streamUrl = session?.teamId
+      ? `${API_BASE}/api/events?teamId=${encodeURIComponent(session.teamId)}`
+      : `${API_BASE}/api/events`
     let stream: EventSource | null = null
+
 
     try {
       stream = new EventSource(streamUrl)

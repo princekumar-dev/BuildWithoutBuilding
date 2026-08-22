@@ -413,6 +413,17 @@ createServer(async (request, response) => {
   const url = new URL(request.url, 'http://localhost')
   const database = readDatabase()
 
+  // Enable Universal CORS for Vercel <-> Render cross-origin communication
+  response.setHeader('Access-Control-Allow-Origin', '*')
+  response.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, PUT, DELETE, OPTIONS')
+  response.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With')
+
+  if (request.method === 'OPTIONS') {
+    response.writeHead(204)
+    response.end()
+    return
+  }
+
   // Serve static assets and SPA routes in production (Render)
   if (!url.pathname.startsWith('/api')) {
     const filePath = join(distDir, url.pathname === '/' ? 'index.html' : url.pathname)
@@ -429,6 +440,7 @@ createServer(async (request, response) => {
       return createReadStream(spaIndex).pipe(response)
     }
   }
+
 
   if (request.method === 'POST' && url.pathname === '/api/auth/login') {
 

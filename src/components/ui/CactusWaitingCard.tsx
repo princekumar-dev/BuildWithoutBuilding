@@ -54,10 +54,9 @@ export function CactusWaitingCard({
   const [slideDirection, setSlideDirection] = useState<1 | -1>(1)
   const [isWiggling, setIsWiggling] = useState(false)
   const [isDancing, setIsDancing] = useState(false)
-  const [petCount, setPetCount] = useState(0)
-
   const [flowerSpin, setFlowerSpin] = useState(false)
   const [isBlushing, setIsBlushing] = useState(false)
+
   const [showAllTips, setShowAllTips] = useState(false)
   const [particles, setParticles] = useState<{ id: number; emoji: string; x: number; y: number; vx: number; vy: number; rot: number }[]>([])
   const [activeTab, setActiveTab] = useState<'passcode' | 'playbook' | 'checklist'>('passcode')
@@ -128,15 +127,13 @@ export function CactusWaitingCard({
     setIsWiggling(true)
     setFlowerSpin(true)
     setIsBlushing(true)
-    const newCount = petCount + 1
-    setPetCount(newCount)
     setSlideDirection(1)
     setQuoteIndex((prev) => (prev + 1) % FUN_QUOTES.length)
-    SoundFX.playCutePop(newCount)
+    SoundFX.playCutePop()
 
-    setTimeout(() => setIsWiggling(false), 900)
-    setTimeout(() => setFlowerSpin(false), 850)
-    setTimeout(() => setIsBlushing(false), 1400)
+    setTimeout(() => setIsWiggling(false), 600)
+    setTimeout(() => setFlowerSpin(false), 750)
+    setTimeout(() => setIsBlushing(false), 900)
 
     const rect = e.currentTarget.getBoundingClientRect()
     spawnParticlesAt(e.clientX - rect.left, e.clientY - rect.top)
@@ -145,35 +142,25 @@ export function CactusWaitingCard({
   const handleNextTip = () => {
     setSlideDirection(1)
     setQuoteIndex((prev) => (prev + 1) % FUN_QUOTES.length)
-    SoundFX.playCutePop(petCount + 1)
+    SoundFX.playCutePop()
   }
 
   const handlePrevTip = () => {
     setSlideDirection(-1)
     setQuoteIndex((prev) => (prev - 1 + FUN_QUOTES.length) % FUN_QUOTES.length)
-    SoundFX.playCutePop(petCount)
+    SoundFX.playCutePop()
   }
 
   const toggleDance = () => {
     setIsDancing((prev) => !prev)
     setIsWiggling(true)
     setFlowerSpin(true)
-    SoundFX.playCutePop(petCount)
-    setTimeout(() => setIsWiggling(false), 1200)
+    SoundFX.playCutePop()
+    setTimeout(() => setIsWiggling(false), 800)
   }
 
-
-  // Mascot Tamagotchi Evolution System
-  const getEvolutionInfo = () => {
-    if (petCount < 5) return { level: 1, name: 'Baby Sprout 🌱', desc: 'Warming up strategy vibes', next: 5, progress: (petCount / 5) * 100 }
-    if (petCount < 15) return { level: 2, name: 'Energetic Spike 🌵', desc: 'Hype building for Round 1!', next: 15, progress: ((petCount - 5) / 10) * 100 }
-    if (petCount < 30) return { level: 3, name: 'Strategy Maestro 🧠', desc: 'Architecting 1st place solutions!', next: 30, progress: ((petCount - 15) / 15) * 100 }
-    if (petCount < 50) return { level: 4, name: 'Golden Champion 👑', desc: 'Grand Finals ready!', next: 50, progress: ((petCount - 30) / 20) * 100 }
-    return { level: 5, name: 'SQUAD DEITY 🔥⚡', desc: 'Unstoppable championship energy!', next: 100, progress: 100 }
-  }
-
-  const evo = getEvolutionInfo()
   const currentTip = FUN_QUOTES[quoteIndex]
+
 
   const copyTipToClipboard = () => {
     navigator.clipboard.writeText(`${currentTip.tag}: ${currentTip.text}`)
@@ -247,18 +234,17 @@ export function CactusWaitingCard({
 
         <motion.div
           onClick={handleCactusClick}
-          title="Tap Spike for happy energy and pro tournament tips!"
+          title="Tap Spike for happy vibes and tournament tips!"
           animate={
             isWiggling || isDancing
               ? {
-                  scale: [1, 1.32, 0.86, 1.22, 0.95, 1],
-                  y: [0, -32, 5, -16, 2, 0],
-                  rotate: isDancing ? [-18, 18, -18, 18, 0] : [0, -15, 15, -8, 8, 0],
+                  scale: [1, 1.08, 0.96, 1.04, 1],
+                  rotate: isDancing ? [-8, 8, -8, 8, 0] : [0, -5, 5, -2, 2, 0],
                 }
               : undefined
           }
           transition={{
-            duration: isDancing ? 0.9 : 0.85,
+            duration: isDancing ? 0.8 : 0.6,
             repeat: isDancing ? Infinity : 0,
             ease: 'easeInOut',
           }}
@@ -282,10 +268,6 @@ export function CactusWaitingCard({
                   <stop offset="75%" stopColor="#10B981" />
                   <stop offset="100%" stopColor="#047857" />
                 </linearGradient>
-                <linearGradient id="crownGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#FDE047" />
-                  <stop offset="100%" stopColor="#EAB308" />
-                </linearGradient>
               </defs>
 
               {/* Pot Base with 3D Bevel & Shadow */}
@@ -295,7 +277,7 @@ export function CactusWaitingCard({
 
               {/* Left Cute Stubby Arm (Chubby Branch) */}
               <motion.g
-                animate={isWiggling || isDancing ? { rotate: [-18, 22, -18] } : undefined}
+                animate={isWiggling || isDancing ? { rotate: [-12, 14, -12] } : undefined}
                 transition={{ repeat: isDancing ? Infinity : 1, duration: 0.35, ease: 'easeInOut' }}
                 style={{ transformOrigin: '32px 64px' }}
               >
@@ -312,7 +294,7 @@ export function CactusWaitingCard({
 
               {/* Right Cute Stubby Arm (Waving Branch) */}
               <motion.g
-                animate={isWiggling || isDancing ? { rotate: [22, -18, 22] } : undefined}
+                animate={isWiggling || isDancing ? { rotate: [14, -12, 14] } : undefined}
                 transition={{ repeat: isDancing ? Infinity : 2, duration: 0.3 }}
                 style={{ transformOrigin: '68px 60px' }}
               >
@@ -339,23 +321,9 @@ export function CactusWaitingCard({
               <path d="M42 20 Q48 18 48 90" stroke="#A7F3D0" strokeWidth="2.2" strokeLinecap="round" fill="none" opacity="0.45" />
               <path d="M58 20 Q52 18 52 90" stroke="#047857" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.3" />
 
-              {/* Golden Crown on Mascot Evolution */}
-              {evo.level >= 2 && (
-                <motion.g
-                  animate={isWiggling || isDancing ? { y: [0, -4, 0], rotate: [-6, 6, -6] } : undefined}
-                  transition={{ repeat: isDancing ? Infinity : 1, duration: 0.4 }}
-                  style={{ transformOrigin: '50px 4px' }}
-                >
-                  <path d="M40 8 L43 1 L50 6 L57 1 L60 8 Z" fill="url(#crownGrad)" stroke="#B45309" strokeWidth="1.2" strokeLinejoin="round" />
-                  <circle cx="43" cy="1" r="1.3" fill="#EF4444" />
-                  <circle cx="50" cy="6" r="1.3" fill="#3B82F6" />
-                  <circle cx="57" cy="1" r="1.3" fill="#10B981" />
-                </motion.g>
-              )}
-
               {/* Top Spinning Kawaii Cherry Blossom Cluster */}
               <motion.g
-                animate={flowerSpin ? { rotate: 360, scale: [1, 1.35, 1] } : undefined}
+                animate={flowerSpin ? { rotate: 360, scale: [1, 1.25, 1] } : undefined}
                 transition={{ duration: 0.75, repeat: 0 }}
                 style={{ transformOrigin: '50px 14px' }}
               >
@@ -425,35 +393,16 @@ export function CactusWaitingCard({
             </svg>
           </div>
 
-
-
-
-
           {/* Interactive Mascot Tap Badge */}
           <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-[10px] sm:text-xs font-mono font-black uppercase tracking-wider mt-1.5 shadow-lg group-hover:scale-105 group-hover:bg-emerald-500/30 transition-all">
             <Sparkles size={12} className="animate-spin text-emerald-400" />
-            <span>Tap Spike for Tips! {petCount > 0 && `(x${petCount})`}</span>
+            <span>Tap Spike for Tips!</span>
           </div>
         </motion.div>
 
-        {/* Mascot Tamagotchi Evolution Progress Bar */}
-        <div className="max-w-xs mx-auto mt-2 px-3 py-1.5 rounded-xl bg-bwb-surface/90 border border-white/10 shadow-inner">
-          <div className="flex items-center justify-between text-[10px] font-mono mb-1">
-            <span className="font-bold text-amber-300">{evo.name}</span>
-            <span className="text-bwb-muted font-semibold">{petCount} Pets</span>
-          </div>
-          <div className="w-full h-1.5 rounded-full bg-white/10 overflow-hidden">
-            <motion.div
-              className="h-full bg-gradient-to-r from-emerald-400 via-teal-400 to-amber-400"
-              initial={{ width: 0 }}
-              animate={{ width: `${evo.progress}%` }}
-              transition={{ duration: 0.4 }}
-            />
-          </div>
-        </div>
-
         {/* INTERACTIVE SLIDING STRATEGY TIP CAROUSEL */}
         <div className="relative mt-4 max-w-lg mx-auto">
+
           <AnimatePresence mode="wait" custom={slideDirection}>
             <motion.div
               key={quoteIndex}

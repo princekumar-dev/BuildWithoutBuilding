@@ -157,12 +157,12 @@ export default function HostGameControlPage() {
     toast.success(`Passcode "${passcode}" for Team "${teamName}" copied!`)
   }
 
-  const handleSetRound = async (roundNum: number) => {
+  const handleSetRound = async (roundNum: number, targetPhase: GamePhase = 'LOBBY') => {
     if (!game.id) return
     try {
-      const updated = await api.setRound(game.id, roundNum)
+      const updated = await api.setRound(game.id, roundNum, targetPhase)
       setGame(updated)
-      toast.success(`Active tournament stage switched to Round ${roundNum}!`)
+      toast.success(`Active tournament stage switched to Round ${roundNum}! Room set to ${PHASE_LABELS[targetPhase]}.`)
     } catch (err: any) {
       toast.error(err.message || 'Unable to update round.')
     }
@@ -897,7 +897,7 @@ export default function HostGameControlPage() {
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-display font-black text-bwb-accent flex items-center gap-1.5">
-                        <Zap size={14} /> Stage Status: {PHASE_LABELS[game.phase]}
+                        <Zap size={14} /> Stage Status: {PHASE_LABELS[game.phase]} (Round {currentRound})
                       </span>
                       <span className="text-[10px] font-mono uppercase bg-white/5 px-2 py-0.5 rounded-md text-bwb-muted">
                         Live on Stage & Screens
@@ -906,42 +906,42 @@ export default function HostGameControlPage() {
 
                     {game.phase === 'LOBBY' && (
                       <p className="text-xs text-bwb-muted">
-                        🚪 <strong>Lobby Standby</strong>: Waiting for teams to connect with PIN <strong className="text-bwb-accent font-mono">{game.code}</strong>. When all teams are present, switch to <strong>Problem Reveal</strong>.
+                        🚪 <strong>Round {currentRound} Standby & Setup</strong>: Previous round leaderboard is cleared and Round {currentRound} is ready! Click <strong>Problem Reveal</strong>, <strong>Card Reveal</strong>, or <strong>Build Phase</strong> when you want to begin Round {currentRound}.
                       </p>
                     )}
                     {game.phase === 'PROBLEM_REVEAL' && (
                       <p className="text-xs text-bwb-muted">
-                        💡 <strong>Problem Selection</strong>: 8 Problem statements are active on projector and player devices. Teams are choosing their challenge track.
+                        💡 <strong>Problem Selection (Round {currentRound})</strong>: 8 Problem statements are active on projector and player devices. Teams are choosing their challenge track.
                       </p>
                     )}
                     {game.phase === 'CARD_REVEAL' && (
                       <p className="text-xs text-bwb-muted">
-                        🎴 <strong>Surprise Tech Card Draft</strong>: Squads have received 3 surprise frontier tech cards. Teams are reviewing their cards before the build sprint.
+                        🎴 <strong>Surprise Tech Card Draft (Round {currentRound})</strong>: Squads have received 3 surprise frontier tech cards. Teams are reviewing their cards before the build sprint.
                       </p>
                     )}
                     {game.phase === 'BUILDING' && (
                       <p className="text-xs text-bwb-muted">
-                        ⚡ <strong>15-Minute Rapid Architecture Sprint Active</strong>: Squads are building system architectures. Submissions received: <strong className="text-bwb-accent">{submittedCount}</strong> / {game.teams.length}.
+                        ⚡ <strong>15-Minute Rapid Architecture Sprint Active (Round {currentRound})</strong>: Squads are building system architectures. Submissions received: <strong className="text-bwb-accent">{submittedCount}</strong> / {game.teams.length}.
                       </p>
                     )}
                     {game.phase === 'PITCHING' && (
                       <p className="text-xs text-bwb-muted">
-                        🎤 <strong>Live Stage Pitching Active</strong>: Teams have 3 minutes to present their system flow, tech card integration, and answer judge defenses.
+                        🎤 <strong>Live Stage Pitching Active (Round {currentRound})</strong>: Teams have 3 minutes to present their system flow, tech card integration, and answer judge defenses.
                       </p>
                     )}
                     {game.phase === 'JUDGING' && (
                       <p className="text-xs text-bwb-muted">
-                        ⚖️ <strong>Judge Scoring Active</strong>: Judges enter ratings across 4 Rubric dimensions: Tech Integration (20), Feasibility (20), Problem Relevance (20), and Presentation (20).
+                        ⚖ <strong>Judge Scoring Active (Round {currentRound})</strong>: Judges enter ratings across 4 Rubric dimensions: Tech Integration (20), Feasibility (20), Problem Relevance (20), and Presentation (20).
                       </p>
                     )}
                     {game.phase === 'LEADERBOARD' && (
                       <p className="text-xs text-bwb-muted">
-                        🏆 <strong>Live Leaderboard & Standings</strong>: {currentRound === 2 ? 'Review Top 8 squads. Click "Lock Top 8 & Start Finals" when ready.' : 'Review final scores before podium reveal.'}
+                        🏆 <strong>Live Leaderboard & Standings (Round {currentRound})</strong>: {currentRound === 2 ? 'Review Top 8 squads. Click "Lock Top 8 & Start Finals" when ready.' : 'Review final scores before podium reveal.'}
                       </p>
                     )}
                     {game.phase === 'RESULTS' && (
                       <p className="text-xs text-bwb-muted">
-                        🎉 <strong>Championship Prize Podium</strong>: 1st Champion, 2nd Runner-Up, and Dual 3rd Bronze Winners are presented with celebration confetti!
+                        🎉 <strong>Championship Prize Podium (Round {currentRound})</strong>: 1st Champion, 2nd Runner-Up, and Dual 3rd Bronze Winners are presented with celebration confetti!
                       </p>
                     )}
                   </div>

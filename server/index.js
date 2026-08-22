@@ -637,7 +637,11 @@ createServer(async (request, response) => {
     if (![1, 2, 3].includes(roundNum)) return json(response, 400, { error: 'Invalid round number. Must be 1, 2, or 3.' });
     game.currentRound = roundNum;
     game.isFinalRound = roundNum === 3;
-    if (input.phase) game.phase = input.phase;
+    if (input.phase) {
+      game.phase = input.phase;
+    } else {
+      game.phase = 'LOBBY';
+    }
     save(database);
     return json(response, 200, publicGame(game));
   }

@@ -250,6 +250,7 @@ export default function HostGameControlPage() {
   }, [game.id, currentRound, game.buildDurationMinutes, game.phase])
 
   const advanceStage = async () => {
+    if (game.phase === 'JUDGING' && !allTeamsScored) return
     if (nextStage) return changePhase(nextStage.phase)
     if (currentRound === 1) return handleSetRound(2, 'LOBBY')
     if (currentRound === 2) return handleAdvanceTop8ToFinals()
@@ -258,6 +259,8 @@ export default function HostGameControlPage() {
 
   const totalParticipants = game.teams.reduce((acc, t) => acc + (t.members?.length ?? 0), 0)
   const submittedCount = game.teams.filter((t) => !!t.submission).length
+  const scoredCount = game.teams.filter((t) => (t.score ?? 0) > 0).length
+  const allTeamsScored = game.teams.length > 0 && scoredCount === game.teams.length
 
 
   return (
@@ -937,17 +940,21 @@ export default function HostGameControlPage() {
                 <Button
                   size="md"
                   onClick={advanceStage}
-                  className="glow-accent shadow-lg shadow-bwb-accent/20"
+                  disabled={game.phase === 'JUDGING' && !allTeamsScored}
+                  className={`glow-accent shadow-lg shadow-bwb-accent/20 ${game.phase === 'JUDGING' && !allTeamsScored ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                   <Play size={15} className="mr-1.5" />
-                  {nextStage ? `Advance to: ${nextStage.title}` : currentRound === 1 ? 'Start Round 2 Lobby' : currentRound === 2 ? 'Lock Top 8 & Start Round 3 Lobby' : 'Reveal Final Results'}
+                  {game.phase === 'JUDGING' && !allTeamsScored
+                    ? `Waiting for Scores (${scoredCount}/${game.teams.length})`
+                    : nextStage ? `Advance to: ${nextStage.title}` : currentRound === 1 ? 'Start Round 2 Lobby' : currentRound === 2 ? 'Lock Top 8 & Start Round 3 Lobby' : 'Reveal Final Results'
+                  }
                 </Button>
               )}
             </div>
 
             {/* Stepper Pipeline Grid */}
             {(() => {
-              const visibleStages = stages.filter(s => s.phase !== 'JUDGING')
+              const visibleStages = stages
               const colCount = visibleStages.length
               const gridClass = colCount <= 4
                 ? 'grid-cols-2 sm:grid-cols-4'

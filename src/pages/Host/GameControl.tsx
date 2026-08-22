@@ -45,6 +45,10 @@ export default function HostGameControlPage() {
   const [isEditingSchedule, setIsEditingSchedule] = useState(false)
   const [scheduledDateTime, setScheduledDateTime] = useState('')
 
+  // Max Teams Capacity state
+  const [isEditingMaxTeams, setIsEditingMaxTeams] = useState(false)
+  const [maxTeamsInput, setMaxTeamsInput] = useState<number>(game.maxTeams || 32)
+
   useRealtimeGame()
 
   useEffect(() => {
@@ -57,6 +61,12 @@ export default function HostGameControlPage() {
     }, 3000)
     return () => clearInterval(interval)
   }, [gameId, setGame])
+
+  useEffect(() => {
+    if (game.maxTeams) {
+      setMaxTeamsInput(game.maxTeams)
+    }
+  }, [game.maxTeams])
 
   useEffect(() => {
     if (game.scheduledStartTime) {
@@ -83,6 +93,20 @@ export default function HostGameControlPage() {
       toast.error('Unable to update schedule.')
     }
   }
+
+  const handleSaveMaxTeams = async (limitVal: number) => {
+    if (!game.id) return
+    try {
+      const cleanLimit = Math.max(2, Math.min(128, limitVal || 32))
+      const updated = await api.updateConfig(game.id, { maxTeams: cleanLimit })
+      setGame(updated)
+      setIsEditingMaxTeams(false)
+      toast.success(`Max team capacity updated to ${cleanLimit} teams!`)
+    } catch {
+      toast.error('Unable to update max team capacity.')
+    }
+  }
+
 
   const timerActive = game.phase !== 'LOBBY'
 
@@ -398,8 +422,119 @@ export default function HostGameControlPage() {
                 </motion.div>
               )}
             </AnimatePresence>
+
+            {/* Max Team Registration Capacity Limit Widget */}
+            <div className="mt-4 pt-4 border-t border-white/5 flex flex-wrap items-center justify-between gap-4">
+
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 rounded-xl bg-cyan-400/10 border border-cyan-400/20 text-cyan-400">
+                  <Users size={18} />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <p className="text-[10px] font-mono uppercase text-bwb-muted font-bold tracking-wider">
+                      Team Registration Capacity Quota
+                    </p>
+                    {game.teams.length >= (game.maxTeams || 32) && (
+                      <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/40 animate-pulse">
+                        ROOM FULL
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs font-mono font-bold text-bwb-text mt-0.5">
+                    Registered:{' '}
+                    <span className={game.teams.length >= (game.maxTeams || 32) ? 'text-rose-400' : 'text-bwb-accent'}>
+                      {game.teams.length}
+                    </span>{' '}
+                    / <span className="text-bwb-text font-black">{game.maxTeams || 32} Teams Max</span>
+                    <span className="text-bwb-muted font-normal ml-2">
+                      ({Math.max(0, (game.maxTeams || 32) - game.teams.length)} slots remaining)
+                    </span>
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={() => setIsEditingMaxTeams(!isEditingMaxTeams)}
+                  className="text-xs border-white/10"
+                >
+                  <Edit3 size={13} className="mr-1.5 text-cyan-400" />
+                  {isEditingMaxTeams ? 'Close Quota Editor' : 'Adjust Max Team Limit'}
+                </Button>
+              </div>
+            </div>
+
+            {/* Inline Max Teams Quota Editor Box */}
+            <AnimatePresence>
+              {isEditingMaxTeams && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="mt-4 p-5 rounded-2xl bg-bwb-bg border border-cyan-400/40 overflow-hidden shadow-2xl"
+                >
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-mono uppercase text-cyan-300 font-bold flex items-center gap-1.5">
+                        <Users size={13} /> Select Maximum Allowed Teams
+                      </label>
+                      <span className="text-xs font-mono font-bold text-cyan-300 bg-cyan-400/10 px-2.5 py-0.5 rounded-full border border-cyan-400/30">
+                        {maxTeamsInput} Teams Max
+                      </span>
+                    </div>
+
+                    {/* Presets */}
+                    <div className="grid grid-cols-6 gap-2">
+                      {[8, 16, 24, 32, 48, 64].map((count) => (
+                        <button
+                          key={count}
+                          type="button"
+                          onClick={() => setMaxTeamsInput(count)}
+                          className={`py-2 rounded-xl text-xs font-mono font-bold transition-all border ${
+                            maxTeamsInput === count
+                              ? 'bg-cyan-400 text-bwb-bg border-cyan-400 shadow-md scale-[1.02]'
+                              : 'bg-bwb-surface border-white/10 text-bwb-muted hover:text-bwb-text hover:border-white/20'
+                          }`}
+                        >
+                          {count}
+                        </button>
+                      ))}
+                    </div>
+
+                    <div className="flex items-center gap-3 pt-1">
+                      <input
+                        type="number"
+                        min={2}
+                        max={128}
+                        value={maxTeamsInput}
+                        onChange={(e) => setMaxTeamsInput(Math.max(2, Math.min(128, Number(e.target.value) || 32)))}
+                        className="flex-1 px-4 py-2.5 rounded-xl bg-bwb-surface border border-bwb-border text-bwb-text text-sm font-mono focus:border-cyan-400 outline-none"
+                        placeholder="Custom max teams (e.g. 20)"
+                      />
+
+                      <Button
+                        size="md"
+                        onClick={() => handleSaveMaxTeams(maxTeamsInput)}
+                        className="text-xs font-bold bg-cyan-400 text-bwb-bg hover:bg-cyan-300 shadow-md shrink-0"
+                      >
+                        <CheckCircle2 size={14} className="mr-1" />
+                        Save Team Limit
+                      </Button>
+                    </div>
+
+                    <p className="text-[11px] text-bwb-muted">
+                      Teams attempting to register past this quota will see a respectful capacity apology card directing them to the Passcode tab.
+                    </p>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </PageTransition>
+
 
 
 

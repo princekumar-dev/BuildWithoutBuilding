@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   UserPlus, Key, ArrowRight, CheckCircle2,
   Copy, Sparkles, UserCheck, Plus, Trash2, Crown, Radio,
-  Mail, Phone, GraduationCap
+  Mail, Phone, GraduationCap, Users, AlertTriangle, ShieldAlert
 } from 'lucide-react'
 import { PageLayout } from '../../components/layout/PageLayout'
 import { Card } from '../../components/ui/Card'
@@ -49,16 +49,27 @@ export default function JoinPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  // Auto-fetch active games and default to the latest created room
+  // Auto-fetch active games and poll every 4 seconds for real-time capacity quota updates
   useEffect(() => {
-    api.listGames().then((games) => {
-      setActiveGames(games)
-      if (games.length > 0) {
-        const latest = games[games.length - 1]
-        setCode(latest.code)
-      }
-    }).catch(() => {})
-  }, [])
+    const fetchGames = () => {
+      api.listGames().then((games) => {
+        setActiveGames(games)
+        if (games.length > 0 && !code) {
+          const latest = games[games.length - 1]
+          setCode(latest.code)
+        }
+      }).catch(() => {})
+    }
+    fetchGames()
+    const interval = setInterval(fetchGames, 4000)
+    return () => clearInterval(interval)
+  }, [code])
+
+  const currentTargetGame = activeGames.find((g) => g.code === code) || (activeGames.length > 0 ? activeGames[activeGames.length - 1] : null)
+  const roomMaxTeams = currentTargetGame ? (currentTargetGame.maxTeams || 32) : 32
+  const roomRegisteredCount = currentTargetGame ? currentTargetGame.teams.length : 0
+  const isRoomFull = currentTargetGame ? roomRegisteredCount >= roomMaxTeams : false
+  const slotsRemaining = Math.max(0, roomMaxTeams - roomRegisteredCount)
 
   const handleAddMember = () => {
     if (members.length < 3) {
@@ -82,6 +93,12 @@ export default function JoinPage() {
   const handleRegisterTeam = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+
+    if (isRoomFull) {
+      setError(`We sincerely apologize! Registration for this room is full (${roomRegisteredCount}/${roomMaxTeams} teams).`)
+      return
+    }
+
     const normalizedCode = code.trim().toUpperCase()
     if (!normalizedCode) {
       setError('Please provide the Event Game Code (e.g. BWB-472).')
@@ -115,7 +132,10 @@ export default function JoinPage() {
       setGame(result.game)
       toast.success(`Team "${teamName}" registered with Passcode: ${result.session.passcode || result.session.teamId}!`)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unable to register team.')
+      const errMsg = err instanceof Error ? err.message : 'Unable to register team.'
+      setError(errMsg)
+      // Refresh games if room was full
+      api.listGames().then(setActiveGames).catch(() => {})
     } finally {
       setLoading(false)
     }
@@ -232,7 +252,7 @@ export default function JoinPage() {
                       onClick={copyPasscode}
                       className="border-amber-400/50 text-xs shrink-0 font-bold"
                     >
-                      {copied ? <CheckCircle2 size={14} className="text-bwb-success mr-1" /> : <Copy size={14} className="mr-1" />}
+                      {copied ? <CheckCircle2 size={14} className="text-bwb-success mr-1" /> : <Copy size={14} />}
                       <span>{copied ? 'Copied' : 'Copy'}</span>
                     </Button>
                   </div>
@@ -273,23 +293,34 @@ export default function JoinPage() {
         {/* REGISTRATION & JOIN CARD */}
         {!registeredSession && (
           <Card glow padding="md" className="border-bwb-border/80 shadow-2xl bg-gradient-to-b from-bwb-surface-2 to-bwb-surface">
-            {/* Locked Active Event Room Header */}
-            <div className="mb-5 p-3 sm:p-4 rounded-2xl bg-bwb-bg/80 border border-white/10 flex items-center justify-between gap-3 shadow-inner">
+            {/* Locked Active Event Room Header with Live Capacity Status */}
+            <div className="mb-5 p-3 sm:p-4 rounded-2xl bg-bwb-bg/80 border border-white/10 flex flex-wrap items-center justify-between gap-3 shadow-inner">
               <div className="truncate">
                 <div className="flex items-center gap-2 mb-0.5">
-                  <span className="inline-block w-2 h-2 rounded-full bg-bwb-success animate-pulse shrink-0" />
+                  <span className={`inline-block w-2 h-2 rounded-full ${isRoomFull ? 'bg-rose-400' : 'bg-bwb-success'} animate-pulse shrink-0`} />
                   <label className="text-[10px] font-mono uppercase text-bwb-muted font-bold tracking-widest truncate">
                     ACTIVE EVENT ROOM
                   </label>
+                  {/* Live Capacity Tag */}
+                  {isRoomFull ? (
+                    <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-rose-500/20 text-rose-300 border border-rose-500/40 flex items-center gap-1">
+                      <AlertTriangle size={11} className="shrink-0" /> Capacity Full ({roomRegisteredCount}/{roomMaxTeams})
+                    </span>
+                  ) : (
+                    <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-md bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 flex items-center gap-1">
+                      <Users size={11} className="shrink-0" /> {roomRegisteredCount}/{roomMaxTeams} Teams ({slotsRemaining} slots left)
+                    </span>
+                  )}
+
                 </div>
                 <p className="text-xs font-semibold text-bwb-text truncate">
-                  {activeGames.length > 0 ? (activeGames[activeGames.length - 1]?.name || 'Live Tournament Room') : 'Live Competition Room'}
+                  {currentTargetGame?.name || 'Live Competition Room'}
                 </p>
               </div>
 
               <div className="px-3 sm:px-4 py-2 rounded-xl bg-bwb-surface-2 border border-bwb-accent/40 font-mono text-sm sm:text-base tracking-widest font-black text-bwb-accent shadow-sm flex items-center gap-1.5 shrink-0 select-all">
                 <Radio size={13} className="text-bwb-accent animate-pulse shrink-0" />
-                <span>{code || (activeGames.length > 0 ? activeGames[activeGames.length - 1]?.code : 'BWB-LIVE')}</span>
+                <span>{code || currentTargetGame?.code || 'BWB-LIVE'}</span>
               </div>
             </div>
 
@@ -316,7 +347,10 @@ export default function JoinPage() {
                   />
                 )}
                 <UserPlus size={15} className="relative z-10" />
-                <span className="relative z-10">Register Team</span>
+                <span className="relative z-10 flex items-center gap-1.5">
+                  Register Team
+                  {isRoomFull && <span className="w-2 h-2 rounded-full bg-rose-400 inline-block" title="Full" />}
+                </span>
               </button>
 
               <button
@@ -348,204 +382,257 @@ export default function JoinPage() {
               <AnimatePresence mode="wait" initial={false}>
                 {/* TAB 1: FULL TEAM REGISTRATION */}
                 {activeTab === 'register' && (
-                  <motion.form
-                    key="join-tab-register"
-                    initial={{ opacity: 0, y: 6 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -6 }}
-                    transition={{ duration: 0.2, ease: [0.25, 1, 0.5, 1] }}
-                    onSubmit={handleRegisterTeam}
-                    className="space-y-5 will-change-transform gpu-layer"
-                  >
-                    <Input
-                      label="Team Name *"
-                      placeholder="e.g. Neural Ninjas"
-                      value={teamName}
-                      onChange={(e) => setTeamName(e.target.value)}
-                      hint="Choose a memorable, technical team name"
-                    />
-
-                    {/* Contact Information (Email & Phone) */}
-                    <div className="grid sm:grid-cols-2 gap-3.5">
-                      <div>
-                        <label className="text-xs font-mono uppercase text-bwb-muted font-bold block mb-1.5 flex items-center gap-1.5">
-                          <Mail size={13} className="text-bwb-accent" />
-                          Email Address
-                        </label>
-                        <input
-                          type="email"
-                          placeholder="e.g. teamlead@college.edu"
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                          className="w-full px-3.5 py-2.5 rounded-xl bg-bwb-bg/70 border border-bwb-border text-bwb-text text-sm font-medium placeholder:text-bwb-muted/60 focus:border-bwb-accent outline-none"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="text-xs font-mono uppercase text-bwb-muted font-bold block mb-1.5 flex items-center gap-1.5">
-                          <Phone size={13} className="text-bwb-accent" />
-                          Phone Number
-                        </label>
-                        <input
-                          type="tel"
-                          placeholder="e.g. +91 9876543210"
-                          value={phone}
-                          onChange={(e) => setPhone(e.target.value)}
-                          className="w-full px-3.5 py-2.5 rounded-xl bg-bwb-bg/70 border border-bwb-border text-bwb-text text-sm font-medium placeholder:text-bwb-muted/60 focus:border-bwb-accent outline-none"
-                        />
-                      </div>
-                    </div>
-
-                    {/* Academic Details (Department, Year, Section Dropdowns) */}
-                    <div className="p-4 rounded-2xl bg-bwb-bg/60 border border-white/5 space-y-3">
-                      <p className="text-[11px] font-mono uppercase text-bwb-accent font-bold tracking-wider flex items-center gap-1.5">
-                        <GraduationCap size={14} />
-                        Academic & College Details
-                      </p>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                        <div>
-                          <label className="text-[11px] font-mono text-bwb-muted font-semibold block mb-1">
-                            Department
-                          </label>
-                          <select
-                            value={department}
-                            onChange={(e) => setDepartment(e.target.value)}
-                            style={{ colorScheme: 'dark' }}
-                            className="w-full px-3 py-2.5 rounded-xl bg-bwb-surface border border-bwb-border text-bwb-text text-xs font-semibold focus:border-bwb-accent outline-none cursor-pointer"
-                          >
-                            <option value="">Select Dept</option>
-                            <option value="AIDS">AIDS (AI & DS)</option>
-                            <option value="CSE">CSE</option>
-                            <option value="IT">IT</option>
-                            <option value="ECE">ECE</option>
-                            <option value="EEE">EEE</option>
-                            <option value="MECH">MECH</option>
-                            <option value="CIVIL">CIVIL</option>
-                            <option value="Other">Other</option>
-                          </select>
-                        </div>
-
-                        {/* Year Dropdown */}
-                        <div>
-                          <label className="text-[11px] font-mono text-bwb-muted font-semibold block mb-1">
-                            Year
-                          </label>
-                          <select
-                            value={year}
-                            onChange={(e) => setYear(e.target.value)}
-                            style={{ colorScheme: 'dark' }}
-                            className="w-full px-3 py-2.5 rounded-xl bg-bwb-surface border border-bwb-border text-bwb-text text-xs font-semibold focus:border-bwb-accent outline-none cursor-pointer"
-                          >
-                            <option value="">Select Year</option>
-                            <option value="1st Year">1st Year</option>
-                            <option value="2nd Year">2nd Year</option>
-                            <option value="3rd Year">3rd Year</option>
-                            <option value="4th Year">4th Year</option>
-                          </select>
-                        </div>
-
-                        {/* Section Dropdown */}
-                        <div>
-                          <label className="text-[11px] font-mono text-bwb-muted font-semibold block mb-1">
-                            Section
-                          </label>
-                          <select
-                            value={section}
-                            onChange={(e) => setSection(e.target.value)}
-                            style={{ colorScheme: 'dark' }}
-                            className="w-full px-3 py-2.5 rounded-xl bg-bwb-surface border border-bwb-border text-bwb-text text-xs font-semibold focus:border-bwb-accent outline-none cursor-pointer"
-                          >
-                            <option value="">Select Section</option>
-                            <option value="A">Section A</option>
-                            <option value="B">Section B</option>
-                            <option value="Nil">Nil</option>
-                          </select>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Team Members List */}
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <label className="text-xs font-mono uppercase text-bwb-muted font-bold tracking-wider">
-                          Team Members ({members.length}/3) · 2 or 3 Members
-                        </label>
-                        {members.length < 3 && (
-                          <button
-                            type="button"
-                            onClick={handleAddMember}
-                            className="text-xs text-bwb-accent hover:underline flex items-center gap-1 font-bold"
-                          >
-                            <Plus size={13} /> Add 3rd Teammate
-                          </button>
-                        )}
-                      </div>
-
-                      <div className="space-y-3">
-                        {members.map((member, i) => (
-                          <div
-                            key={i}
-                            className="p-3 rounded-2xl bg-bwb-bg/60 border border-white/5 flex items-center gap-3 transition-colors hover:border-white/10"
-                          >
-                            {/* Member Role Badge */}
-                            <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border ${
-                              i === 0
-                                ? 'bg-amber-500/15 border-amber-400/40 text-amber-300'
-                                : 'bg-cyan-500/10 border-cyan-400/30 text-cyan-300'
-                            }`}>
-                              {i === 0 ? <Crown size={16} /> : <span className="font-mono text-xs font-bold">#{i + 1}</span>}
-                            </div>
-
-                            {/* Text Input */}
-                            <div className="flex-1">
-                              <input
-                                type="text"
-                                placeholder={
-                                  i === 0
-                                    ? 'Team Leader Name (Required)'
-                                    : i === 1
-                                    ? 'Teammate #2 Name (Required)'
-                                    : 'Teammate #3 Name (Optional 3rd Member)'
-                                }
-                                value={member}
-                                onChange={(e) => handleMemberChange(i, e.target.value)}
-                                className="w-full bg-transparent border-none text-bwb-text text-sm font-medium placeholder:text-bwb-muted/60 focus:outline-none"
-                              />
-                            </div>
-                            {/* Delete Button (Only for 3rd member) */}
-                            {i === 2 && members.length > 2 && (
-                              <button
-                                type="button"
-                                onClick={() => handleRemoveMember(i)}
-                                className="p-1.5 text-bwb-muted hover:text-bwb-danger transition-colors rounded-lg hover:bg-bwb-danger/10"
-                                title="Remove 3rd Teammate"
-                              >
-                                <Trash2 size={15} />
-                              </button>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {error && (
-                      <p className="text-xs text-bwb-danger font-medium p-3 rounded-xl bg-bwb-danger/10 border border-bwb-danger/20">
-                        {error}
-                      </p>
-                    )}
-
-                    <Button
-                      type="submit"
-                      fullWidth
-                      size="lg"
-                      disabled={loading}
-                      className="shadow-xl shadow-bwb-accent/20 font-bold text-sm"
+                  isRoomFull ? (
+                    /* APOLOGY NOTICE & CAPACITY REACHED EXPLANATION */
+                    <motion.div
+                      key="join-tab-full-apology"
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -6 }}
+                      transition={{ duration: 0.2, ease: [0.25, 1, 0.5, 1] }}
+                      className="p-5 sm:p-7 rounded-3xl bg-gradient-to-br from-amber-500/10 via-rose-500/5 to-bwb-bg border border-amber-400/30 text-center space-y-4 shadow-xl will-change-transform gpu-layer"
                     >
-                      <Sparkles size={16} className="mr-2" />
-                      {loading ? 'Registering Team...' : 'Register Team & Generate Team ID'}
-                    </Button>
-                  </motion.form>
+                      <div className="w-14 h-14 mx-auto rounded-2xl bg-amber-400/15 border border-amber-400/30 flex items-center justify-center text-amber-400 shadow-lg shadow-amber-400/10">
+                        <AlertTriangle size={28} />
+                      </div>
+
+                      <div>
+                        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-400/15 border border-amber-400/30 text-amber-300 font-mono text-[11px] font-bold uppercase tracking-wider mb-2">
+                          <ShieldAlert size={13} /> Registration Limit Reached ({roomRegisteredCount}/{roomMaxTeams} Teams)
+                        </div>
+                        <h3 className="font-display text-xl sm:text-2xl font-black text-bwb-text">
+                          We're Sincerely Sorry, Room Is Full!
+                        </h3>
+                        <p className="text-xs sm:text-sm text-bwb-muted mt-2 max-w-md mx-auto leading-relaxed">
+                          This tournament room has reached its maximum capacity of <strong className="text-bwb-text">{roomMaxTeams} registered squads</strong> set by the host. New team registrations are closed for this session.
+                        </p>
+                      </div>
+
+                      {/* Guidance Box for Already Registered Squads */}
+                      <div className="p-4 rounded-2xl bg-bwb-surface-2/90 border border-white/10 text-left space-y-1.5 shadow-inner">
+                        <p className="text-xs font-mono font-bold text-amber-300 flex items-center gap-1.5">
+                          <Key size={14} className="shrink-0 text-amber-400" /> Already Registered Your Team Earlier?
+                        </p>
+                        <p className="text-xs text-bwb-muted leading-relaxed">
+                          Your team spot is safely reserved! You or your teammates can enter the lobby anytime by entering your unique <strong>Team Passcode</strong> on the Passcode tab.
+                        </p>
+                      </div>
+
+                      <Button
+                        fullWidth
+                        size="lg"
+                        onClick={() => {
+                          setActiveTab('passcode')
+                          setError('')
+                          SoundFX.playCutePop()
+                        }}
+                        className="bg-amber-400 text-bwb-bg hover:bg-amber-300 font-bold text-sm shadow-xl shadow-amber-400/20"
+                      >
+                        <Key size={16} className="mr-2" />
+                        Switch to Passcode Quick Join <ArrowRight size={16} className="ml-2" />
+                      </Button>
+                    </motion.div>
+                  ) : (
+                    /* STANDARD TEAM REGISTRATION FORM */
+                    <motion.form
+                      key="join-tab-register"
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -6 }}
+                      transition={{ duration: 0.2, ease: [0.25, 1, 0.5, 1] }}
+                      onSubmit={handleRegisterTeam}
+                      className="space-y-5 will-change-transform gpu-layer"
+                    >
+                      <Input
+                        label="Team Name *"
+                        placeholder="e.g. Neural Ninjas"
+                        value={teamName}
+                        onChange={(e) => setTeamName(e.target.value)}
+                        hint="Choose a memorable, technical team name"
+                      />
+
+                      {/* Contact Information (Email & Phone) */}
+                      <div className="grid sm:grid-cols-2 gap-3.5">
+                        <div>
+                          <label className="text-xs font-mono uppercase text-bwb-muted font-bold block mb-1.5 flex items-center gap-1.5">
+                            <Mail size={13} className="text-bwb-accent" />
+                            Email Address
+                          </label>
+                          <input
+                            type="email"
+                            placeholder="e.g. teamlead@college.edu"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            className="w-full px-3.5 py-2.5 rounded-xl bg-bwb-bg/70 border border-bwb-border text-bwb-text text-sm font-medium placeholder:text-bwb-muted/60 focus:border-bwb-accent outline-none"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="text-xs font-mono uppercase text-bwb-muted font-bold block mb-1.5 flex items-center gap-1.5">
+                            <Phone size={13} className="text-bwb-accent" />
+                            Phone Number
+                          </label>
+                          <input
+                            type="tel"
+                            placeholder="e.g. +91 9876543210"
+                            value={phone}
+                            onChange={(e) => setPhone(e.target.value)}
+                            className="w-full px-3.5 py-2.5 rounded-xl bg-bwb-bg/70 border border-bwb-border text-bwb-text text-sm font-medium placeholder:text-bwb-muted/60 focus:border-bwb-accent outline-none"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Academic Details (Department, Year, Section Dropdowns) */}
+                      <div className="p-4 rounded-2xl bg-bwb-bg/60 border border-white/5 space-y-3">
+                        <p className="text-[11px] font-mono uppercase text-bwb-accent font-bold tracking-wider flex items-center gap-1.5">
+                          <GraduationCap size={14} />
+                          Academic & College Details
+                        </p>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                          <div>
+                            <label className="text-[11px] font-mono text-bwb-muted font-semibold block mb-1">
+                              Department
+                            </label>
+                            <select
+                              value={department}
+                              onChange={(e) => setDepartment(e.target.value)}
+                              style={{ colorScheme: 'dark' }}
+                              className="w-full px-3 py-2.5 rounded-xl bg-bwb-surface border border-bwb-border text-bwb-text text-xs font-semibold focus:border-bwb-accent outline-none cursor-pointer"
+                            >
+                              <option value="">Select Dept</option>
+                              <option value="AIDS">AIDS (AI & DS)</option>
+                              <option value="CSE">CSE</option>
+                              <option value="IT">IT</option>
+                              <option value="ECE">ECE</option>
+                              <option value="EEE">EEE</option>
+                              <option value="MECH">MECH</option>
+                              <option value="CIVIL">CIVIL</option>
+                              <option value="Other">Other</option>
+                            </select>
+                          </div>
+
+                          {/* Year Dropdown */}
+                          <div>
+                            <label className="text-[11px] font-mono text-bwb-muted font-semibold block mb-1">
+                              Year
+                            </label>
+                            <select
+                              value={year}
+                              onChange={(e) => setYear(e.target.value)}
+                              style={{ colorScheme: 'dark' }}
+                              className="w-full px-3 py-2.5 rounded-xl bg-bwb-surface border border-bwb-border text-bwb-text text-xs font-semibold focus:border-bwb-accent outline-none cursor-pointer"
+                            >
+                              <option value="">Select Year</option>
+                              <option value="1st Year">1st Year</option>
+                              <option value="2nd Year">2nd Year</option>
+                              <option value="3rd Year">3rd Year</option>
+                              <option value="4th Year">4th Year</option>
+                            </select>
+                          </div>
+
+                          {/* Section Dropdown */}
+                          <div>
+                            <label className="text-[11px] font-mono text-bwb-muted font-semibold block mb-1">
+                              Section
+                            </label>
+                            <select
+                              value={section}
+                              onChange={(e) => setSection(e.target.value)}
+                              style={{ colorScheme: 'dark' }}
+                              className="w-full px-3 py-2.5 rounded-xl bg-bwb-surface border border-bwb-border text-bwb-text text-xs font-semibold focus:border-bwb-accent outline-none cursor-pointer"
+                            >
+                              <option value="">Select Section</option>
+                              <option value="A">Section A</option>
+                              <option value="B">Section B</option>
+                              <option value="Nil">Nil</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Team Members List */}
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <label className="text-xs font-mono uppercase text-bwb-muted font-bold tracking-wider">
+                            Team Members ({members.length}/3) · 2 or 3 Members
+                          </label>
+                          {members.length < 3 && (
+                            <button
+                              type="button"
+                              onClick={handleAddMember}
+                              className="text-xs text-bwb-accent hover:underline flex items-center gap-1 font-bold"
+                            >
+                              <Plus size={13} /> Add 3rd Teammate
+                            </button>
+                          )}
+                        </div>
+
+                        <div className="space-y-3">
+                          {members.map((member, i) => (
+                            <div
+                              key={i}
+                              className="p-3 rounded-2xl bg-bwb-bg/60 border border-white/5 flex items-center gap-3 transition-colors hover:border-white/10"
+                            >
+                              {/* Member Role Badge */}
+                              <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border ${
+                                i === 0
+                                  ? 'bg-amber-500/15 border-amber-400/40 text-amber-300'
+                                  : 'bg-cyan-500/10 border-cyan-400/30 text-cyan-300'
+                              }`}>
+                                {i === 0 ? <Crown size={16} /> : <span className="font-mono text-xs font-bold">#{i + 1}</span>}
+                              </div>
+
+                              {/* Text Input */}
+                              <div className="flex-1">
+                                <input
+                                  type="text"
+                                  placeholder={
+                                    i === 0
+                                      ? 'Team Leader Name (Required)'
+                                      : i === 1
+                                      ? 'Teammate #2 Name (Required)'
+                                      : 'Teammate #3 Name (Optional 3rd Member)'
+                                  }
+                                  value={member}
+                                  onChange={(e) => handleMemberChange(i, e.target.value)}
+                                  className="w-full bg-transparent border-none text-bwb-text text-sm font-medium placeholder:text-bwb-muted/60 focus:outline-none"
+                                />
+                              </div>
+                              {/* Delete Button (Only for 3rd member) */}
+                              {i === 2 && members.length > 2 && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleRemoveMember(i)}
+                                  className="p-1.5 text-bwb-muted hover:text-bwb-danger transition-colors rounded-lg hover:bg-bwb-danger/10"
+                                  title="Remove 3rd Teammate"
+                                >
+                                  <Trash2 size={15} />
+                                </button>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {error && (
+                        <p className="text-xs text-bwb-danger font-medium p-3 rounded-xl bg-bwb-danger/10 border border-bwb-danger/20">
+                          {error}
+                        </p>
+                      )}
+
+                      <Button
+                        type="submit"
+                        fullWidth
+                        size="lg"
+                        disabled={loading}
+                        className="shadow-xl shadow-bwb-accent/20 font-bold text-sm"
+                      >
+                        <Sparkles size={16} className="mr-2" />
+                        {loading ? 'Registering Team...' : 'Register Team & Generate Team ID'}
+                      </Button>
+                    </motion.form>
+                  )
                 )}
 
                 {/* TAB 2: JOIN WITH UNIQUE TEAM PASSCODE */}

@@ -95,8 +95,10 @@ export interface Game {
   finalistTeamIds?: string[]
   problemTeamCounts?: Record<string, number>
   scheduledStartTime?: string
+  maxTeams?: number
   createdAt?: string
 }
+
 
 export interface ParticipantSession {
   name: string

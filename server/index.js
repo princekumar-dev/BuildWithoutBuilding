@@ -389,6 +389,7 @@ function publicGame(game) {
   game.currentRound = game.currentRound || (game.isFinalRound ? 3 : 1);
   game.finalistTeamIds = game.finalistTeamIds || [];
   game.problemTeamCounts = counts;
+  game.maxTeams = Number(game.maxTeams) || 32;
 
   const ranked = [...game.teams].sort((a, b) => (b.score ?? 0) - (a.score ?? 0)).map((team, index) => {
     const isFinalist = game.finalistTeamIds.length > 0
@@ -399,6 +400,7 @@ function publicGame(game) {
 
   return { ...game, teams: ranked };
 }
+
 
 function requireHost(request, response) {
   const token = request.headers.authorization?.replace('Bearer ', '')
@@ -504,6 +506,7 @@ createServer(async (request, response) => {
       teams: [],
       currentProblem: catalog.problems[0],
       buildDurationMinutes: Number(input.buildDurationMinutes) || 15,
+      maxTeams: Math.max(2, Math.min(128, Number(input.maxTeams) || 32)),
       scheduledStartTime: input.scheduledStartTime || null,
       isFinalRound: false,
       createdAt: new Date().toISOString()
@@ -525,7 +528,7 @@ createServer(async (request, response) => {
     }
   }
 
-  const match = url.pathname.match(/^\/api\/games\/([^/]+)(?:\/(join|phase|round|finalists|schedule|assign-cards|select-problem|reveal-card|submissions|scores|ping))?$/)
+  const match = url.pathname.match(/^\/api\/games\/([^/]+)(?:\/(join|phase|round|finalists|schedule|config|assign-cards|select-problem|reveal-card|submissions|scores|ping))?$/)
   if (!match) return json(response, 404, { error: 'API route not found.' })
   const game = gameFor(database, decodeURIComponent(match[1])); if (!game) return json(response, 404, { error: 'Game not found.' })
   if (request.method === 'GET' && !match[2]) return json(response, 200, publicGame(game))
@@ -549,7 +552,17 @@ createServer(async (request, response) => {
 
     if (!team) {
       if (!input.teamName?.trim()) return json(response, 400, { error: 'Team name is required.' });
-      if (game.teams.length >= MAX_TEAMS) return json(response, 409, { error: `This game is full (maximum ${MAX_TEAMS} teams).` });
+      const roomMax = Number(game.maxTeams) || 32;
+      if (game.teams.length >= roomMax) {
+        return json(response, 409, {
+          error: `Registration Capacity Reached: This event room is full (maximum limit: ${roomMax} teams).`,
+          isFull: true,
+          maxTeams: roomMax,
+          registeredCount: game.teams.length,
+          message: `We sincerely apologize! Registration for "${game.name}" is now closed as all ${roomMax} team slots have been filled. If you have already registered, you can still join immediately via the Passcode tab.`
+        });
+      }
+
       
       // Generate clean unique team ID/Passcode
       const cleanSlug = input.teamName.trim().toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 4) || 'TEAM';
@@ -637,12 +650,21 @@ createServer(async (request, response) => {
     return json(response, 200, publicGame(game));
   }
 
-  if (request.method === 'PATCH' && action === 'schedule') {
+  if (request.method === 'PATCH' && (action === 'schedule' || action === 'config')) {
     if (!requireHost(request, response)) return;
-    game.scheduledStartTime = input.scheduledStartTime !== undefined ? input.scheduledStartTime : null;
+    if (input.scheduledStartTime !== undefined) {
+      game.scheduledStartTime = input.scheduledStartTime;
+    }
+    if (input.maxTeams !== undefined) {
+      game.maxTeams = Math.max(2, Math.min(128, Number(input.maxTeams) || 32));
+    }
+    if (input.name && typeof input.name === 'string' && input.name.trim()) {
+      game.name = input.name.trim();
+    }
     save(database);
     return json(response, 200, publicGame(game));
   }
+
 
   if (request.method === 'POST' && action === 'assign-cards') { 
     if (!requireHost(request, response)) return; 

@@ -31,6 +31,7 @@ export default function HostDashboardPage() {
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [newGameName, setNewGameName] = useState('')
   const [newGameSchedule, setNewGameSchedule] = useState('')
+  const [newGameMaxTeams, setNewGameMaxTeams] = useState<number>(32)
   const [creating, setCreating] = useState(false)
   const [deleteTarget, setDeleteTarget] = useState<Game | null>(null)
   const [deleting, setDeleting] = useState(false)
@@ -42,11 +43,12 @@ export default function HostDashboardPage() {
     setCreating(true)
     try {
       const scheduleIso = newGameSchedule ? new Date(newGameSchedule).toISOString() : null
-      const game = await api.createGame(newGameName.trim(), scheduleIso)
-      toast.success(`Game "${game.name}" created!`)
+      const game = await api.createGame(newGameName.trim(), scheduleIso, Number(newGameMaxTeams) || 32)
+      toast.success(`Game "${game.name}" created with max ${game.maxTeams || 32} teams!`)
       setShowCreateModal(false)
       setNewGameName('')
       setNewGameSchedule('')
+      setNewGameMaxTeams(32)
       navigate(`/host/game/${game.id}`)
     } catch (reason) {
       toast.error(reason instanceof Error ? reason.message : 'Unable to create game.')
@@ -54,6 +56,7 @@ export default function HostDashboardPage() {
       setCreating(false)
     }
   }
+
 
   const handleLogout = () => { localStorage.removeItem('host_token'); toast.info('Logged out.'); navigate('/host/login') }
 
@@ -152,12 +155,54 @@ export default function HostDashboardPage() {
             </p>
           </div>
 
+          <div>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="text-xs font-mono uppercase text-bwb-muted font-bold">
+                Max Team Capacity Limit *
+              </label>
+              <span className="text-xs font-mono font-bold text-bwb-accent bg-bwb-accent/15 px-2 py-0.5 rounded-full border border-bwb-accent/30">
+                {newGameMaxTeams} Teams Max
+              </span>
+            </div>
+            
+            <div className="grid grid-cols-6 gap-1.5 mb-2">
+              {[8, 16, 24, 32, 48, 64].map((count) => (
+                <button
+                  key={count}
+                  type="button"
+                  onClick={() => setNewGameMaxTeams(count)}
+                  className={`py-2 rounded-xl text-xs font-mono font-bold transition-all border ${
+                    newGameMaxTeams === count
+                      ? 'bg-bwb-accent text-bwb-bg border-bwb-accent shadow-sm scale-[1.02]'
+                      : 'bg-bwb-surface border-white/10 text-bwb-muted hover:text-bwb-text hover:border-white/20'
+                  }`}
+                >
+                  {count}
+                </button>
+              ))}
+            </div>
+
+            <input
+              type="number"
+              min={2}
+              max={128}
+              value={newGameMaxTeams}
+              onChange={(e) => setNewGameMaxTeams(Math.max(2, Math.min(128, Number(e.target.value) || 32)))}
+              className="w-full px-3.5 py-2 rounded-xl bg-bwb-surface border border-bwb-border text-bwb-text text-xs font-mono focus:border-bwb-accent outline-none"
+              placeholder="Or enter custom team count (e.g. 20)"
+            />
+            <p className="text-[11px] text-bwb-muted mt-1">
+              Once reached, registration closes and newly arriving teams see a friendly apology card.
+            </p>
+          </div>
+
           <div className="flex gap-3 justify-end pt-2">
             <Button variant="ghost" onClick={() => setShowCreateModal(false)}>Cancel</Button>
             <Button onClick={createGame} disabled={creating}>
               {creating ? 'Creating...' : 'Create Game'}
             </Button>
           </div>
+
         </div>
       </Modal>
 

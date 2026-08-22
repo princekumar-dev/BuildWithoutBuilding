@@ -32,7 +32,7 @@ export const api = {
   login: (email: string, password: string) => request<{ token: string }>('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) }),
   listGames: () => request<Game[]>('/games', undefined, true),
   getGame: (idOrCode: string) => request<Game>(`/games/${encodeURIComponent(idOrCode)}`),
-  createGame: (name: string, scheduledStartTime?: string | null) => request<Game>('/games', { method: 'POST', body: JSON.stringify({ name, scheduledStartTime }) }, true),
+  createGame: (name: string, scheduledStartTime?: string | null, maxTeams?: number) => request<Game>('/games', { method: 'POST', body: JSON.stringify({ name, scheduledStartTime, maxTeams }) }, true),
   deleteGame: (gameId: string) => request<{ ok: boolean }>(`/games/${gameId}`, { method: 'DELETE' }, true),
   getCatalog: () => request<{ technologies: Technology[]; problems: Problem[] }>('/catalog'),
   joinGame: (code: string, input: {
@@ -58,5 +58,7 @@ export const api = {
   setRound: (gameId: string, round: number, phase?: GamePhase) => request<Game>(`/games/${gameId}/round`, { method: 'PATCH', body: JSON.stringify({ round, phase }) }, true),
   setFinalists: (gameId: string, teamIds: string[]) => request<Game>(`/games/${gameId}/finalists`, { method: 'POST', body: JSON.stringify({ teamIds }) }, true),
   updateSchedule: (gameId: string, scheduledStartTime: string | null) => request<Game>(`/games/${gameId}/schedule`, { method: 'PATCH', body: JSON.stringify({ scheduledStartTime }) }, true),
+  updateConfig: (gameId: string, config: { maxTeams?: number; scheduledStartTime?: string | null; name?: string }) => request<Game>(`/games/${gameId}/config`, { method: 'PATCH', body: JSON.stringify(config) }, true),
 }
+
 

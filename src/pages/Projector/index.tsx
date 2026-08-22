@@ -182,6 +182,9 @@ export default function ProjectorPage() {
   const totalCardsRevealed = game.teams.reduce((acc, t) => acc + (t.revealedCards?.length ?? 0), 0)
   const totalSubmissions = game.teams.filter((t) => !!t.submission).length
   const isRoomFull = game.teams.length >= (game.maxTeams || 32)
+  const lobbyTeams = game.currentRound === 3 && (game.finalistTeamIds?.length ?? 0) > 0
+    ? game.teams.filter((team) => game.finalistTeamIds?.includes(team.id))
+    : game.teams
   const currentAnnouncement = STADIUM_ANNOUNCEMENTS[announcementIndex]
 
   return (
@@ -615,20 +618,20 @@ export default function ProjectorPage() {
                 <div className="flex items-center gap-3">
                   <Users className="text-bwb-accent" size={24} />
                   <h2 className="font-display text-xl sm:text-2xl font-bold text-bwb-text">
-                    Registered Arena Teams ({game.teams.length})
+                    {game.currentRound === 3 ? 'Grand Finalists (Top 8)' : `Registered Arena Teams (${lobbyTeams.length})`}
                   </h2>
                 </div>
                 <div className="flex items-center gap-4 text-xs font-mono text-bwb-muted">
                   <span className="flex items-center gap-1.5 text-emerald-400 font-bold">
                     <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                    Live in Room: {game.teams.filter((t) => t.isOnline).length} / {game.teams.length}
+                    Live in Room: {lobbyTeams.filter((t) => t.isOnline).length} / {lobbyTeams.length}
                   </span>
                   <span>·</span>
                   <span>Total Players: <strong className="text-bwb-text">{totalParticipants}</strong></span>
                 </div>
               </div>
 
-              {game.teams.length === 0 ? (
+              {lobbyTeams.length === 0 ? (
                 <div className="stereo-card rounded-3xl p-12 text-center border border-dashed border-bwb-border">
                   <div className="w-16 h-16 rounded-full bg-bwb-surface-2 mx-auto flex items-center justify-center text-bwb-muted mb-4 animate-bounce">
                     <Users size={32} />
@@ -639,7 +642,7 @@ export default function ProjectorPage() {
               ) : (
                 <motion.div layout className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   <AnimatePresence>
-                    {game.teams.map((team, idx) => (
+                    {lobbyTeams.map((team, idx) => (
                       <motion.div
                         key={team.id}
                         initial={{ opacity: 0, scale: 0.85, y: 15 }}

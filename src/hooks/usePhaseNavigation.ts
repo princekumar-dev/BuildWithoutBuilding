@@ -41,7 +41,10 @@ export function usePhaseNavigation() {
       return
     }
 
-    const target = PHASE_ROUTES[phase]
+    const isEliminatedFinalist = game.currentRound === 3 &&
+      (game.finalistTeamIds?.length ?? 0) > 0 &&
+      !game.finalistTeamIds?.includes(session.teamId)
+    const target = isEliminatedFinalist ? '/leaderboard' : PHASE_ROUTES[phase]
     if (!target || currentPath === target) return
 
     navigate(target, { replace: true })

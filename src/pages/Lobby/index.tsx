@@ -27,6 +27,9 @@ export default function LobbyPage() {
 
   const myTeam = game.teams.find((t) => t.id === session?.teamId)
   const currentPasscode = myTeam?.passcode || session?.passcode || myTeam?.id
+  const lobbyTeams = game.currentRound === 3 && (game.finalistTeamIds?.length ?? 0) > 0
+    ? game.teams.filter((team) => game.finalistTeamIds?.includes(team.id))
+    : game.teams
 
   return (
     <PageLayout>
@@ -61,11 +64,11 @@ export default function LobbyPage() {
           <h3 className="font-display font-semibold mb-4 text-sm uppercase tracking-wider text-bwb-muted flex items-center gap-2">
             <Users size={16} /> Teams in Lobby
           </h3>
-          {game.teams.length === 0 ? (
+          {lobbyTeams.length === 0 ? (
             <p className="text-center text-bwb-muted text-sm py-8">No teams have joined yet. You&apos;re first!</p>
           ) : (
             <div className="grid sm:grid-cols-2 gap-3">
-              {game.teams.map((team, i) => (
+              {lobbyTeams.map((team, i) => (
                 <motion.div
                   key={team.id}
                   initial={{ opacity: 0, x: -10 }}

@@ -4,8 +4,7 @@ import {
   Play, SkipForward, Eye, Lock, AlertTriangle, Users,
   ChevronLeft, Timer, Zap, Shield, Trophy, CheckCircle2,
   ExternalLink, Copy, Trash2, Key, UserCheck, Crown,
-  Calendar, Edit3, Clock, Sparkles, ArrowRight,
-  Award, Rocket
+  Calendar, Edit3, Clock, ArrowRight, Rocket
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { PageLayout } from '../../components/layout/PageLayout'
@@ -23,7 +22,9 @@ import { api } from '../../lib/api'
 
 import { useRealtimeGame } from '../../hooks/useRealtimeGame'
 
-const STAGES: { phase: GamePhase; step: number; title: string; desc: string; icon: string }[] = [
+type Stage = { phase: GamePhase; step: number; title: string; desc: string; icon: string }
+
+const ROUND_ONE_STAGES: Stage[] = [
   { phase: 'LOBBY', step: 1, title: 'Lobby', desc: 'Waiting for teams to join', icon: '🚪' },
   { phase: 'PROBLEM_REVEAL', step: 2, title: 'Problem Reveal', desc: 'Teams select 1 of 8 challenges', icon: '💡' },
   { phase: 'CARD_REVEAL', step: 3, title: 'Card Reveal', desc: 'Teams draft 3 random tech cards', icon: '🎴' },
@@ -32,6 +33,16 @@ const STAGES: { phase: GamePhase; step: number; title: string; desc: string; ico
   { phase: 'JUDGING', step: 6, title: 'Judging', desc: 'Deliberation & rubric scoring', icon: '⚖️' },
   { phase: 'LEADERBOARD', step: 7, title: 'Leaderboard', desc: 'Rank reveal & podium honors', icon: '🏆' },
 ]
+
+const LATER_ROUND_STAGES: Stage[] = [
+  { phase: 'LOBBY', step: 1, title: 'Round Lobby', desc: 'Announce the round and confirm eligible teams', icon: '🚪' },
+  { phase: 'BUILDING', step: 2, title: 'Build Phase', desc: 'Teams formulate their next-round solution', icon: '⚡' },
+  { phase: 'PITCHING', step: 3, title: 'Pitching', desc: 'Live pitches and defense', icon: '🎤' },
+  { phase: 'JUDGING', step: 4, title: 'Judging', desc: 'Deliberation and rubric scoring', icon: '⚖️' },
+  { phase: 'LEADERBOARD', step: 5, title: 'Leaderboard', desc: 'Round standings and advancement', icon: '🏆' },
+]
+
+const stagesForRound = (round: number) => round === 1 ? ROUND_ONE_STAGES : LATER_ROUND_STAGES
 
 
 export default function HostGameControlPage() {
@@ -180,17 +191,25 @@ export default function HostGameControlPage() {
     if (!confirmed) return
     try {
       await api.setFinalists(game.id, top8Ids)
-      const updated = await api.setRound(game.id, 3, 'PROBLEM_REVEAL')
+      const updated = await api.setRound(game.id, 3, 'LOBBY')
       setGame(updated)
-      toast.success(`Top ${top8Ids.length} squads advanced to Grand Finals (Round 3)!`)
+      toast.success(`Top ${top8Ids.length} squads advanced to the Round 3 lobby!`)
     } catch (err: any) {
       toast.error(err.message || 'Unable to advance finalists.')
     }
   }
 
   const currentRound = game.currentRound || (game.isFinalRound ? 3 : 1)
-  const currentStageIndex = STAGES.findIndex((s) => s.phase === game.phase)
-  const nextStage = currentStageIndex >= 0 && currentStageIndex < STAGES.length - 1 ? STAGES[currentStageIndex + 1] : null
+  const stages = stagesForRound(currentRound)
+  const currentStageIndex = stages.findIndex((s) => s.phase === game.phase)
+  const nextStage = currentStageIndex >= 0 && currentStageIndex < stages.length - 1 ? stages[currentStageIndex + 1] : null
+
+  const advanceStage = async () => {
+    if (nextStage) return changePhase(nextStage.phase)
+    if (currentRound === 1) return handleSetRound(2, 'LOBBY')
+    if (currentRound === 2) return handleAdvanceTop8ToFinals()
+    return changePhase('RESULTS')
+  }
 
   const totalParticipants = game.teams.reduce((acc, t) => acc + (t.members?.length ?? 0), 0)
   const submittedCount = game.teams.filter((t) => !!t.submission).length
@@ -532,8 +551,8 @@ export default function HostGameControlPage() {
                   </div>
                 </motion.div>
               )}
-            </AnimatePresence>
-          </div>
+              </AnimatePresence>
+            </div>
         </PageTransition>
 
 
@@ -547,7 +566,7 @@ export default function HostGameControlPage() {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4 pb-3 border-b border-white/5">
               <div>
                 <span className="text-[10px] font-mono uppercase tracking-widest text-purple-300 font-bold">
-                  TOURNAMENT ROUND CONTROLLER
+                  TOURNAMENT FLOW CONTROLLER
                 </span>
                 <h2 className="font-display font-black text-xl text-bwb-text flex items-center gap-2">
                   <span>Current: Round {currentRound}</span>
@@ -640,34 +659,6 @@ export default function HostGameControlPage() {
                       All squads participate in Round 1 with zero elimination. Use this round to calibrate team pitching dynamics, draft surprise tech cards, and formulate a 15-minute system architecture pitch. All teams advance into Round 2.
                     </p>
 
-                    <div className="pt-2.5 mt-2 border-t border-white/5 flex flex-wrap items-center justify-between gap-2">
-                      <span className="text-[10px] font-mono uppercase text-bwb-muted font-bold flex items-center gap-1">
-                        <Sparkles size={12} className="text-amber-400" /> Recommended Host Next Steps:
-                      </span>
-                      <div className="flex flex-wrap items-center gap-1.5 text-xs font-mono">
-                        <button
-                          type="button"
-                          onClick={() => changePhase('PROBLEM_REVEAL')}
-                          className="px-2.5 py-1 rounded-lg bg-bwb-surface-2 hover:bg-bwb-accent/20 hover:text-bwb-accent text-bwb-muted transition-all border border-white/5"
-                        >
-                          1. Problem Reveal
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => changePhase('CARD_REVEAL')}
-                          className="px-2.5 py-1 rounded-lg bg-bwb-surface-2 hover:bg-bwb-accent/20 hover:text-bwb-accent text-bwb-muted transition-all border border-white/5"
-                        >
-                          2. Tech Draft
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => changePhase('BUILDING')}
-                          className="px-2.5 py-1 rounded-lg bg-bwb-accent/20 text-bwb-accent font-bold hover:bg-bwb-accent/30 transition-all border border-bwb-accent/30"
-                        >
-                          3. Start Build Phase
-                        </button>
-                      </div>
-                    </div>
                   </div>
                 )}
 
@@ -693,41 +684,6 @@ export default function HostGameControlPage() {
                       8 real-world challenge domains with strict maximum 2 teams per statement. Teams draft surprise tech cards and pitch live architecture defense. After judging, the <strong>Top 8 highest-scoring squads</strong> qualify for the Grand Finals!
                     </p>
 
-                    <div className="pt-2.5 mt-2 border-t border-white/5 flex flex-wrap items-center justify-between gap-2">
-                      <span className="text-[10px] font-mono uppercase text-bwb-muted font-bold flex items-center gap-1">
-                        <Trophy size={12} className="text-amber-400" /> Recommended Host Next Steps:
-                      </span>
-                      <div className="flex flex-wrap items-center gap-1.5 text-xs font-mono">
-                        <button
-                          type="button"
-                          onClick={() => changePhase('BUILDING')}
-                          className="px-2.5 py-1 rounded-lg bg-bwb-surface-2 hover:bg-bwb-accent/20 hover:text-bwb-accent text-bwb-muted transition-all border border-white/5"
-                        >
-                          1. Build Sprint
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => changePhase('PITCHING')}
-                          className="px-2.5 py-1 rounded-lg bg-bwb-surface-2 hover:bg-bwb-accent/20 hover:text-bwb-accent text-bwb-muted transition-all border border-white/5"
-                        >
-                          2. Pitch Defense
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => changePhase('JUDGING')}
-                          className="px-2.5 py-1 rounded-lg bg-bwb-surface-2 hover:bg-bwb-accent/20 hover:text-bwb-accent text-bwb-muted transition-all border border-white/5"
-                        >
-                          3. Judge Scoring
-                        </button>
-                        <Button
-                          size="sm"
-                          onClick={handleAdvanceTop8ToFinals}
-                          className="bg-amber-400 hover:bg-amber-300 text-bwb-bg font-black text-xs shadow-md"
-                        >
-                          4. Lock Top 8 & Start Finals
-                        </Button>
-                      </div>
-                    </div>
                   </div>
                 )}
 
@@ -753,34 +709,6 @@ export default function HostGameControlPage() {
                       The Top 8 Finalist squads pitch their master systems live on stage in front of the judges! The Top 4 squads are awarded championship honors: <strong>1st Place Champion, 2nd Place Runner-Up, and Dual 3rd Place Bronze Winners</strong>!
                     </p>
 
-                    <div className="pt-2.5 mt-2 border-t border-white/5 flex flex-wrap items-center justify-between gap-2">
-                      <span className="text-[10px] font-mono uppercase text-bwb-muted font-bold flex items-center gap-1">
-                        <Award size={12} className="text-amber-400" /> Recommended Host Next Steps:
-                      </span>
-                      <div className="flex flex-wrap items-center gap-1.5 text-xs font-mono">
-                        <button
-                          type="button"
-                          onClick={() => changePhase('PITCHING')}
-                          className="px-2.5 py-1 rounded-lg bg-bwb-accent/20 text-bwb-accent font-bold hover:bg-bwb-accent/30 transition-all border border-bwb-accent/30"
-                        >
-                          1. Finalist Stage Pitching
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => changePhase('JUDGING')}
-                          className="px-2.5 py-1 rounded-lg bg-bwb-surface-2 hover:bg-bwb-accent/20 hover:text-bwb-accent text-bwb-muted transition-all border border-white/5"
-                        >
-                          2. Deliberate & Score
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => changePhase('RESULTS')}
-                          className="px-3 py-1 rounded-lg bg-gradient-to-r from-amber-500 to-amber-600 text-bwb-bg font-black hover:opacity-90 transition-all shadow-md"
-                        >
-                          3. Reveal Championship Prize Podium!
-                        </button>
-                      </div>
-                    </div>
                   </div>
                 )}
               </motion.div>
@@ -817,14 +745,12 @@ export default function HostGameControlPage() {
                 </div>
               </div>
             )}
-          </div>
-
-          {/* Stage Progression Pipeline / Interactive Stepper */}
-          <div className="stereo-card rounded-3xl p-6 sm:p-7 mb-8 border border-bwb-border">
+            {/* Stage Progression Pipeline / Interactive Stepper */}
+            <div className="mt-6 pt-5 border-t border-white/10">
             <div className="flex flex-wrap items-center justify-between gap-4 mb-5 pb-3 border-b border-white/5">
               <div>
                 <h2 className="font-display font-bold text-lg text-bwb-text flex items-center gap-2">
-                  <Zap size={18} className="text-bwb-accent" /> Event Stage Flow
+                  <Zap size={18} className="text-bwb-accent" /> Round {currentRound} Stage Flow
                 </h2>
                 <p className="text-xs text-bwb-muted mt-0.5">
                   Click any stage to transition the entire room (player screens & projector auto-update)
@@ -832,21 +758,21 @@ export default function HostGameControlPage() {
               </div>
 
               {/* Advance CTA */}
-              {nextStage && (
+              {(nextStage || game.phase === 'LEADERBOARD') && (
                 <Button
                   size="md"
-                  onClick={() => changePhase(nextStage.phase)}
+                  onClick={advanceStage}
                   className="glow-accent shadow-lg shadow-bwb-accent/20"
                 >
                   <Play size={15} className="mr-1.5" />
-                  Advance to: {nextStage.title}
+                  {nextStage ? `Advance to: ${nextStage.title}` : currentRound === 1 ? 'Start Round 2 Lobby' : currentRound === 2 ? 'Lock Top 8 & Start Round 3 Lobby' : 'Reveal Final Results'}
                 </Button>
               )}
             </div>
 
             {/* Stepper Pipeline Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5">
-              {STAGES.map((stg) => {
+            <div className={`grid grid-cols-2 sm:grid-cols-4 gap-2.5 ${stages.length === 5 ? 'lg:grid-cols-5' : 'lg:grid-cols-7'}`}>
+              {stages.map((stg) => {
                 const isActive = game.phase === stg.phase
                 return (
                   <motion.button
@@ -883,7 +809,8 @@ export default function HostGameControlPage() {
               })}
             </div>
 
-            {/* CONTEXTUAL STAGE INTELLIGENCE & GUIDANCE CARD */}
+            {/* Stage status is intentionally omitted: the highlighted stage card is the live status. */}
+            {false && (
             <div className="mt-5 pt-4 border-t border-white/5">
               <AnimatePresence mode="wait">
                 <motion.div
@@ -946,19 +873,21 @@ export default function HostGameControlPage() {
                     )}
                   </div>
 
-                  {nextStage && (
+                  {(nextStage || game.phase === 'LEADERBOARD') && (
                     <Button
                       size="sm"
-                      onClick={() => changePhase(nextStage.phase)}
+                      onClick={advanceStage}
                       className="shrink-0 bg-bwb-accent text-bwb-bg font-bold text-xs shadow-md hover:bg-bwb-accent/90"
                     >
-                      <span>Advance to {nextStage.title}</span>
+                      <span>{nextStage ? `Advance to ${nextStage.title}` : currentRound === 1 ? 'Start Round 2 Lobby' : currentRound === 2 ? 'Lock Top 8 & Start Round 3 Lobby' : 'Reveal Final Results'}</span>
                       <ArrowRight size={14} className="ml-1" />
                     </Button>
                   )}
                 </motion.div>
               </AnimatePresence>
             </div>
+            )}
+          </div>
           </div>
         </PageTransition>
 

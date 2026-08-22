@@ -17,8 +17,8 @@ export default function PitchPage() {
   const isJudging = demoPhase === 'JUDGING' || game.phase === 'JUDGING'
 
   const myTeam = game.teams.find((t) => t.id === session?.teamId)
-  const pitchTeam = game.teams.find((t) => t.id === game.currentPitchTeamId) ?? (myTeam || game.teams[0])
-  const isMyTeamOnStage = !!myTeam && myTeam.id === pitchTeam?.id
+  const pitchTeam = game.teams.find((t) => t.id === game.currentPitchTeamId)
+  const isMyTeamOnStage = !!pitchTeam && !!myTeam && myTeam.id === pitchTeam.id
   const submission = pitchTeam?.submission || myTeam?.submission
 
   return (
@@ -57,15 +57,15 @@ export default function PitchPage() {
         >
           <div className="flex items-center justify-center gap-2 mb-3">
             <Badge variant="accent" className="font-mono text-xs font-bold px-3 py-1">
-              On Stage: {pitchTeam?.name || 'Competing Squad'}
+              {pitchTeam ? `On Stage: ${pitchTeam.name}` : 'Waiting for Next Team'}
             </Badge>
           </div>
 
           <h1 className="font-display text-2xl sm:text-4xl font-black text-bwb-text mb-2">
-            {submission?.solutionName || 'System Architecture Proposal'}
+            {submission?.solutionName || (pitchTeam ? 'System Architecture Proposal' : 'No Active Pitch')}
           </h1>
           <p className="text-bwb-muted text-xs sm:text-sm font-medium">
-            {isAttack ? 'Judge Attack & Technical Defense' : isJudging ? 'Judges Submitting Rubric Scores' : '60-Second Live Elevator Pitch'}
+            {isAttack ? 'Judge Attack & Technical Defense' : isJudging ? 'Judges Submitting Rubric Scores' : pitchTeam ? '60-Second Live Elevator Pitch' : 'Next team will be called by the judge'}
           </p>
         </motion.div>
 
@@ -92,12 +92,19 @@ export default function PitchPage() {
               </p>
             </div>
           ) : (
-            <div className="flex flex-col items-center">
-              <div className="w-14 h-14 rounded-2xl bg-bwb-accent/20 text-bwb-accent border border-bwb-accent/40 flex items-center justify-center mb-3 shadow-lg">
-                <Mic size={28} />
+            pitchTeam ? (
+              <div className="flex flex-col items-center">
+                <div className="w-14 h-14 rounded-2xl bg-bwb-accent/20 text-bwb-accent border border-bwb-accent/40 flex items-center justify-center mb-3 shadow-lg">
+                  <Mic size={28} />
+                </div>
+                <CountdownTimer initialSeconds={60} size="xl" label="PITCH TIME" />
               </div>
-              <CountdownTimer initialSeconds={60} size="xl" label="PITCH TIME" />
-            </div>
+            ) : (
+              <div className="flex flex-col items-center py-6">
+                <Mic size={28} className="text-bwb-muted/40 mb-3" />
+                <p className="text-sm text-bwb-muted font-mono">Waiting for judge to call a team...</p>
+              </div>
+            )
           )}
         </div>
 

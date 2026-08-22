@@ -958,7 +958,7 @@ export default function HostGameControlPage() {
               const colCount = visibleStages.length
               const gridClass = colCount <= 4
                 ? 'grid-cols-2 sm:grid-cols-4'
-                : 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-6'
+                : 'grid-cols-3 sm:grid-cols-5 lg:grid-cols-7'
               return (
                 <div className={`grid gap-2.5 ${gridClass}`}>
                   {visibleStages.map((stg, idx) => {
@@ -970,7 +970,7 @@ export default function HostGameControlPage() {
                     onClick={() => changePhase(stg.phase)}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    className={`p-3.5 rounded-2xl border text-left transition-all relative flex flex-col justify-between min-h-[105px] ${
+                    className={`p-2.5 sm:p-3.5 rounded-2xl border text-left transition-all relative flex flex-col justify-between min-h-[80px] sm:min-h-[105px] ${
                       isActive
                         ? 'bg-bwb-accent text-bwb-bg font-bold shadow-xl shadow-bwb-accent/25 border-bwb-accent ring-2 ring-bwb-accent/40'
                         : 'bg-bwb-surface-2/80 text-bwb-muted hover:text-bwb-text border-bwb-border hover:border-bwb-accent/40'

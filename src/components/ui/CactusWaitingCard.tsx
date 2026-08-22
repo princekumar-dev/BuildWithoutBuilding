@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Calendar, Clock, Copy, CheckCircle2, UserCheck, Sparkles,
-  ShieldCheck, Layers, Crown
+  ShieldCheck, Layers, Crown, ChevronLeft, ChevronRight, BookOpen,
+  Music, X
 } from 'lucide-react'
 import { Button } from './Button'
 import { toast } from './Toast'
@@ -17,10 +18,10 @@ interface CactusWaitingCardProps {
 }
 
 const FUN_QUOTES = [
-  { icon: '🌵', tag: 'MASCOT HYPE', text: "Spike the Cactus says: You're 100% ready to build without building! Own that stage!" },
+  { icon: '🌵', tag: 'MASCOT HYPE', text: "Spike the Cactus says: You're 100% ready to build without building! Own that stage and shock the judges!" },
   { icon: '🧠', tag: 'PITCH TIMING', text: "Pitch Blueprint (60s): 15s Problem Hook ➔ 30s Architecture & Tech Synergy ➔ 15s Real-World Impact!" },
-  { icon: '⚡', tag: 'TECH SYNERGY', text: "Drawing IoT + Edge AI? Emphasize on-device inferencing to eliminate cloud round-trip latency!" },
-  { icon: '🛡️', tag: 'JUDGE DEFENSE', text: "Judges love attacking offline edge failure. Always explain local cache fallback & offline sync!" },
+  { icon: '⚡', tag: 'TECH SYNERGY', text: "Drawing IoT + Edge AI? Emphasize on-device inferencing to eliminate cloud round-trip latency & cut costs!" },
+  { icon: '🛡️', tag: 'JUDGE DEFENSE', text: "Judges love attacking offline edge failure. Always explain local cache fallback & offline sync protocols!" },
   { icon: '👑', tag: '1ST PLACE HACK', text: "Grand Champions don't just solve the problem — they quantify cost reduction and scale to 1M users!" },
   { icon: '🃏', tag: 'CARD STRATEGY', text: "Never fight your 3 surprise constraint cards — turn them into unique architectural superpowers!" },
   { icon: '🚀', tag: 'ROUND 1 RULES', text: "Round 1 has ZERO elimination! Use it to test your pitch chemistry and calibrate judge feedback!" },
@@ -48,10 +49,14 @@ export function CactusWaitingCard({
 }: CactusWaitingCardProps) {
   const [copied, setCopied] = useState(false)
   const [quoteIndex, setQuoteIndex] = useState(0)
+  const [slideDirection, setSlideDirection] = useState<1 | -1>(1)
   const [isWiggling, setIsWiggling] = useState(false)
+  const [isDancing, setIsDancing] = useState(false)
+  const [isBlinking, setIsBlinking] = useState(false)
   const [petCount, setPetCount] = useState(0)
   const [flowerSpin, setFlowerSpin] = useState(false)
   const [isBlushing, setIsBlushing] = useState(false)
+  const [showAllTips, setShowAllTips] = useState(false)
   const [particles, setParticles] = useState<{ id: number; emoji: string; x: number; y: number; vx: number; vy: number; rot: number }[]>([])
   const [activeTab, setActiveTab] = useState<'passcode' | 'playbook' | 'checklist'>('passcode')
 
@@ -70,6 +75,15 @@ export function CactusWaitingCard({
     isPast: false,
     hasSchedule: false,
   })
+
+  // Natural mascot eye blinking
+  useEffect(() => {
+    const blinkInterval = setInterval(() => {
+      setIsBlinking(true)
+      setTimeout(() => setIsBlinking(false), 220)
+    }, 3800)
+    return () => clearInterval(blinkInterval)
+  }, [])
 
   useEffect(() => {
     if (!scheduledStartTime) {
@@ -106,47 +120,34 @@ export function CactusWaitingCard({
       const gain = ctx.createGain()
       const now = ctx.currentTime
 
-      const pitches = [523.25, 587.33, 659.25, 783.99, 880.0, 1046.5]
+      const pitches = [523.25, 587.33, 659.25, 783.99, 880.0, 1046.5, 1174.66]
       const note = pitches[petCount % pitches.length]
 
       osc.type = 'sine'
       osc.frequency.setValueAtTime(note, now)
-      osc.frequency.exponentialRampToValueAtTime(note * 1.5, now + 0.12)
+      osc.frequency.exponentialRampToValueAtTime(note * 1.6, now + 0.12)
 
-      gain.gain.setValueAtTime(0.12, now)
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25)
+      gain.gain.setValueAtTime(0.14, now)
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.28)
 
       osc.connect(gain)
       gain.connect(ctx.destination)
 
       osc.start(now)
-      osc.stop(now + 0.25)
+      osc.stop(now + 0.28)
     } catch {}
   }
 
-  const handleCactusClick = (e: React.MouseEvent) => {
-    setIsWiggling(true)
-    setFlowerSpin(true)
-    setIsBlushing(true)
-    setPetCount((prev) => prev + 1)
-    setQuoteIndex((prev) => (prev + 1) % FUN_QUOTES.length)
-    playCuteChime()
-
-    setTimeout(() => setIsWiggling(false), 900)
-    setTimeout(() => setFlowerSpin(false), 800)
-    setTimeout(() => setIsBlushing(false), 1400)
-
-    // Spawn 4-5 colorful burst particles
-    const rect = e.currentTarget.getBoundingClientRect()
-    const emojiList = ['💖', '✨', '⚡', '🌟', '🎉', '🌸', '🌵', '🚀', '🔥', '🏆', '💫', '🎶']
-    const newBurst = Array.from({ length: 4 }).map((_, i) => ({
+  const spawnParticlesAt = (x: number, y: number) => {
+    const emojiList = ['💖', '✨', '⚡', '🌟', '🎉', '🌸', '🌵', '🚀', '🔥', '👑', '💫', '🎶']
+    const newBurst = Array.from({ length: 5 }).map((_, i) => ({
       id: Date.now() + i + Math.random(),
       emoji: emojiList[Math.floor(Math.random() * emojiList.length)],
-      x: e.clientX - rect.left + (Math.random() * 40 - 20),
-      y: e.clientY - rect.top + (Math.random() * 20 - 10),
-      vx: (Math.random() - 0.5) * 70,
-      vy: -40 - Math.random() * 50,
-      rot: (Math.random() - 0.5) * 60,
+      x: x + (Math.random() * 40 - 20),
+      y: y + (Math.random() * 20 - 10),
+      vx: (Math.random() - 0.5) * 80,
+      vy: -45 - Math.random() * 55,
+      rot: (Math.random() - 0.5) * 70,
     }))
 
     setParticles((prev) => [...prev, ...newBurst])
@@ -155,7 +156,59 @@ export function CactusWaitingCard({
     }, 1200)
   }
 
+  const handleCactusClick = (e: React.MouseEvent) => {
+    setIsWiggling(true)
+    setFlowerSpin(true)
+    setIsBlushing(true)
+    setPetCount((prev) => prev + 1)
+    setSlideDirection(1)
+    setQuoteIndex((prev) => (prev + 1) % FUN_QUOTES.length)
+    playCuteChime()
+
+    setTimeout(() => setIsWiggling(false), 900)
+    setTimeout(() => setFlowerSpin(false), 850)
+    setTimeout(() => setIsBlushing(false), 1400)
+
+    const rect = e.currentTarget.getBoundingClientRect()
+    spawnParticlesAt(e.clientX - rect.left, e.clientY - rect.top)
+  }
+
+  const handleNextTip = () => {
+    setSlideDirection(1)
+    setQuoteIndex((prev) => (prev + 1) % FUN_QUOTES.length)
+    playCuteChime()
+  }
+
+  const handlePrevTip = () => {
+    setSlideDirection(-1)
+    setQuoteIndex((prev) => (prev - 1 + FUN_QUOTES.length) % FUN_QUOTES.length)
+    playCuteChime()
+  }
+
+  const toggleDance = () => {
+    setIsDancing((prev) => !prev)
+    setIsWiggling(true)
+    setFlowerSpin(true)
+    playCuteChime()
+    setTimeout(() => setIsWiggling(false), 1200)
+  }
+
+  // Mascot Tamagotchi Evolution System
+  const getEvolutionInfo = () => {
+    if (petCount < 5) return { level: 1, name: 'Baby Sprout 🌱', desc: 'Warming up strategy vibes', next: 5, progress: (petCount / 5) * 100 }
+    if (petCount < 15) return { level: 2, name: 'Energetic Spike 🌵', desc: 'Hype building for Round 1!', next: 15, progress: ((petCount - 5) / 10) * 100 }
+    if (petCount < 30) return { level: 3, name: 'Strategy Maestro 🧠', desc: 'Architecting 1st place solutions!', next: 30, progress: ((petCount - 15) / 15) * 100 }
+    if (petCount < 50) return { level: 4, name: 'Golden Champion 👑', desc: 'Grand Finals ready!', next: 50, progress: ((petCount - 30) / 20) * 100 }
+    return { level: 5, name: 'SQUAD DEITY 🔥⚡', desc: 'Unstoppable championship energy!', next: 100, progress: 100 }
+  }
+
+  const evo = getEvolutionInfo()
   const currentTip = FUN_QUOTES[quoteIndex]
+
+  const copyTipToClipboard = () => {
+    navigator.clipboard.writeText(`${currentTip.tag}: ${currentTip.text}`)
+    toast.success(`Strategy Tip "${currentTip.tag}" copied to clipboard!`)
+  }
 
   const copyPasscode = () => {
     if (currentPasscode) {
@@ -178,7 +231,7 @@ export function CactusWaitingCard({
       <div className="absolute -bottom-20 left-1/3 w-64 h-64 rounded-full bg-teal-500/10 blur-[80px] pointer-events-none" />
 
       {/* Top Status Radar Pill */}
-      <div className="flex flex-wrap items-center justify-between gap-3 mb-6 pb-4 border-b border-white/10">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-5 pb-4 border-b border-white/10">
         <div className="flex items-center gap-2">
           <span className="relative flex h-2.5 w-2.5">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
@@ -198,7 +251,7 @@ export function CactusWaitingCard({
       </div>
 
       {/* CUTE ANIMATED 3D-STYLE KAWAII CACTUS MASCOT */}
-      <div className="relative inline-block my-2">
+      <div className="relative inline-block my-1">
         {/* Floating Multi-Particle Bursts */}
         <AnimatePresence>
           {particles.map((p) => (
@@ -207,14 +260,14 @@ export function CactusWaitingCard({
               initial={{ opacity: 1, scale: 0.5, x: 0, y: 0, rotate: 0 }}
               animate={{
                 opacity: 0,
-                scale: [0.6, 1.4, 1.1],
+                scale: [0.6, 1.5, 1.2],
                 x: p.vx,
                 y: p.vy,
                 rotate: p.rot,
               }}
               exit={{ opacity: 0 }}
               transition={{ duration: 1.1, ease: 'easeOut' }}
-              className="absolute pointer-events-none z-30 font-bold text-base sm:text-lg select-none drop-shadow-md"
+              className="absolute pointer-events-none z-30 font-bold text-lg select-none drop-shadow-md"
               style={{ left: p.x, top: p.y }}
             >
               {p.emoji}
@@ -226,176 +279,339 @@ export function CactusWaitingCard({
           onClick={handleCactusClick}
           title="Tap Spike for happy energy and pro tournament tips!"
           animate={
-            isWiggling
+            isWiggling || isDancing
               ? {
-                  scale: [1, 1.3, 0.88, 1.18, 0.96, 1],
-                  y: [0, -28, 4, -14, 2, 0],
-                  rotate: [0, -14, 14, -8, 8, 0],
+                  scale: [1, 1.32, 0.86, 1.22, 0.95, 1],
+                  y: [0, -32, 5, -16, 2, 0],
+                  rotate: isDancing ? [-18, 18, -18, 18, 0] : [0, -15, 15, -8, 8, 0],
                 }
               : {
-                  y: [0, -7, 0],
+                  y: [0, -8, 0],
                   rotate: [-1.5, 1.5, -1.5],
                 }
           }
           transition={{
-            duration: isWiggling ? 0.85 : 3.5,
-            repeat: isWiggling ? 0 : Infinity,
+            duration: isDancing ? 0.9 : isWiggling ? 0.85 : 3.5,
+            repeat: isDancing ? Infinity : isWiggling ? 0 : Infinity,
             ease: 'easeInOut',
           }}
           className="relative inline-flex flex-col items-center cursor-pointer group select-none touch-manipulation active:scale-95"
         >
           {/* Pulsing Mascot Aura Pedestal */}
-          <div className="absolute bottom-1 w-32 h-7 bg-emerald-500/25 rounded-full blur-lg group-hover:bg-emerald-400/40 transition-all animate-pulse" />
+          <div className="absolute bottom-1 w-36 h-8 bg-emerald-500/25 rounded-full blur-lg group-hover:bg-emerald-400/45 transition-all animate-pulse" />
 
-          {/* Stylized Ultra-Kawaii SVG Cactus */}
-          <div className="w-32 h-36 relative flex items-center justify-center filter drop-shadow-[0_12px_28px_rgba(16,185,129,0.45)] group-hover:scale-105 transition-transform">
+          {/* Stylized Ultra-Kawaii 3D SVG Cactus (Spike 2.0) */}
+          <div className="w-36 h-40 relative flex items-center justify-center filter drop-shadow-[0_14px_32px_rgba(16,185,129,0.5)] group-hover:scale-105 transition-transform">
             <svg viewBox="0 0 100 120" className="w-full h-full">
               <defs>
-                <linearGradient id="potGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#FBBF24" />
-                  <stop offset="100%" stopColor="#D97706" />
+                <linearGradient id="potGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#FCD34D" />
+                  <stop offset="40%" stopColor="#F59E0B" />
+                  <stop offset="100%" stopColor="#B45309" />
                 </linearGradient>
-                <linearGradient id="cactusGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#34D399" />
-                  <stop offset="45%" stopColor="#10B981" />
+                <linearGradient id="cactusGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#6EE7B7" />
+                  <stop offset="35%" stopColor="#10B981" />
+                  <stop offset="85%" stopColor="#047857" />
+                  <stop offset="100%" stopColor="#064E3B" />
+                </linearGradient>
+                <linearGradient id="armGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#A7F3D0" />
+                  <stop offset="50%" stopColor="#10B981" />
                   <stop offset="100%" stopColor="#047857" />
                 </linearGradient>
-                <linearGradient id="armGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#6EE7B7" />
-                  <stop offset="100%" stopColor="#059669" />
+                <linearGradient id="crownGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#FDE047" />
+                  <stop offset="100%" stopColor="#EAB308" />
                 </linearGradient>
               </defs>
 
-              {/* Pot Base with 3D bevel */}
-              <path d="M28 88 L34 116 Q50 119 66 116 L72 88 Z" fill="url(#potGrad)" />
-              <path d="M24 84 Q50 81 76 84 L74 89 Q50 86 26 89 Z" fill="#F59E0B" />
-              <ellipse cx="50" cy="85" rx="24" ry="3" fill="#B45309" opacity="0.6" />
+              {/* Pot Base with 3D Bevel & Shadow */}
+              <path d="M26 88 L33 116 Q50 120 67 116 L74 88 Z" fill="url(#potGrad2)" />
+              <path d="M22 84 Q50 80 78 84 L76 89 Q50 86 24 89 Z" fill="#F59E0B" />
+              <ellipse cx="50" cy="85" rx="26" ry="3.5" fill="#78350F" opacity="0.6" />
 
-              {/* Main Cactus Body */}
+              {/* Chubby Round Cactus Body */}
               <path
-                d="M38 28 Q38 12 50 12 Q62 12 62 28 L62 86 Q50 89 38 86 Z"
-                fill="url(#cactusGrad)"
+                d="M36 28 Q36 10 50 10 Q64 10 64 28 L64 86 Q50 90 36 86 Z"
+                fill="url(#cactusGrad2)"
               />
-              {/* Highlight Ridge */}
-              <path d="M48 14 Q52 14 52 87 L48 87 Z" fill="#A7F3D0" opacity="0.45" />
+              {/* Highlight Ridge with Mint Glow */}
+              <path d="M47 12 Q53 12 53 88 L47 88 Z" fill="#D1FAE5" opacity="0.45" />
 
-              {/* Left Cute Arm (Bouncing) */}
+              {/* Left Bouncy Arm */}
               <motion.path
-                animate={isWiggling ? { rotate: [-18, 22, -18] } : { rotate: [0, -6, 0] }}
-                transition={{ repeat: isWiggling ? 2 : Infinity, duration: isWiggling ? 0.35 : 2.5, ease: 'easeInOut' }}
-                style={{ transformOrigin: '38px 56px' }}
-                d="M38 48 Q20 48 20 32 Q20 25 26 25 Q32 25 32 32 L32 54 Q32 60 38 60 Z"
-                fill="url(#armGrad)"
+                animate={isWiggling || isDancing ? { rotate: [-24, 28, -24] } : { rotate: [0, -8, 0] }}
+                transition={{ repeat: isWiggling || isDancing ? Infinity : Infinity, duration: isWiggling || isDancing ? 0.35 : 2.5, ease: 'easeInOut' }}
+                style={{ transformOrigin: '36px 56px' }}
+                d="M36 48 Q18 48 18 30 Q18 22 24 22 Q30 22 30 30 L30 54 Q30 60 36 60 Z"
+                fill="url(#armGrad2)"
               />
 
-              {/* Right Waving Arm (Excited Wave) */}
+              {/* Right Excited Waving Arm */}
               <motion.path
-                animate={isWiggling ? { rotate: [25, -20, 25] } : { rotate: [-10, 16, -10] }}
-                transition={{ repeat: isWiggling ? 3 : Infinity, duration: isWiggling ? 0.3 : 2 }}
-                style={{ transformOrigin: '62px 56px' }}
-                d="M62 44 Q80 44 80 28 Q80 21 74 21 Q68 21 68 28 L68 50 Q68 56 62 56 Z"
-                fill="url(#armGrad)"
+                animate={isWiggling || isDancing ? { rotate: [30, -25, 30] } : { rotate: [-12, 18, -12] }}
+                transition={{ repeat: isWiggling || isDancing ? Infinity : Infinity, duration: isWiggling || isDancing ? 0.3 : 2 }}
+                style={{ transformOrigin: '64px 56px' }}
+                d="M64 44 Q82 44 82 26 Q82 18 76 18 Q70 18 70 26 L70 50 Q70 56 64 56 Z"
+                fill="url(#armGrad2)"
               />
 
-              {/* Top Spinning Kawaii Flower */}
+              {/* Golden Crown Accessory on High Level */}
+              {evo.level >= 2 && (
+                <motion.g
+                  animate={{ y: [0, -3, 0], rotate: [-4, 4, -4] }}
+                  transition={{ repeat: Infinity, duration: 2.2 }}
+                  style={{ transformOrigin: '50px 4px' }}
+                >
+                  <path d="M42 6 L44 0 L50 4 L56 0 L58 6 Z" fill="url(#crownGrad)" stroke="#CA8A04" strokeWidth="0.8" />
+                  <circle cx="44" cy="0" r="1" fill="#EF4444" />
+                  <circle cx="50" cy="4" r="1" fill="#3B82F6" />
+                  <circle cx="56" cy="0" r="1" fill="#10B981" />
+                </motion.g>
+              )}
+
+              {/* Top Spinning Kawaii Cherry Blossoms */}
               <motion.g
-                animate={flowerSpin ? { rotate: 360, scale: [1, 1.35, 1] } : { scale: [1, 1.08, 1] }}
+                animate={flowerSpin ? { rotate: 360, scale: [1, 1.4, 1] } : { scale: [1, 1.1, 1] }}
                 transition={{ duration: flowerSpin ? 0.75 : 2.5, repeat: flowerSpin ? 0 : Infinity }}
-                style={{ transformOrigin: '50px 12px' }}
+                style={{ transformOrigin: '50px 10px' }}
               >
-                <circle cx="50" cy="12" r="6.5" fill="#F43F5E" />
-                <circle cx="44" cy="9" r="4.5" fill="#FB7185" />
-                <circle cx="56" cy="9" r="4.5" fill="#FB7185" />
-                <circle cx="50" cy="6" r="4.5" fill="#FDA4AF" />
-                <circle cx="45" cy="15" r="4" fill="#FDA4AF" />
-                <circle cx="55" cy="15" r="4" fill="#FDA4AF" />
-                <circle cx="50" cy="12" r="3" fill="#FEF08A" />
+                <circle cx="50" cy="10" r="7" fill="#F43F5E" />
+                <circle cx="43" cy="7" r="5" fill="#FB7185" />
+                <circle cx="57" cy="7" r="5" fill="#FB7185" />
+                <circle cx="50" cy="3" r="5" fill="#FDA4AF" />
+                <circle cx="44" cy="14" r="4.5" fill="#FDA4AF" />
+                <circle cx="56" cy="14" r="4.5" fill="#FDA4AF" />
+                <circle cx="50" cy="10" r="3.5" fill="#FEF08A" />
               </motion.g>
 
-              {/* Cute Sparkly Blinking Eyes */}
-              {isWiggling ? (
-                // Happy Arc Eyes (^ ◡ ^)
+              {/* Cute Sparkly Blinking Anime Eyes */}
+              {isWiggling || isDancing ? (
+                // Happy Arc Squint Eyes (^ ◡ ^)
                 <g>
-                  <path d="M42 37 Q45 32 48 37" stroke="#064E3B" strokeWidth="2" strokeLinecap="round" fill="none" />
-                  <path d="M52 37 Q55 32 58 37" stroke="#064E3B" strokeWidth="2" strokeLinecap="round" fill="none" />
+                  <path d="M41 36 Q45 30 49 36" stroke="#064E3B" strokeWidth="2.2" strokeLinecap="round" fill="none" />
+                  <path d="M51 36 Q55 30 59 36" stroke="#064E3B" strokeWidth="2.2" strokeLinecap="round" fill="none" />
+                </g>
+              ) : isBlinking ? (
+                // Closed Blinking Eyes
+                <g>
+                  <line x1="41" y1="36" x2="49" y2="36" stroke="#064E3B" strokeWidth="2.2" strokeLinecap="round" />
+                  <line x1="51" y1="36" x2="59" y2="36" stroke="#064E3B" strokeWidth="2.2" strokeLinecap="round" />
                 </g>
               ) : (
-                // Twinkling Kawaii Eyes
+                // Giant Kawaii Anime Eyes with Dual Catchlights
                 <g>
-                  <circle cx="45" cy="36" r="3.2" fill="#064E3B" />
-                  <circle cx="55" cy="36" r="3.2" fill="#064E3B" />
-                  <circle cx="44" cy="35" r="1.3" fill="#FFFFFF" />
-                  <circle cx="54" cy="35" r="1.3" fill="#FFFFFF" />
-                  <circle cx="46.5" cy="37.5" r="0.6" fill="#FFFFFF" />
-                  <circle cx="56.5" cy="37.5" r="0.6" fill="#FFFFFF" />
+                  <ellipse cx="45" cy="35" rx="3.8" ry="4.2" fill="#064E3B" />
+                  <ellipse cx="55" cy="35" rx="3.8" ry="4.2" fill="#064E3B" />
+                  {/* Primary Large Highlight */}
+                  <circle cx="43.8" cy="33.5" r="1.6" fill="#FFFFFF" />
+                  <circle cx="53.8" cy="33.5" r="1.6" fill="#FFFFFF" />
+                  {/* Secondary Sparkle Catchlight */}
+                  <circle cx="46.5" cy="37" r="0.8" fill="#FFFFFF" />
+                  <circle cx="56.5" cy="37" r="0.8" fill="#FFFFFF" />
                 </g>
               )}
 
-              {/* Animated Blushing Cheeks */}
+              {/* Glowing Rosy Cheeks */}
               <ellipse
-                cx="41"
+                cx="40"
                 cy="42"
-                rx={isBlushing ? 3.8 : 3}
-                ry={isBlushing ? 2.4 : 1.8}
+                rx={isBlushing ? 4.2 : 3.4}
+                ry={isBlushing ? 2.6 : 2}
                 fill={isBlushing ? '#F43F5E' : '#FB7185'}
                 opacity={isBlushing ? 0.95 : 0.75}
               />
               <ellipse
-                cx="59"
+                cx="60"
                 cy="42"
-                rx={isBlushing ? 3.8 : 3}
-                ry={isBlushing ? 2.4 : 1.8}
+                rx={isBlushing ? 4.2 : 3.4}
+                ry={isBlushing ? 2.6 : 2}
                 fill={isBlushing ? '#F43F5E' : '#FB7185'}
                 opacity={isBlushing ? 0.95 : 0.75}
               />
 
-              {/* Kawaii Open Happy Smile */}
+              {/* Kawaii Happy Open Mouth */}
               <path
-                d={isWiggling ? 'M45 40 Q50 48 55 40 Z' : 'M46 41 Q50 46 54 41'}
+                d={isWiggling || isDancing ? 'M44 40 Q50 49 56 40 Z' : 'M45 41 Q50 47 55 41'}
                 stroke="#064E3B"
-                strokeWidth={isWiggling ? '1.5' : '1.8'}
+                strokeWidth={isWiggling || isDancing ? '1.5' : '1.8'}
                 strokeLinecap="round"
-                fill={isWiggling ? '#F43F5E' : 'none'}
+                fill={isWiggling || isDancing ? '#F43F5E' : 'none'}
               />
 
-              {/* Needles & Spines */}
-              <circle cx="36" cy="70" r="0.9" fill="#D1FAE5" />
-              <circle cx="64" cy="70" r="0.9" fill="#D1FAE5" />
-              <circle cx="50" cy="62" r="0.9" fill="#D1FAE5" />
-              <circle cx="26" cy="38" r="0.9" fill="#D1FAE5" />
-              <circle cx="74" cy="36" r="0.9" fill="#D1FAE5" />
+              {/* Cute Little Needles & Spines */}
+              <circle cx="34" cy="70" r="1" fill="#D1FAE5" />
+              <circle cx="66" cy="70" r="1" fill="#D1FAE5" />
+              <circle cx="50" cy="62" r="1" fill="#D1FAE5" />
+              <circle cx="24" cy="38" r="1" fill="#D1FAE5" />
+              <circle cx="76" cy="36" r="1" fill="#D1FAE5" />
             </svg>
           </div>
 
           {/* Interactive Mascot Tap Badge */}
-          <div className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-[10px] font-mono font-black uppercase tracking-wider mt-1.5 shadow-lg group-hover:scale-105 group-hover:bg-emerald-500/30 transition-all">
-            <Sparkles size={11} className="animate-spin text-emerald-400" />
+          <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-[10px] sm:text-xs font-mono font-black uppercase tracking-wider mt-1.5 shadow-lg group-hover:scale-105 group-hover:bg-emerald-500/30 transition-all">
+            <Sparkles size={12} className="animate-spin text-emerald-400" />
             <span>Tap Spike for Tips! {petCount > 0 && `(x${petCount})`}</span>
           </div>
         </motion.div>
 
-        {/* Dynamic Cute Speech Bubble with Tag Badge */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={quoteIndex}
-            initial={{ opacity: 0, y: 10, scale: 0.92 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -8, scale: 0.92 }}
-            transition={{ duration: 0.35, ease: 'easeOut' }}
-            className="mt-3.5 w-full max-w-lg mx-auto p-3 sm:p-4 rounded-2xl bg-gradient-to-r from-emerald-950/40 via-bwb-surface-2 to-emerald-950/40 border border-emerald-500/40 text-emerald-200 font-mono text-xs font-semibold shadow-xl shadow-emerald-500/10 flex flex-col sm:flex-row items-center gap-2.5 text-left"
+        {/* Mascot Tamagotchi Evolution Progress Bar */}
+        <div className="max-w-xs mx-auto mt-2 px-3 py-1.5 rounded-xl bg-bwb-surface/90 border border-white/10 shadow-inner">
+          <div className="flex items-center justify-between text-[10px] font-mono mb-1">
+            <span className="font-bold text-amber-300">{evo.name}</span>
+            <span className="text-bwb-muted font-semibold">{petCount} Pets</span>
+          </div>
+          <div className="w-full h-1.5 rounded-full bg-white/10 overflow-hidden">
+            <motion.div
+              className="h-full bg-gradient-to-r from-emerald-400 via-teal-400 to-amber-400"
+              initial={{ width: 0 }}
+              animate={{ width: `${evo.progress}%` }}
+              transition={{ duration: 0.4 }}
+            />
+          </div>
+        </div>
+
+        {/* INTERACTIVE SLIDING STRATEGY TIP CAROUSEL */}
+        <div className="relative mt-4 max-w-lg mx-auto">
+          <AnimatePresence mode="wait" custom={slideDirection}>
+            <motion.div
+              key={quoteIndex}
+              custom={slideDirection}
+              initial={{ opacity: 0, x: slideDirection * 40, scale: 0.95 }}
+              animate={{ opacity: 1, x: 0, scale: 1 }}
+              exit={{ opacity: 0, x: -slideDirection * 40, scale: 0.95 }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
+              className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-emerald-950/40 via-bwb-surface-2 to-emerald-950/30 border border-emerald-500/40 text-emerald-200 shadow-xl shadow-emerald-500/10 text-left relative overflow-hidden"
+            >
+              <div className="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-emerald-500/20">
+                <div className="flex items-center gap-2">
+                  <span className="text-xl">{currentTip.icon}</span>
+                  <span className="px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider bg-emerald-500/25 text-emerald-300 border border-emerald-500/40">
+                    {currentTip.tag}
+                  </span>
+                </div>
+                <div className="flex items-center gap-1 text-[10px] font-mono text-emerald-400/80">
+                  <span>Tip {quoteIndex + 1} of {FUN_QUOTES.length}</span>
+                </div>
+              </div>
+
+              <p className="text-xs sm:text-sm text-bwb-text font-medium leading-relaxed mb-3">
+                {currentTip.text}
+              </p>
+
+              {/* Card Bottom Navigation Controls */}
+              <div className="flex items-center justify-between pt-2 border-t border-white/5 text-xs font-mono">
+                <div className="flex items-center gap-1.5">
+                  <button
+                    onClick={handlePrevTip}
+                    className="p-1.5 rounded-lg bg-bwb-surface hover:bg-emerald-500/20 text-emerald-300 border border-white/10 hover:border-emerald-500/40 transition-colors"
+                    title="Previous Tip"
+                  >
+                    <ChevronLeft size={14} />
+                  </button>
+                  <button
+                    onClick={handleNextTip}
+                    className="p-1.5 rounded-lg bg-bwb-surface hover:bg-emerald-500/20 text-emerald-300 border border-white/10 hover:border-emerald-500/40 transition-colors"
+                    title="Next Tip"
+                  >
+                    <ChevronRight size={14} />
+                  </button>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={copyTipToClipboard}
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-bwb-surface hover:bg-emerald-500/20 text-emerald-300 border border-white/10 text-[10px] font-bold transition-colors"
+                  >
+                    <Copy size={11} /> Copy Tip
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+        {/* Mascot Quick Action Toolbar */}
+        <div className="flex flex-wrap items-center justify-center gap-2 mt-3.5 max-w-md mx-auto">
+          <button
+            onClick={handleNextTip}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-bwb-surface-2 hover:bg-emerald-500/20 border border-white/10 hover:border-emerald-400/40 text-bwb-text text-xs font-bold transition-all shadow-md active:scale-95"
           >
-            <div className="flex items-center gap-2 shrink-0">
-              <span className="text-xl">{currentTip.icon}</span>
-              <span className="px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                {currentTip.tag}
-              </span>
-            </div>
-            <p className="text-xs sm:text-sm text-bwb-text font-medium leading-relaxed">
-              {currentTip.text}
-            </p>
-          </motion.div>
-        </AnimatePresence>
+            <Sparkles size={13} className="text-emerald-400" /> Next Tip
+          </button>
+          <button
+            onClick={toggleDance}
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold transition-all shadow-md active:scale-95 ${
+              isDancing
+                ? 'bg-amber-500/30 border-amber-400 text-amber-300'
+                : 'bg-bwb-surface-2 hover:bg-amber-500/20 border-white/10 hover:border-amber-400/40 text-bwb-text'
+            }`}
+          >
+            <Music size={13} className="text-amber-400" /> {isDancing ? 'Stop Dance' : 'Dance Mode'}
+          </button>
+          <button
+            onClick={() => setShowAllTips(true)}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-bwb-surface-2 hover:bg-cyan-500/20 border border-white/10 hover:border-cyan-400/40 text-bwb-text text-xs font-bold transition-all shadow-md active:scale-95"
+          >
+            <BookOpen size={13} className="text-cyan-400" /> All Tips ({FUN_QUOTES.length})
+          </button>
+        </div>
       </div>
+
+      {/* ALL TIPS POPUP MODAL */}
+      <AnimatePresence>
+        {showAllTips && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="relative w-full max-w-2xl max-h-[85vh] rounded-3xl bg-bwb-surface-2 border border-emerald-500/40 shadow-2xl overflow-hidden flex flex-col text-left"
+            >
+              <div className="p-4 sm:p-5 border-b border-white/10 flex items-center justify-between bg-bwb-surface">
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl">🌵</span>
+                  <div>
+                    <h3 className="font-display font-black text-lg text-bwb-text">Spike&apos;s Strategy Arsenal</h3>
+                    <p className="text-xs text-bwb-muted">20 Pro Tournament Tips & Pitch Defense Tactics</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowAllTips(false)}
+                  className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-bwb-muted hover:text-bwb-text transition-colors"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <div className="p-4 sm:p-6 overflow-y-auto space-y-3 divide-y divide-white/5">
+                {FUN_QUOTES.map((q, idx) => (
+                  <div key={idx} className="pt-3 first:pt-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span>{q.icon}</span>
+                      <span className="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                        {q.tag}
+                      </span>
+                      <span className="text-[10px] font-mono text-bwb-muted ml-auto">#{idx + 1}</span>
+                    </div>
+                    <p className="text-xs sm:text-sm text-bwb-text/90 leading-relaxed pl-6">
+                      {q.text}
+                    </p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="p-4 border-t border-white/10 bg-bwb-surface text-center">
+                <Button size="sm" fullWidth onClick={() => setShowAllTips(false)}>
+                  Close Arsenal & Return to Lobby
+                </Button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
 
 
       {/* Main Title & Description */}

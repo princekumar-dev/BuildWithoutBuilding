@@ -1051,7 +1051,7 @@ export default function ProjectorPage() {
             </div>
 
             {/* Countdown Hero */}
-
+            <div className="w-full text-center mb-8">
               <div className="stereo-card rounded-3xl p-6 sm:p-8 max-w-2xl mx-auto border-2 border-bwb-accent/40 shadow-2xl mb-6 relative overflow-hidden">
                 <div className="absolute -top-20 -right-20 w-48 h-48 rounded-full bg-bwb-accent/10 blur-3xl pointer-events-none" />
                 <CountdownTimer

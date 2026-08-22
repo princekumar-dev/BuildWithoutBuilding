@@ -129,7 +129,7 @@ export default function LandingPage() {
                 </Button>
               </Link>
 
-              <div className="grid grid-cols-2 gap-3 w-full sm:w-auto sm:flex sm:items-center">
+              <div className="flex justify-center w-full sm:w-auto">
                 <Link to="/how-to-play" className="w-full sm:w-auto">
                   <Button variant="secondary" size="lg" className="w-full sm:min-w-[150px] text-xs sm:text-sm font-bold border-white/10 hover:border-white/25 bg-bwb-surface-2/90 shadow-md">
                     <Globe size={16} className="mr-1.5 sm:mr-2 text-amber-400" /> How to Play

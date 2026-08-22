@@ -130,12 +130,6 @@ export default function LandingPage() {
               </Link>
 
               <div className="grid grid-cols-2 gap-3 w-full sm:w-auto sm:flex sm:items-center">
-                <Link to="/projector" className="w-full sm:w-auto">
-                  <Button variant="secondary" size="lg" className="w-full sm:min-w-[180px] text-xs sm:text-sm font-bold border-bwb-accent/40 bg-bwb-surface-2/90 shadow-md">
-                    <Radio size={16} className="mr-1.5 sm:mr-2 text-bwb-accent animate-pulse" /> Live Projector
-                  </Button>
-                </Link>
-
                 <Link to="/how-to-play" className="w-full sm:w-auto">
                   <Button variant="secondary" size="lg" className="w-full sm:min-w-[150px] text-xs sm:text-sm font-bold border-white/10 hover:border-white/25 bg-bwb-surface-2/90 shadow-md">
                     <Globe size={16} className="mr-1.5 sm:mr-2 text-amber-400" /> How to Play
@@ -313,15 +307,10 @@ export default function LandingPage() {
           <p className="text-bwb-muted mb-8 max-w-xl mx-auto text-xs sm:text-sm">
             Whether you are competing, hosting the session, scoring as a judge, or projecting to the auditorium screen.
           </p>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 max-w-4xl mx-auto">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 max-w-4xl mx-auto">
             <Link to="/join" className="block">
               <Button fullWidth size="lg" className="font-bold">
                 <Users size={16} className="mr-2" /> Participant
-              </Button>
-            </Link>
-            <Link to="/projector" className="block">
-              <Button fullWidth size="lg" variant="secondary" className="font-bold">
-                <Radio size={16} className="mr-2 text-bwb-accent" /> Projector
               </Button>
             </Link>
             <Link to="/host/login" className="block">

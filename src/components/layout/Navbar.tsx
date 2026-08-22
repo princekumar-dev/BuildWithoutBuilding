@@ -155,15 +155,6 @@ export function Navbar() {
             >
               Standings
             </Link>
-            <Link
-              to="/projector"
-              target="_blank"
-              rel="noreferrer"
-              className="px-3 py-1.5 text-xs font-semibold rounded-xl text-bwb-muted hover:text-bwb-accent hover:bg-bwb-surface-2 flex items-center gap-1 transition-all"
-            >
-              <Tv size={13} /> Projector
-              <ExternalLink size={11} className="opacity-60" />
-            </Link>
           </div>
         )}
 
@@ -206,14 +197,6 @@ export function Navbar() {
               }`}
             >
               Join Game
-            </Link>
-            <Link
-              to="/projector"
-              target="_blank"
-              rel="noreferrer"
-              className="px-3 py-1.5 text-sm rounded-xl text-bwb-muted hover:text-bwb-accent hover:bg-bwb-surface-2 flex items-center gap-1 transition-colors"
-            >
-              <Tv size={14} /> Projector
             </Link>
             <Link
               to="/host/login"
@@ -362,14 +345,6 @@ export function Navbar() {
               >
                 Leaderboard
               </Link>
-              <Link
-                to="/projector"
-                target="_blank"
-                onClick={() => setOpen(false)}
-                className="block px-3 py-2 text-sm rounded-xl text-bwb-accent hover:bg-bwb-surface-2"
-              >
-                📺 Projector Screen
-              </Link>
             </>
           ) : isParticipant ? (
             <>
@@ -409,14 +384,6 @@ export function Navbar() {
                 className="block px-3 py-2 text-sm rounded-xl text-bwb-muted hover:text-bwb-text hover:bg-bwb-surface-2"
               >
                 Join Game
-              </Link>
-              <Link
-                to="/projector"
-                target="_blank"
-                onClick={() => setOpen(false)}
-                className="block px-3 py-2 text-sm rounded-xl text-bwb-muted hover:text-bwb-text hover:bg-bwb-surface-2"
-              >
-                Projector Screen
               </Link>
               <Link
                 to="/host/login"

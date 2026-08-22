@@ -55,8 +55,10 @@ export function CactusWaitingCard({
   const [slideDirection, setSlideDirection] = useState<1 | -1>(1)
   const [isWiggling, setIsWiggling] = useState(false)
   const [isSleeping, setIsSleeping] = useState(false)
+  const [isWakingUp, setIsWakingUp] = useState(false)
   const [flowerSpin, setFlowerSpin] = useState(false)
   const [isBlushing, setIsBlushing] = useState(false)
+
 
   const [showAllTips, setShowAllTips] = useState(false)
   const [particles, setParticles] = useState<{ id: number; emoji: string; x: number; y: number; vx: number; vy: number; rot: number }[]>([])
@@ -127,14 +129,16 @@ export function CactusWaitingCard({
   const handleCactusClick = (e: React.MouseEvent) => {
     if (isSleeping) {
       setIsSleeping(false)
+      setIsWakingUp(true)
       setIsWiggling(true)
       setIsBlushing(true)
       setFlowerSpin(true)
       SoundFX.playCutePop()
       toast.success("Spike woke up full of strategy energy! ☀️")
-      setTimeout(() => setIsWiggling(false), 700)
-      setTimeout(() => setFlowerSpin(false), 800)
-      setTimeout(() => setIsBlushing(false), 1000)
+      setTimeout(() => setIsWiggling(false), 900)
+      setTimeout(() => setFlowerSpin(false), 850)
+      setTimeout(() => setIsBlushing(false), 1200)
+      setTimeout(() => setIsWakingUp(false), 1400)
     } else {
       setIsWiggling(true)
       setFlowerSpin(true)
@@ -168,20 +172,24 @@ export function CactusWaitingCard({
     setIsSleeping((prev) => {
       const next = !prev
       if (next) {
+        setIsWakingUp(false)
         toast.info("Spike is taking a cozy power nap... 💤")
       } else {
+        setIsWakingUp(true)
         setIsWiggling(true)
         setIsBlushing(true)
         setFlowerSpin(true)
-        setTimeout(() => setIsWiggling(false), 700)
-        setTimeout(() => setFlowerSpin(false), 800)
-        setTimeout(() => setIsBlushing(false), 1000)
+        setTimeout(() => setIsWiggling(false), 900)
+        setTimeout(() => setFlowerSpin(false), 850)
+        setTimeout(() => setIsBlushing(false), 1200)
+        setTimeout(() => setIsWakingUp(false), 1400)
         toast.success("Spike woke up! ☀️")
       }
       return next
     })
     SoundFX.playCutePop()
   }
+
 
 
   const currentTip = FUN_QUOTES[quoteIndex]
@@ -257,27 +265,27 @@ export function CactusWaitingCard({
           ))}
         </AnimatePresence>
 
-        {/* Floating Animated Zzz Sleep Bubbles */}
+        {/* Floating Animated Zzz Sleep Bubbles directly above Cactus Head */}
         {isSleeping && (
-          <div className="absolute -top-3 right-0 sm:right-2 pointer-events-none z-30 select-none flex flex-col items-center">
+          <div className="absolute top-0 right-4 sm:right-8 pointer-events-none z-30 select-none flex flex-col items-center">
             <motion.span
-              animate={{ y: [0, -18, -30], x: [0, 8, 16], opacity: [0, 1, 0], scale: [0.6, 1.1, 1.3] }}
+              animate={{ y: [0, -18, -32], x: [0, 8, 16], opacity: [0, 1, 0], scale: [0.6, 1.1, 1.35] }}
               transition={{ duration: 2.2, repeat: Infinity, ease: 'easeOut', delay: 0 }}
-              className="text-cyan-300 font-display font-black text-base drop-shadow-[0_2px_8px_rgba(6,182,212,0.8)]"
+              className="text-cyan-300 font-display font-black text-lg drop-shadow-[0_2px_8px_rgba(6,182,212,0.8)]"
             >
               Z
             </motion.span>
             <motion.span
-              animate={{ y: [0, -14, -24], x: [0, 6, 12], opacity: [0, 1, 0], scale: [0.6, 0.9, 1.1] }}
+              animate={{ y: [0, -14, -25], x: [0, 6, 12], opacity: [0, 1, 0], scale: [0.6, 0.9, 1.15] }}
               transition={{ duration: 2.2, repeat: Infinity, ease: 'easeOut', delay: 0.7 }}
-              className="text-teal-300 font-display font-bold text-xs -mt-1 drop-shadow-[0_2px_6px_rgba(20,184,166,0.8)]"
+              className="text-teal-300 font-display font-bold text-sm -mt-1 drop-shadow-[0_2px_6px_rgba(20,184,166,0.8)]"
             >
               z
             </motion.span>
             <motion.span
-              animate={{ y: [0, -10, -18], x: [0, 4, 8], opacity: [0, 1, 0], scale: [0.5, 0.8, 0.95] }}
+              animate={{ y: [0, -10, -18], x: [0, 4, 8], opacity: [0, 1, 0], scale: [0.5, 0.8, 1] }}
               transition={{ duration: 2.2, repeat: Infinity, ease: 'easeOut', delay: 1.4 }}
-              className="text-emerald-300 font-display font-semibold text-[10px] -mt-1 drop-shadow-[0_2px_4px_rgba(16,185,129,0.8)]"
+              className="text-emerald-300 font-display font-semibold text-xs -mt-1 drop-shadow-[0_2px_4px_rgba(16,185,129,0.8)]"
             >
               z
             </motion.span>
@@ -295,13 +303,13 @@ export function CactusWaitingCard({
                 }
               : isWiggling
               ? {
-                  scale: [1, 1.08, 0.96, 1.04, 1],
-                  rotate: [0, -5, 5, -2, 2, 0],
+                  scale: isWakingUp ? [1, 1.14, 0.94, 1.06, 1] : [1, 1.08, 0.96, 1.04, 1],
+                  rotate: [0, -6, 6, -3, 3, 0],
                 }
               : undefined
           }
           transition={{
-            duration: isSleeping ? 2.8 : 0.6,
+            duration: isSleeping ? 2.8 : isWakingUp ? 0.85 : 0.6,
             repeat: isSleeping ? Infinity : 0,
             ease: 'easeInOut',
           }}
@@ -395,12 +403,26 @@ export function CactusWaitingCard({
                 <circle cx="50" cy="14" r="4" fill="#FEF08A" stroke="#EAB308" strokeWidth="0.8" />
               </motion.g>
 
-              {/* Big Expressive Anime Eyes with Catchlights / Sleeping Eyes */}
+              {/* Big Expressive Anime Eyes with Catchlights / Sleeping Eyes / Sparkle Star Eyes */}
               {isSleeping ? (
                 // Peaceful Slumber Eyes (∪ ∪)
                 <g>
                   <path d="M39 44 Q43 50 47 44" stroke="#064E3B" strokeWidth="2.6" strokeLinecap="round" fill="none" />
                   <path d="M53 44 Q57 50 61 44" stroke="#064E3B" strokeWidth="2.6" strokeLinecap="round" fill="none" />
+                </g>
+              ) : isWakingUp ? (
+                // Dazzling Sparkle Star Eyes (✦ ✦) on Wake Up!
+                <g>
+                  <ellipse cx="43" cy="41" rx="4.8" ry="5.5" fill="#064E3B" />
+                  <ellipse cx="57" cy="41" rx="4.8" ry="5.5" fill="#064E3B" />
+                  {/* Big Golden Sparkle Stars */}
+                  <path d="M43 37 L44 40 L47 41 L44 42 L43 45 L42 42 L39 41 L42 40 Z" fill="#FDE047" />
+                  <path d="M57 37 L58 40 L61 41 L58 42 L57 45 L56 42 L53 41 L56 40 Z" fill="#FDE047" />
+                  {/* Diamond Catchlights */}
+                  <circle cx="41" cy="38" r="1.5" fill="#FFFFFF" />
+                  <circle cx="55" cy="38" r="1.5" fill="#FFFFFF" />
+                  <circle cx="44.8" cy="43.5" r="1" fill="#FFFFFF" />
+                  <circle cx="58.8" cy="43.5" r="1" fill="#FFFFFF" />
                 </g>
               ) : isWiggling ? (
                 // Happy Squint Eyes (^ ◡ ^)
@@ -421,6 +443,7 @@ export function CactusWaitingCard({
                   <circle cx="58.8" cy="43.5" r="1" fill="#FFFFFF" />
                 </g>
               )}
+
 
               {/* Soft Blushing Rosy Cheeks */}
               <ellipse

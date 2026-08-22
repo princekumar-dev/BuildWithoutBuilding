@@ -710,8 +710,8 @@ export function CactusWaitingCard({
         </div>
       )}
 
-      {/* INTERACTIVE NAVIGATION TABS */}
-      <div className="w-full max-w-xl mx-auto mb-4 flex rounded-xl bg-bwb-bg p-1 border border-white/5 text-xs font-mono font-bold">
+      {/* INTERACTIVE NAVIGATION TABS WITH SMOOTH SLIDING PILL */}
+      <div className="w-full max-w-xl mx-auto mb-4 relative flex rounded-xl bg-bwb-bg p-1 border border-white/10 text-xs font-mono font-bold shadow-inner">
         <button
           type="button"
           onClick={() => {
@@ -720,14 +720,19 @@ export function CactusWaitingCard({
               SoundFX.playCutePop()
             }
           }}
-          className={`flex-1 py-2 sm:py-2.5 rounded-lg transition-all flex items-center justify-center gap-1.5 ${
-            activeTab === 'passcode'
-              ? 'bg-amber-400/20 text-amber-300 border border-amber-400/40 shadow-sm'
-              : 'text-bwb-muted hover:text-bwb-text'
+          className={`relative z-10 flex-1 py-2 sm:py-2.5 rounded-lg transition-colors duration-200 flex items-center justify-center gap-1.5 ${
+            activeTab === 'passcode' ? 'text-amber-300' : 'text-bwb-muted hover:text-bwb-text'
           }`}
         >
-          <Sparkles size={13} />
-          <span>Team Passcode</span>
+          {activeTab === 'passcode' && (
+            <motion.div
+              layoutId="activeWaitingTabPill"
+              className="absolute inset-0 rounded-lg bg-amber-400/20 border border-amber-400/50 shadow-[0_0_15px_rgba(251,191,36,0.25)]"
+              transition={{ type: 'spring', stiffness: 420, damping: 32 }}
+            />
+          )}
+          <Sparkles size={13} className="relative z-10" />
+          <span className="relative z-10">Team Passcode</span>
         </button>
 
         <button
@@ -738,27 +743,32 @@ export function CactusWaitingCard({
               SoundFX.playCutePop()
             }
           }}
-          className={`flex-1 py-2 sm:py-2.5 rounded-lg transition-all flex items-center justify-center gap-1.5 ${
-            activeTab === 'playbook'
-              ? 'bg-bwb-accent/20 text-bwb-accent border border-bwb-accent/40 shadow-sm'
-              : 'text-bwb-muted hover:text-bwb-text'
+          className={`relative z-10 flex-1 py-2 sm:py-2.5 rounded-lg transition-colors duration-200 flex items-center justify-center gap-1.5 ${
+            activeTab === 'playbook' ? 'text-bwb-accent' : 'text-bwb-muted hover:text-bwb-text'
           }`}
         >
-          <Layers size={13} />
-          <span>Tournament Playbook</span>
+          {activeTab === 'playbook' && (
+            <motion.div
+              layoutId="activeWaitingTabPill"
+              className="absolute inset-0 rounded-lg bg-bwb-accent/20 border border-bwb-accent/50 shadow-[0_0_15px_rgba(0,229,199,0.25)]"
+              transition={{ type: 'spring', stiffness: 420, damping: 32 }}
+            />
+          )}
+          <Layers size={13} className="relative z-10" />
+          <span className="relative z-10">Tournament Playbook</span>
         </button>
       </div>
 
-      {/* GPU ACCELERATED TAB PANELS */}
-      <AnimatePresence mode="wait" initial={false}>
+      {/* GPU ACCELERATED CINEMATIC TAB PANELS */}
+      <AnimatePresence mode="popLayout" initial={false}>
         {/* TAB 1: PASSCODE & ROSTER VAULT */}
         {activeTab === 'passcode' && currentPasscode ? (
           <motion.div
             key="tab-passcode"
-            initial={{ opacity: 0, y: 4 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -4 }}
-            transition={{ duration: 0.18, ease: 'easeOut' }}
+            initial={{ opacity: 0, x: -14, filter: 'blur(3px)' }}
+            animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
+            exit={{ opacity: 0, x: -14, filter: 'blur(3px)' }}
+            transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
             className="w-full max-w-xl mx-auto p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-bwb-bg via-bwb-bg to-bwb-surface border border-amber-400/35 mb-6 shadow-xl text-left will-change-transform gpu-layer"
           >
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -812,12 +822,13 @@ export function CactusWaitingCard({
           /* TAB 2: TOURNAMENT PLAYBOOK (3-ROUND TOURNAMENT & 7-STAGE PIPELINE) */
           <motion.div
             key="tab-playbook"
-            initial={{ opacity: 0, y: 4 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -4 }}
-            transition={{ duration: 0.18, ease: 'easeOut' }}
+            initial={{ opacity: 0, x: 14, filter: 'blur(3px)' }}
+            animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
+            exit={{ opacity: 0, x: 14, filter: 'blur(3px)' }}
+            transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
             className="w-full max-w-xl mx-auto p-3.5 sm:p-4 rounded-2xl bg-bwb-bg border border-white/10 mb-6 text-left space-y-3 will-change-transform gpu-layer"
           >
+
             {/* Round 1 */}
             <div className="p-3 rounded-xl bg-bwb-surface border border-purple-500/20 flex items-start gap-3">
               <span className="w-7 h-7 rounded-lg bg-purple-500/20 text-purple-300 border border-purple-500/40 flex items-center justify-center text-xs font-mono font-bold shrink-0">

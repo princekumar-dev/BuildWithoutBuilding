@@ -5,6 +5,7 @@ import { Card } from '../../components/ui/Card'
 import { Badge } from '../../components/ui/Badge'
 import { PhaseIndicator } from '../../components/ui/PhaseIndicator'
 import { CountdownTimer } from '../../components/timer/CountdownTimer'
+import { LeaderboardTable } from '../../components/leaderboard/LeaderboardTable'
 import { useGameStore } from '../../store/gameStore'
 import { useRealtimeGame } from '../../hooks/useRealtimeGame'
 import { PHASE_LABELS } from '../../data/mockData'
@@ -211,6 +212,23 @@ export default function PitchPage() {
               {submission.whatItDoes || submission.howItWorks || 'System formulation submitted.'}
             </p>
           </Card>
+        )}
+
+        {/* Live Leaderboard Table */}
+        {(isLeaderboard || isResults) && game.teams.length > 0 && (
+          <div className="mt-4">
+            <h3 className="font-display font-bold text-base text-bwb-text mb-3 flex items-center gap-2">
+              <Trophy size={16} className="text-bwb-gold" />
+              {isResults ? 'Final Tournament Standings' : 'Current Live Standings'}
+            </h3>
+            <LeaderboardTable
+              teams={game.teams}
+              highlightTeamId={session?.teamId}
+              showMovement
+              round={currentRound}
+              isFinalResults={isResults}
+            />
+          </div>
         )}
       </div>
     </PageLayout>

@@ -4,7 +4,8 @@ import {
   Play, SkipForward, Eye, Lock, AlertTriangle, Users,
   ChevronLeft, Timer, Zap, Shield, Trophy, CheckCircle2,
   ExternalLink, Copy, Trash2, Key, UserCheck, Crown,
-  Calendar, Edit3, Clock
+  Calendar, Edit3, Clock, Sparkles, ArrowRight,
+  Award, Rocket
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { PageLayout } from '../../components/layout/PageLayout'
@@ -607,18 +608,183 @@ export default function HostGameControlPage() {
               </div>
             </div>
 
-            {/* Round Explanation Rule Banner */}
-            <div className="text-xs text-bwb-muted flex items-center gap-2">
-              {currentRound === 1 && (
-                <span>🛡️ <strong>Round 1 Rules</strong>: No elimination. All {game.teams.length} teams participate and will advance into Round 2.</span>
-              )}
-              {currentRound === 2 && (
-                <span>⚡ <strong>Round 2 Rules</strong>: 8 Problem Statements, strictly max 2 teams per problem statement (16 team slots). Top 8 advance to Finals.</span>
-              )}
-              {currentRound === 3 && (
-                <span>🏆 <strong>Round 3 Finals</strong>: 8 Finalist squads. Top 4 awarded prizes: 1st Place (1), 2nd Place (1), 3rd Place (2).</span>
-              )}
-            </div>
+            {/* RICH ANIMATED ROUND TRANSITION & MISSION ANNOUNCEMENT CARD */}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={`round-guide-${currentRound}`}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.25 }}
+                className="mt-4 p-4 sm:p-5 rounded-2xl bg-bwb-bg/90 border border-purple-500/40 shadow-xl space-y-3"
+              >
+                {/* Round 1 Mission Briefing */}
+                {currentRound === 1 && (
+                  <div>
+                    <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                      <div className="flex items-center gap-2">
+                        <span className="px-2.5 py-0.5 rounded-lg bg-purple-500/20 text-purple-300 font-mono text-xs font-bold border border-purple-500/30 flex items-center gap-1.5">
+                          <Rocket size={13} className="text-purple-400" />
+                          <span>ROUND 1: OPEN QUALIFIER ACTIVATED</span>
+                        </span>
+                        <span className="text-[11px] font-mono text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">
+                          🛡️ Zero Elimination
+                        </span>
+                      </div>
+                      <span className="text-xs font-mono text-bwb-muted">
+                        All {game.teams.length} Squads Active
+                      </span>
+                    </div>
+
+                    <p className="text-xs text-bwb-text/90 leading-relaxed">
+                      All squads participate in Round 1 with zero elimination. Use this round to calibrate team pitching dynamics, draft surprise tech cards, and formulate a 15-minute system architecture pitch. All teams advance into Round 2.
+                    </p>
+
+                    <div className="pt-2.5 mt-2 border-t border-white/5 flex flex-wrap items-center justify-between gap-2">
+                      <span className="text-[10px] font-mono uppercase text-bwb-muted font-bold flex items-center gap-1">
+                        <Sparkles size={12} className="text-amber-400" /> Recommended Host Next Steps:
+                      </span>
+                      <div className="flex flex-wrap items-center gap-1.5 text-xs font-mono">
+                        <button
+                          type="button"
+                          onClick={() => changePhase('PROBLEM_REVEAL')}
+                          className="px-2.5 py-1 rounded-lg bg-bwb-surface-2 hover:bg-bwb-accent/20 hover:text-bwb-accent text-bwb-muted transition-all border border-white/5"
+                        >
+                          1. Problem Reveal
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => changePhase('CARD_REVEAL')}
+                          className="px-2.5 py-1 rounded-lg bg-bwb-surface-2 hover:bg-bwb-accent/20 hover:text-bwb-accent text-bwb-muted transition-all border border-white/5"
+                        >
+                          2. Tech Draft
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => changePhase('BUILDING')}
+                          className="px-2.5 py-1 rounded-lg bg-bwb-accent/20 text-bwb-accent font-bold hover:bg-bwb-accent/30 transition-all border border-bwb-accent/30"
+                        >
+                          3. Start Build Phase
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Round 2 Mission Briefing */}
+                {currentRound === 2 && (
+                  <div>
+                    <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                      <div className="flex items-center gap-2">
+                        <span className="px-2.5 py-0.5 rounded-lg bg-cyan-500/20 text-cyan-300 font-mono text-xs font-bold border border-cyan-500/30 flex items-center gap-1.5">
+                          <Zap size={13} className="text-cyan-400" />
+                          <span>ROUND 2: 8×2 PROBLEM SHOWDOWN ACTIVATED</span>
+                        </span>
+                        <span className="text-[11px] font-mono text-amber-300 font-bold bg-amber-500/10 px-2 py-0.5 rounded-md border border-amber-500/20">
+                          ⚡ Top 8 Advance to Finals
+                        </span>
+                      </div>
+                      <span className="text-xs font-mono text-bwb-muted">
+                        Max 16 Teams (2 per Challenge)
+                      </span>
+                    </div>
+
+                    <p className="text-xs text-bwb-text/90 leading-relaxed">
+                      8 real-world challenge domains with strict maximum 2 teams per statement. Teams draft surprise tech cards and pitch live architecture defense. After judging, the <strong>Top 8 highest-scoring squads</strong> qualify for the Grand Finals!
+                    </p>
+
+                    <div className="pt-2.5 mt-2 border-t border-white/5 flex flex-wrap items-center justify-between gap-2">
+                      <span className="text-[10px] font-mono uppercase text-bwb-muted font-bold flex items-center gap-1">
+                        <Trophy size={12} className="text-amber-400" /> Recommended Host Next Steps:
+                      </span>
+                      <div className="flex flex-wrap items-center gap-1.5 text-xs font-mono">
+                        <button
+                          type="button"
+                          onClick={() => changePhase('BUILDING')}
+                          className="px-2.5 py-1 rounded-lg bg-bwb-surface-2 hover:bg-bwb-accent/20 hover:text-bwb-accent text-bwb-muted transition-all border border-white/5"
+                        >
+                          1. Build Sprint
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => changePhase('PITCHING')}
+                          className="px-2.5 py-1 rounded-lg bg-bwb-surface-2 hover:bg-bwb-accent/20 hover:text-bwb-accent text-bwb-muted transition-all border border-white/5"
+                        >
+                          2. Pitch Defense
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => changePhase('JUDGING')}
+                          className="px-2.5 py-1 rounded-lg bg-bwb-surface-2 hover:bg-bwb-accent/20 hover:text-bwb-accent text-bwb-muted transition-all border border-white/5"
+                        >
+                          3. Judge Scoring
+                        </button>
+                        <Button
+                          size="sm"
+                          onClick={handleAdvanceTop8ToFinals}
+                          className="bg-amber-400 hover:bg-amber-300 text-bwb-bg font-black text-xs shadow-md"
+                        >
+                          4. Lock Top 8 & Start Finals
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Round 3 Mission Briefing */}
+                {currentRound === 3 && (
+                  <div>
+                    <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                      <div className="flex items-center gap-2">
+                        <span className="px-2.5 py-0.5 rounded-lg bg-amber-500/20 text-amber-300 font-mono text-xs font-bold border border-amber-500/30 flex items-center gap-1.5">
+                          <Crown size={13} className="text-amber-400" />
+                          <span>ROUND 3: GRAND FINALS & PRIZE PODIUM ACTIVATED</span>
+                        </span>
+                        <span className="text-[11px] font-mono text-amber-300 font-bold bg-amber-500/10 px-2 py-0.5 rounded-md border border-amber-500/20">
+                          🏆 Top 4 Prized on Podium
+                        </span>
+                      </div>
+                      <span className="text-xs font-mono text-bwb-muted">
+                        Top 8 Finalist Squads
+                      </span>
+                    </div>
+
+                    <p className="text-xs text-bwb-text/90 leading-relaxed">
+                      The Top 8 Finalist squads pitch their master systems live on stage in front of the judges! The Top 4 squads are awarded championship honors: <strong>1st Place Champion, 2nd Place Runner-Up, and Dual 3rd Place Bronze Winners</strong>!
+                    </p>
+
+                    <div className="pt-2.5 mt-2 border-t border-white/5 flex flex-wrap items-center justify-between gap-2">
+                      <span className="text-[10px] font-mono uppercase text-bwb-muted font-bold flex items-center gap-1">
+                        <Award size={12} className="text-amber-400" /> Recommended Host Next Steps:
+                      </span>
+                      <div className="flex flex-wrap items-center gap-1.5 text-xs font-mono">
+                        <button
+                          type="button"
+                          onClick={() => changePhase('PITCHING')}
+                          className="px-2.5 py-1 rounded-lg bg-bwb-accent/20 text-bwb-accent font-bold hover:bg-bwb-accent/30 transition-all border border-bwb-accent/30"
+                        >
+                          1. Finalist Stage Pitching
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => changePhase('JUDGING')}
+                          className="px-2.5 py-1 rounded-lg bg-bwb-surface-2 hover:bg-bwb-accent/20 hover:text-bwb-accent text-bwb-muted transition-all border border-white/5"
+                        >
+                          2. Deliberate & Score
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => changePhase('RESULTS')}
+                          className="px-3 py-1 rounded-lg bg-gradient-to-r from-amber-500 to-amber-600 text-bwb-bg font-black hover:opacity-90 transition-all shadow-md"
+                        >
+                          3. Reveal Championship Prize Podium!
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </motion.div>
+            </AnimatePresence>
 
             {/* 8 Problem Statements Distribution Matrix (Visible in Round 2) */}
             {currentRound === 2 && problems.length > 0 && (
@@ -680,7 +846,6 @@ export default function HostGameControlPage() {
 
             {/* Stepper Pipeline Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5">
-
               {STAGES.map((stg) => {
                 const isActive = game.phase === stg.phase
                 return (
@@ -717,8 +882,86 @@ export default function HostGameControlPage() {
                 )
               })}
             </div>
+
+            {/* CONTEXTUAL STAGE INTELLIGENCE & GUIDANCE CARD */}
+            <div className="mt-5 pt-4 border-t border-white/5">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={`stage-info-${game.phase}`}
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -6 }}
+                  transition={{ duration: 0.2 }}
+                  className="p-4 rounded-2xl bg-bwb-bg/70 border border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-4"
+                >
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-display font-black text-bwb-accent flex items-center gap-1.5">
+                        <Zap size={14} /> Stage Status: {PHASE_LABELS[game.phase]}
+                      </span>
+                      <span className="text-[10px] font-mono uppercase bg-white/5 px-2 py-0.5 rounded-md text-bwb-muted">
+                        Live on Stage & Screens
+                      </span>
+                    </div>
+
+                    {game.phase === 'LOBBY' && (
+                      <p className="text-xs text-bwb-muted">
+                        🚪 <strong>Lobby Standby</strong>: Waiting for teams to connect with PIN <strong className="text-bwb-accent font-mono">{game.code}</strong>. When all teams are present, switch to <strong>Problem Reveal</strong>.
+                      </p>
+                    )}
+                    {game.phase === 'PROBLEM_REVEAL' && (
+                      <p className="text-xs text-bwb-muted">
+                        💡 <strong>Problem Selection</strong>: 8 Problem statements are active on projector and player devices. Teams are choosing their challenge track.
+                      </p>
+                    )}
+                    {game.phase === 'CARD_REVEAL' && (
+                      <p className="text-xs text-bwb-muted">
+                        🎴 <strong>Surprise Tech Card Draft</strong>: Squads have received 3 surprise frontier tech cards. Teams are reviewing their cards before the build sprint.
+                      </p>
+                    )}
+                    {game.phase === 'BUILDING' && (
+                      <p className="text-xs text-bwb-muted">
+                        ⚡ <strong>15-Minute Rapid Architecture Sprint Active</strong>: Squads are building system architectures. Submissions received: <strong className="text-bwb-accent">{submittedCount}</strong> / {game.teams.length}.
+                      </p>
+                    )}
+                    {game.phase === 'PITCHING' && (
+                      <p className="text-xs text-bwb-muted">
+                        🎤 <strong>Live Stage Pitching Active</strong>: Teams have 3 minutes to present their system flow, tech card integration, and answer judge defenses.
+                      </p>
+                    )}
+                    {game.phase === 'JUDGING' && (
+                      <p className="text-xs text-bwb-muted">
+                        ⚖️ <strong>Judge Scoring Active</strong>: Judges enter ratings across 4 Rubric dimensions: Tech Integration (20), Feasibility (20), Problem Relevance (20), and Presentation (20).
+                      </p>
+                    )}
+                    {game.phase === 'LEADERBOARD' && (
+                      <p className="text-xs text-bwb-muted">
+                        🏆 <strong>Live Leaderboard & Standings</strong>: {currentRound === 2 ? 'Review Top 8 squads. Click "Lock Top 8 & Start Finals" when ready.' : 'Review final scores before podium reveal.'}
+                      </p>
+                    )}
+                    {game.phase === 'RESULTS' && (
+                      <p className="text-xs text-bwb-muted">
+                        🎉 <strong>Championship Prize Podium</strong>: 1st Champion, 2nd Runner-Up, and Dual 3rd Bronze Winners are presented with celebration confetti!
+                      </p>
+                    )}
+                  </div>
+
+                  {nextStage && (
+                    <Button
+                      size="sm"
+                      onClick={() => changePhase(nextStage.phase)}
+                      className="shrink-0 bg-bwb-accent text-bwb-bg font-bold text-xs shadow-md hover:bg-bwb-accent/90"
+                    >
+                      <span>Advance to {nextStage.title}</span>
+                      <ArrowRight size={14} className="ml-1" />
+                    </Button>
+                  )}
+                </motion.div>
+              </AnimatePresence>
+            </div>
           </div>
         </PageTransition>
+
 
 
         {/* Live Teams, Selection & Submission Status Grid */}

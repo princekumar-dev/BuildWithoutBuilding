@@ -41,11 +41,14 @@ export function ConfettiCanvas({ active = true, durationMs = 4000 }: ConfettiPro
     const colors = ['#f59e0b', '#ec4899', '#8b5cf6', '#3b82f6', '#10b981', '#fbbf24', '#ffffff']
     const particles: Particle[] = []
 
-    for (let i = 0; i < 90; i++) {
+    const isMobile = window.innerWidth < 768
+    const particleCount = isMobile ? 45 : 90
+
+    for (let i = 0; i < particleCount; i++) {
       particles.push({
         x: Math.random() * width,
         y: Math.random() * -height * 0.5,
-        vx: (Math.random() - 0.5) * 5,
+        vx: (Math.random() - 0.5) * (isMobile ? 3.5 : 5),
         vy: Math.random() * 4 + 3,
         color: colors[Math.floor(Math.random() * colors.length)],
         size: Math.random() * 8 + 4,
@@ -54,6 +57,7 @@ export function ConfettiCanvas({ active = true, durationMs = 4000 }: ConfettiPro
         shape: Math.random() > 0.6 ? 'rect' : Math.random() > 0.3 ? 'circle' : 'star',
       })
     }
+
 
     let animationId: number
     const startTime = Date.now()

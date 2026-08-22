@@ -220,3 +220,30 @@ h1, h2, h3, h4, h5, h6 {
 .backface-hidden {
   backface-visibility: hidden;
 }
+
+/* GPU Hardware Acceleration & Smooth 60-120fps Rendering */
+.gpu-layer {
+  transform: translate3d(0, 0, 0);
+  -webkit-transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  will-change: transform, opacity;
+}
+
+/* Mobile & Low-End GPU Optimization */
+@media (max-width: 768px) {
+  .glass, .glass-card, .holo-card {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+}
+
+/* Graceful Reduced Motion Preference Support */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

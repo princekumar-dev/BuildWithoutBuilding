@@ -487,7 +487,7 @@ export default function ProjectorPage() {
               {/* STAGE CENTER: GRAND COUNTDOWN OR STANDBY RADAR */}
               {timeLeft.hasSchedule && !timeLeft.isPast ? (
                 <div className="mb-8 p-6 rounded-2xl bg-bwb-bg/90 border border-amber-400/40 shadow-inner relative overflow-hidden text-center">
-                  <div className="flex items-center justify-between mb-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
                     <p className="text-xs uppercase tracking-widest text-amber-400 font-mono font-bold flex items-center gap-2">
                       <Clock size={15} className="animate-spin text-amber-400" />
                       <span>TOURNAMENT STARTS IN</span>
@@ -615,19 +615,19 @@ export default function ProjectorPage() {
 
             {/* Live Teams & Players Arena Wall (NO PASSCODES DISPLAYED) */}
             <div className="w-full max-w-6xl">
-              <div className="flex items-center justify-between mb-5 pb-3 border-b border-bwb-border">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-5 pb-3 border-b border-bwb-border gap-3">
                 <div className="flex items-center gap-3">
-                  <Users className="text-bwb-accent" size={24} />
+                  <Users className="text-bwb-accent shrink-0" size={24} />
                   <h2 className="font-display text-xl sm:text-2xl font-bold text-bwb-text">
                     {game.currentRound === 3 ? 'Grand Finalists (Top 8)' : `Registered Arena Teams (${lobbyTeams.length})`}
                   </h2>
                 </div>
-                <div className="flex items-center gap-4 text-xs font-mono text-bwb-muted">
+                <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs font-mono text-bwb-muted pl-9 sm:pl-0">
                   <span className="flex items-center gap-1.5 text-emerald-400 font-bold">
                     <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                     Live in Room: {lobbyTeams.filter((t) => t.isOnline).length} / {lobbyTeams.length}
                   </span>
-                  <span>·</span>
+                  <span className="hidden sm:inline">·</span>
                   <span>Total Players: <strong className="text-bwb-text">{totalParticipants}</strong></span>
                 </div>
               </div>

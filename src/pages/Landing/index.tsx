@@ -54,7 +54,8 @@ export default function LandingPage() {
   return (
     <PageLayout fullWidth className="overflow-x-hidden">
       {/* HERO SECTION WITH DEPARTMENT & MICROSOFT AI CLUB BRANDING */}
-      <section className="relative pt-8 sm:pt-16 pb-16 sm:pb-24 px-4 sm:px-6 overflow-hidden">
+      <section className="relative pt-6 sm:pt-12 pb-4 sm:pb-8 px-4 sm:px-6 overflow-hidden">
+
         {/* Background Atmospheric Glows */}
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[700px] h-[500px] bg-gradient-to-tr from-bwb-accent/15 via-purple-600/10 to-transparent blur-[120px] pointer-events-none" />
         <div className="absolute top-10 right-10 w-96 h-96 bg-cyan-500/10 blur-[100px] pointer-events-none" />
@@ -122,7 +123,7 @@ export default function LandingPage() {
             </div>
 
             {/* Primary Calls to Action */}
-            <div className="flex flex-wrap items-center justify-center gap-4 mb-16">
+            <div className="flex flex-wrap items-center justify-center gap-4 mb-2 sm:mb-4">
               <Link to="/join" className="w-full sm:w-auto">
                 <Button size="lg" className="w-full sm:min-w-[200px] shadow-xl shadow-bwb-accent/25 hover:scale-105 transition-transform text-sm font-bold">
                   <Users size={18} className="mr-2" /> Enter Live Event <ArrowRight size={16} className="ml-1.5" />
@@ -147,12 +148,11 @@ export default function LandingPage() {
         </div>
       </section>
 
-
       {/* 3. EVENT LOGISTICS & SCHEDULE CARD */}
-
-      <section className="max-w-6xl mx-auto px-3 sm:px-6 mb-12 sm:mb-20">
+      <section className="max-w-6xl mx-auto px-3 sm:px-6 mb-10 sm:mb-16 mt-2 sm:mt-4">
         <div className="stereo-card rounded-3xl p-5 sm:p-8 border border-white/10 shadow-2xl bg-gradient-to-br from-bwb-surface-2 to-bwb-surface relative overflow-hidden">
           <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/5 rounded-full blur-3xl pointer-events-none" />
+
 
           <div className="grid md:grid-cols-3 gap-5 sm:gap-6 divide-y md:divide-y-0 md:divide-x divide-white/10">
             {/* Date */}

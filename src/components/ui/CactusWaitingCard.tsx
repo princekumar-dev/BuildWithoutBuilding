@@ -759,155 +759,157 @@ export function CactusWaitingCard({
         </button>
       </div>
 
-      {/* GPU ACCELERATED CINEMATIC TAB PANELS */}
-      <AnimatePresence mode="popLayout" initial={false}>
-        {/* TAB 1: PASSCODE & ROSTER VAULT */}
-        {activeTab === 'passcode' && currentPasscode ? (
-          <motion.div
-            key="tab-passcode"
-            initial={{ opacity: 0, x: -14, filter: 'blur(3px)' }}
-            animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
-            exit={{ opacity: 0, x: -14, filter: 'blur(3px)' }}
-            transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
-            className="w-full max-w-xl mx-auto p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-bwb-bg via-bwb-bg to-bwb-surface border border-amber-400/35 mb-6 shadow-xl text-left will-change-transform gpu-layer"
-          >
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-[10px] font-mono uppercase tracking-widest text-amber-400 font-bold flex items-center gap-1">
-                    <ShieldCheck size={12} /> YOUR TEAM ENTRY PASSCODE
-                  </span>
-                </div>
-                <p className="font-mono text-2xl sm:text-3xl font-black text-bwb-text tracking-wider text-shadow">
-                  {currentPasscode}
-                </p>
-              </div>
-              <Button
-                size="md"
-                variant="secondary"
-                onClick={copyPasscode}
-                className="border-amber-400/40 hover:bg-amber-400/20 text-amber-300 font-bold text-xs shrink-0 shadow-sm"
-              >
-                {copied ? <CheckCircle2 size={15} className="text-bwb-success" /> : <Copy size={15} />}
-                <span>{copied ? 'Passcode Copied!' : 'Copy Code'}</span>
-              </Button>
-            </div>
+      {/* GPU ACCELERATED CINEMATIC TAB PANELS WITH SMOOTH LAYOUT EXPANSION */}
+      <motion.div layout transition={{ duration: 0.24, ease: [0.25, 1, 0.5, 1] }} className="w-full max-w-xl mx-auto overflow-hidden mb-6">
+        <AnimatePresence mode="wait" initial={false}>
 
-            {/* Roster members */}
-            {myTeam && myTeam.members.length > 0 && (
-              <div className="mt-4 pt-3.5 border-t border-white/10">
-                <p className="text-[10px] font-mono uppercase text-bwb-muted font-bold mb-2 flex items-center gap-1.5">
-                  <span>Registered Roster ({myTeam.members.length} Players):</span>
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {myTeam.members.map((member, idx) => (
-                    <span
-                      key={idx}
-                      className={`px-2.5 sm:px-3 py-1 rounded-xl text-xs font-semibold border flex items-center gap-1.5 ${
-                        idx === 0
-                          ? 'bg-amber-400/10 border-amber-400/30 text-amber-300'
-                          : 'bg-cyan-500/10 border-cyan-500/30 text-cyan-300'
-                      }`}
-                    >
-                      {idx === 0 ? <Crown size={12} className="text-amber-400" /> : <UserCheck size={12} />}
-                      <span>{member}</span>
-                      {idx === 0 && <span className="text-[9px] uppercase font-bold opacity-80">(Lead)</span>}
+          {/* TAB 1: PASSCODE & ROSTER VAULT */}
+          {activeTab === 'passcode' && currentPasscode ? (
+            <motion.div
+              key="tab-passcode"
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.2, ease: [0.25, 1, 0.5, 1] }}
+              className="w-full p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-bwb-bg via-bwb-bg to-bwb-surface border border-amber-400/35 shadow-xl text-left will-change-transform gpu-layer"
+            >
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-[10px] font-mono uppercase tracking-widest text-amber-400 font-bold flex items-center gap-1">
+                      <ShieldCheck size={12} /> YOUR TEAM ENTRY PASSCODE
                     </span>
-                  ))}
+                  </div>
+                  <p className="font-mono text-2xl sm:text-3xl font-black text-bwb-text tracking-wider text-shadow">
+                    {currentPasscode}
+                  </p>
+                </div>
+                <Button
+                  size="md"
+                  variant="secondary"
+                  onClick={copyPasscode}
+                  className="border-amber-400/40 hover:bg-amber-400/20 text-amber-300 font-bold text-xs shrink-0 shadow-sm"
+                >
+                  {copied ? <CheckCircle2 size={15} className="text-bwb-success" /> : <Copy size={15} />}
+                  <span>{copied ? 'Passcode Copied!' : 'Copy Code'}</span>
+                </Button>
+              </div>
+
+              {/* Roster members */}
+              {myTeam && myTeam.members.length > 0 && (
+                <div className="mt-4 pt-3.5 border-t border-white/10">
+                  <p className="text-[10px] font-mono uppercase text-bwb-muted font-bold mb-2 flex items-center gap-1.5">
+                    <span>Registered Roster ({myTeam.members.length} Players):</span>
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {myTeam.members.map((member, idx) => (
+                      <span
+                        key={idx}
+                        className={`px-2.5 sm:px-3 py-1 rounded-xl text-xs font-semibold border flex items-center gap-1.5 ${
+                          idx === 0
+                            ? 'bg-amber-400/10 border-amber-400/30 text-amber-300'
+                            : 'bg-cyan-500/10 border-cyan-500/30 text-cyan-300'
+                        }`}
+                      >
+                        {idx === 0 ? <Crown size={12} className="text-amber-400" /> : <UserCheck size={12} />}
+                        <span>{member}</span>
+                        {idx === 0 && <span className="text-[9px] uppercase font-bold opacity-80">(Lead)</span>}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </motion.div>
+          ) : activeTab === 'playbook' ? (
+            /* TAB 2: TOURNAMENT PLAYBOOK (3-ROUND TOURNAMENT & 7-STAGE PIPELINE) */
+            <motion.div
+              key="tab-playbook"
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.2, ease: [0.25, 1, 0.5, 1] }}
+              className="w-full p-3.5 sm:p-4 rounded-2xl bg-bwb-bg border border-white/10 text-left space-y-3 will-change-transform gpu-layer"
+            >
+
+              {/* Round 1 */}
+              <div className="p-3 rounded-xl bg-bwb-surface border border-purple-500/20 flex items-start gap-3">
+                <span className="w-7 h-7 rounded-lg bg-purple-500/20 text-purple-300 border border-purple-500/40 flex items-center justify-center text-xs font-mono font-bold shrink-0">
+                  R1
+                </span>
+                <div>
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <p className="text-xs font-bold text-bwb-text">Round 1: Open Qualifier</p>
+                    <span className="text-[10px] font-mono font-bold px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                      No Elimination
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-bwb-muted mt-0.5 leading-relaxed">
+                    Choose from 8 problem statements, draft 3 surprise tech cards, and formulate a 15-minute system architecture. All registered squads advance to Round 2!
+                  </p>
                 </div>
               </div>
-            )}
-          </motion.div>
-        ) : activeTab === 'playbook' ? (
-          /* TAB 2: TOURNAMENT PLAYBOOK (3-ROUND TOURNAMENT & 7-STAGE PIPELINE) */
-          <motion.div
-            key="tab-playbook"
-            initial={{ opacity: 0, x: 14, filter: 'blur(3px)' }}
-            animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
-            exit={{ opacity: 0, x: 14, filter: 'blur(3px)' }}
-            transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
-            className="w-full max-w-xl mx-auto p-3.5 sm:p-4 rounded-2xl bg-bwb-bg border border-white/10 mb-6 text-left space-y-3 will-change-transform gpu-layer"
-          >
 
-            {/* Round 1 */}
-            <div className="p-3 rounded-xl bg-bwb-surface border border-purple-500/20 flex items-start gap-3">
-              <span className="w-7 h-7 rounded-lg bg-purple-500/20 text-purple-300 border border-purple-500/40 flex items-center justify-center text-xs font-mono font-bold shrink-0">
-                R1
-              </span>
-              <div>
-                <div className="flex items-center gap-1.5 flex-wrap">
-                  <p className="text-xs font-bold text-bwb-text">Round 1: Open Qualifier</p>
-                  <span className="text-[10px] font-mono font-bold px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                    No Elimination
-                  </span>
+              {/* Round 2 */}
+              <div className="p-3 rounded-xl bg-bwb-surface border border-bwb-accent/20 flex items-start gap-3">
+                <span className="w-7 h-7 rounded-lg bg-bwb-accent/20 text-bwb-accent border border-bwb-accent/40 flex items-center justify-center text-xs font-mono font-bold shrink-0">
+                  R2
+                </span>
+                <div>
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <p className="text-xs font-bold text-bwb-text">Round 2: Problem Showdown</p>
+                    <span className="text-[10px] font-mono font-bold px-1.5 py-0.2 rounded bg-bwb-accent/20 text-bwb-accent border border-bwb-accent/30">
+                      Top 8 Qualify
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-bwb-muted mt-0.5 leading-relaxed">
+                    8 distinct challenge tracks with strictly max 2 teams per problem statement. The Top 8 squads advance to the Grand Finals.
+                  </p>
                 </div>
-                <p className="text-[11px] text-bwb-muted mt-0.5 leading-relaxed">
-                  Choose from 8 problem statements, draft 3 surprise tech cards, and formulate a 15-minute system architecture. All registered squads advance to Round 2!
+              </div>
+
+              {/* Round 3 */}
+              <div className="p-3 rounded-xl bg-bwb-surface border border-amber-500/20 flex items-start gap-3">
+                <span className="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center justify-center text-xs font-mono font-bold shrink-0">
+                  R3
+                </span>
+                <div>
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <p className="text-xs font-bold text-bwb-text">Round 3: Grand Finals & Prize Podium</p>
+                    <span className="text-[10px] font-mono font-bold px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                      Top 4 Prized
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-bwb-muted mt-0.5 leading-relaxed">
+                    Top 8 Finalists defend live on stage. Top 4 teams receive championship prizes: 🥇 1st Place (Champion), 🥈 2nd Place (Runner-Up), and 🥉 3rd Place (Dual Bronze Winners).
+                  </p>
+                </div>
+              </div>
+
+              {/* 7-Stage Flow */}
+              <div className="pt-2 border-t border-white/5">
+                <p className="text-[10px] font-mono uppercase text-bwb-muted font-bold mb-1.5">
+                  ⚡ 7-Stage Live Event Pipeline:
                 </p>
-              </div>
-            </div>
-
-            {/* Round 2 */}
-            <div className="p-3 rounded-xl bg-bwb-surface border border-bwb-accent/20 flex items-start gap-3">
-              <span className="w-7 h-7 rounded-lg bg-bwb-accent/20 text-bwb-accent border border-bwb-accent/40 flex items-center justify-center text-xs font-mono font-bold shrink-0">
-                R2
-              </span>
-              <div>
-                <div className="flex items-center gap-1.5 flex-wrap">
-                  <p className="text-xs font-bold text-bwb-text">Round 2: Problem Showdown</p>
-                  <span className="text-[10px] font-mono font-bold px-1.5 py-0.2 rounded bg-bwb-accent/20 text-bwb-accent border border-bwb-accent/30">
-                    Top 8 Qualify
-                  </span>
+                <div className="flex flex-wrap items-center gap-1 text-[10px] font-mono text-bwb-text">
+                  <span className="px-1.5 py-0.5 rounded bg-white/5">1. Lobby</span>
+                  <span>➔</span>
+                  <span className="px-1.5 py-0.5 rounded bg-white/5">2. Problem Reveal</span>
+                  <span>➔</span>
+                  <span className="px-1.5 py-0.5 rounded bg-white/5">3. Card Draft</span>
+                  <span>➔</span>
+                  <span className="px-1.5 py-0.5 rounded bg-white/5">4. Build</span>
+                  <span>➔</span>
+                  <span className="px-1.5 py-0.5 rounded bg-white/5">5. Pitch</span>
+                  <span>➔</span>
+                  <span className="px-1.5 py-0.5 rounded bg-white/5 text-purple-300">6. Judging</span>
+                  <span>➔</span>
+                  <span className="px-1.5 py-0.5 rounded bg-bwb-gold/20 text-bwb-gold">7. Podium</span>
                 </div>
-                <p className="text-[11px] text-bwb-muted mt-0.5 leading-relaxed">
-                  8 distinct challenge tracks with strictly max 2 teams per problem statement. The Top 8 squads advance to the Grand Finals.
-                </p>
               </div>
-            </div>
-
-            {/* Round 3 */}
-            <div className="p-3 rounded-xl bg-bwb-surface border border-amber-500/20 flex items-start gap-3">
-              <span className="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center justify-center text-xs font-mono font-bold shrink-0">
-                R3
-              </span>
-              <div>
-                <div className="flex items-center gap-1.5 flex-wrap">
-                  <p className="text-xs font-bold text-bwb-text">Round 3: Grand Finals & Prize Podium</p>
-                  <span className="text-[10px] font-mono font-bold px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                    Top 4 Prized
-                  </span>
-                </div>
-                <p className="text-[11px] text-bwb-muted mt-0.5 leading-relaxed">
-                  Top 8 Finalists defend live on stage. Top 4 teams receive championship prizes: 🥇 1st Place (Champion), 🥈 2nd Place (Runner-Up), and 🥉 3rd Place (Dual Bronze Winners).
-                </p>
-              </div>
-            </div>
-
-            {/* 7-Stage Flow */}
-            <div className="pt-2 border-t border-white/5">
-              <p className="text-[10px] font-mono uppercase text-bwb-muted font-bold mb-1.5">
-                ⚡ 7-Stage Live Event Pipeline:
-              </p>
-              <div className="flex flex-wrap items-center gap-1 text-[10px] font-mono text-bwb-text">
-                <span className="px-1.5 py-0.5 rounded bg-white/5">1. Lobby</span>
-                <span>➔</span>
-                <span className="px-1.5 py-0.5 rounded bg-white/5">2. Problem Reveal</span>
-                <span>➔</span>
-                <span className="px-1.5 py-0.5 rounded bg-white/5">3. Card Draft</span>
-                <span>➔</span>
-                <span className="px-1.5 py-0.5 rounded bg-white/5">4. Build</span>
-                <span>➔</span>
-                <span className="px-1.5 py-0.5 rounded bg-white/5">5. Pitch</span>
-                <span>➔</span>
-                <span className="px-1.5 py-0.5 rounded bg-white/5 text-purple-300">6. Judging</span>
-                <span>➔</span>
-                <span className="px-1.5 py-0.5 rounded bg-bwb-gold/20 text-bwb-gold">7. Podium</span>
-              </div>
-            </div>
-          </motion.div>
-        ) : null}
-      </AnimatePresence>
-
+            </motion.div>
+          ) : null}
+        </AnimatePresence>
+      </motion.div>
 
       {/* Footer Meta */}
       <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-xs text-bwb-muted font-mono pt-2">

@@ -879,7 +879,7 @@ export default function HostGameControlPage() {
                       onClick={advanceStage}
                       className="shrink-0 bg-bwb-accent text-bwb-bg font-bold text-xs shadow-md hover:bg-bwb-accent/90"
                     >
-                      <span>{nextStage ? `Advance to ${nextStage.title}` : currentRound === 1 ? 'Start Round 2 Lobby' : currentRound === 2 ? 'Lock Top 8 & Start Round 3 Lobby' : 'Reveal Final Results'}</span>
+                      <span>{nextStage ? `Advance to ${nextStage?.title}` : currentRound === 1 ? 'Start Round 2 Lobby' : currentRound === 2 ? 'Lock Top 8 & Start Round 3 Lobby' : 'Reveal Final Results'}</span>
                       <ArrowRight size={14} className="ml-1" />
                     </Button>
                   )}

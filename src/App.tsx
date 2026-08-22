@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 
 import LandingPage from './pages/Landing'
 import HowToPlayPage from './pages/HowToPlay'
@@ -36,10 +36,13 @@ function ProtectedHost({ children }: { children: React.ReactNode }) {
 
 function GlobalGamifiedSync() {
   usePhaseNavigation()
+  const location = useLocation()
+  const isProjector = location.pathname === '/projector'
+
   return (
     <>
-      <PhaseTransitionOverlay />
-      <TournamentAlertModal />
+      {!isProjector && <PhaseTransitionOverlay />}
+      {!isProjector && <TournamentAlertModal />}
       <SoundToggle />
     </>
   )

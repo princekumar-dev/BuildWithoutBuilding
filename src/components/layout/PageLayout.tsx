@@ -12,9 +12,10 @@ export function PageLayout({ children, hideNav, fullWidth, className = '' }: Pag
   return (
     <div className={`min-h-screen grid-bg ${className}`}>
       {!hideNav && <Navbar />}
-      <main className={fullWidth ? '' : 'max-w-7xl mx-auto px-4 sm:px-6 py-8'}>
+      <main className={fullWidth ? '' : 'max-w-7xl mx-auto px-2.5 sm:px-6 py-4 sm:py-8'}>
         {children}
       </main>
+
     </div>
   )
 }

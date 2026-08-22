@@ -169,16 +169,16 @@ export default function JoinPage() {
 
   return (
     <PageLayout>
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 py-6">
+      <div className="max-w-2xl mx-auto px-1 sm:px-6 py-2 sm:py-6">
         {/* Header Title */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-bwb-accent/15 border border-bwb-accent/30 text-bwb-accent text-xs font-mono font-bold uppercase tracking-widest mb-3 shadow-sm">
+        <div className="text-center mb-6 sm:mb-8">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-bwb-accent/15 border border-bwb-accent/30 text-bwb-accent text-xs font-mono font-bold uppercase tracking-widest mb-2.5 shadow-sm">
             <Sparkles size={13} /> Official Event Entry
           </div>
-          <h1 className="font-display text-3xl sm:text-5xl font-black text-bwb-text tracking-tight">
+          <h1 className="font-display text-2xl sm:text-5xl font-black text-bwb-text tracking-tight">
             Team Registration & Entry
           </h1>
-          <p className="text-bwb-muted text-xs sm:text-sm mt-2 max-w-md mx-auto">
+          <p className="text-bwb-muted text-xs sm:text-sm mt-1.5 max-w-md mx-auto">
             Register your team roster to receive a unique Team Passcode, or join directly with your team code.
           </p>
         </div>
@@ -192,7 +192,7 @@ export default function JoinPage() {
               exit={{ opacity: 0, scale: 0.96 }}
               className="mb-8"
             >
-              <div className="stereo-card rounded-3xl p-6 sm:p-8 border-2 border-bwb-success/50 bg-gradient-to-br from-emerald-950/40 via-bwb-surface-2 to-bwb-surface shadow-2xl relative overflow-hidden">
+              <div className="stereo-card rounded-3xl p-4 sm:p-8 border-2 border-bwb-success/50 bg-gradient-to-br from-emerald-950/40 via-bwb-surface-2 to-bwb-surface shadow-2xl relative overflow-hidden">
                 <div className="flex items-center gap-3.5 mb-5 pb-4 border-b border-white/10">
                   <div className="w-12 h-12 rounded-2xl bg-bwb-success/20 text-bwb-success border border-bwb-success/40 flex items-center justify-center shrink-0 shadow-lg shadow-bwb-success/10">
                     <CheckCircle2 size={26} />
@@ -208,7 +208,7 @@ export default function JoinPage() {
                 </div>
 
                 {/* Unique Team Passcode Box */}
-                <div className="p-5 rounded-2xl bg-bwb-bg/90 border border-amber-400/40 mb-6 shadow-inner">
+                <div className="p-4 sm:p-5 rounded-2xl bg-bwb-bg/90 border border-amber-400/40 mb-6 shadow-inner">
                   <div className="flex items-center justify-between gap-2 mb-2">
                     <span className="text-[10px] uppercase font-mono text-amber-400 font-bold tracking-wider">
                       YOUR UNIQUE TEAM PASSCODE
@@ -218,10 +218,10 @@ export default function JoinPage() {
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between gap-3 bg-bwb-surface-2 px-4 py-3 rounded-xl border border-white/10">
-                    <div className="flex items-center gap-2.5">
-                      <Key size={20} className="text-amber-400 shrink-0" />
-                      <span className="font-mono text-2xl sm:text-3xl font-black text-bwb-accent tracking-widest select-all">
+                  <div className="flex items-center justify-between gap-3 bg-bwb-surface-2 px-3 sm:px-4 py-3 rounded-xl border border-white/10">
+                    <div className="flex items-center gap-2">
+                      <Key size={18} className="text-amber-400 shrink-0" />
+                      <span className="font-mono text-xl sm:text-3xl font-black text-bwb-accent tracking-widest select-all">
                         {displayPasscode}
                       </span>
                     </div>
@@ -246,7 +246,7 @@ export default function JoinPage() {
                     {registeredSession.game.teams.find((t) => t.id === registeredSession.session.teamId)?.members.map((member, i) => (
                       <span
                         key={i}
-                        className="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-bwb-surface border border-white/10 text-bwb-text flex items-center gap-1.5 shadow-sm"
+                        className="px-3 py-1 rounded-xl text-xs font-semibold bg-bwb-surface border border-white/10 text-bwb-text flex items-center gap-1.5 shadow-sm"
                       >
                         {i === 0 ? <Crown size={13} className="text-amber-400" /> : <UserCheck size={13} className="text-bwb-accent" />}
                         {member} {i === 0 && <span className="text-[10px] text-amber-400 font-mono font-bold">(Lead)</span>}
@@ -271,29 +271,29 @@ export default function JoinPage() {
 
         {/* REGISTRATION & JOIN CARD */}
         {!registeredSession && (
-          <Card glow padding="lg" className="border-bwb-border/80 shadow-2xl bg-gradient-to-b from-bwb-surface-2 to-bwb-surface">
+          <Card glow padding="md" className="border-bwb-border/80 shadow-2xl bg-gradient-to-b from-bwb-surface-2 to-bwb-surface">
             {/* Locked Active Event Room Header */}
-            <div className="mb-6 p-4 rounded-2xl bg-bwb-bg/80 border border-white/10 flex items-center justify-between gap-3 shadow-inner">
-              <div>
+            <div className="mb-5 p-3 sm:p-4 rounded-2xl bg-bwb-bg/80 border border-white/10 flex items-center justify-between gap-3 shadow-inner">
+              <div className="truncate">
                 <div className="flex items-center gap-2 mb-0.5">
-                  <span className="inline-block w-2 h-2 rounded-full bg-bwb-success animate-pulse" />
-                  <label className="text-[10px] font-mono uppercase text-bwb-muted font-bold tracking-widest">
+                  <span className="inline-block w-2 h-2 rounded-full bg-bwb-success animate-pulse shrink-0" />
+                  <label className="text-[10px] font-mono uppercase text-bwb-muted font-bold tracking-widest truncate">
                     ACTIVE EVENT ROOM
                   </label>
                 </div>
-                <p className="text-xs font-semibold text-bwb-text">
+                <p className="text-xs font-semibold text-bwb-text truncate">
                   {activeGames.length > 0 ? (activeGames[activeGames.length - 1]?.name || 'Live Tournament Room') : 'Live Competition Room'}
                 </p>
               </div>
 
-              <div className="px-4 py-2 rounded-xl bg-bwb-surface-2 border border-bwb-accent/40 font-mono text-base tracking-widest font-black text-bwb-accent shadow-sm flex items-center gap-2 select-all">
-                <Radio size={14} className="text-bwb-accent animate-pulse shrink-0" />
+              <div className="px-3 sm:px-4 py-2 rounded-xl bg-bwb-surface-2 border border-bwb-accent/40 font-mono text-sm sm:text-base tracking-widest font-black text-bwb-accent shadow-sm flex items-center gap-1.5 shrink-0 select-all">
+                <Radio size={13} className="text-bwb-accent animate-pulse shrink-0" />
                 <span>{code || (activeGames.length > 0 ? activeGames[activeGames.length - 1]?.code : 'BWB-LIVE')}</span>
               </div>
             </div>
 
             {/* Mode Switcher Tabs */}
-            <div className="grid grid-cols-2 gap-2 p-1.5 bg-bwb-bg rounded-2xl mb-8 border border-white/5">
+            <div className="grid grid-cols-2 gap-2 p-1.5 bg-bwb-bg rounded-2xl mb-6 border border-white/5">
               <button
                 type="button"
                 onClick={() => { setActiveTab('register'); setError('') }}
@@ -323,6 +323,7 @@ export default function JoinPage() {
 
             {/* TAB 1: FULL TEAM REGISTRATION */}
             {activeTab === 'register' && (
+
               <form onSubmit={handleRegisterTeam} className="space-y-5">
                 <Input
                   label="Team Name *"

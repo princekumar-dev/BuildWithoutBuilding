@@ -111,8 +111,9 @@ export function CactusWaitingCard({
     <motion.div
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
-      className="relative rounded-3xl p-6 sm:p-9 text-center mb-8 border border-white/15 shadow-2xl overflow-hidden bg-gradient-to-b from-bwb-surface-2/95 via-bwb-surface/95 to-bwb-bg/95 backdrop-blur-2xl"
+      className="relative rounded-3xl p-4 sm:p-9 text-center mb-8 border border-white/15 shadow-2xl overflow-hidden bg-gradient-to-b from-bwb-surface-2/95 via-bwb-surface/95 to-bwb-bg/95 backdrop-blur-2xl"
     >
+
       {/* Dynamic Ambient Neon Mesh Glows */}
       <div className="absolute -top-24 -left-20 w-72 h-72 rounded-full bg-emerald-500/15 blur-[90px] pointer-events-none" />
       <div className="absolute top-1/2 -right-20 w-80 h-80 rounded-full bg-amber-500/15 blur-[100px] pointer-events-none" />

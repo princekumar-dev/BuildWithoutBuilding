@@ -7,7 +7,12 @@ interface CardProps {
   padding?: 'sm' | 'md' | 'lg'
 }
 
-const paddingMap = { sm: 'p-4', md: 'p-6', lg: 'p-8' }
+const paddingMap = {
+  sm: 'p-3 sm:p-4',
+  md: 'p-4 sm:p-6',
+  lg: 'p-4 sm:p-8',
+}
+
 
 export function Card({ children, className = '', glow, padding = 'md' }: CardProps) {
   return (

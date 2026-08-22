@@ -110,7 +110,7 @@ export default function CardRevealPage() {
         </motion.div>
 
         {/* 3 Interactive Tech Card Slots */}
-        <div className="grid sm:grid-cols-3 gap-5 mb-8">
+        <div className="grid sm:grid-cols-3 gap-4 mb-5">
           {[0, 1, 2].map((slotIndex) => {
             const isRevealed = revealed.includes(slotIndex)
             const tech = myTechs[slotIndex]
@@ -137,7 +137,7 @@ export default function CardRevealPage() {
 
         {/* Quick Action Button for player */}
         {!allRevealed && (
-          <div className="text-center mb-8">
+          <div className="text-center mb-5">
             <Button variant="secondary" size="md" onClick={revealAll}>
               <Zap size={16} className="mr-1.5 text-bwb-accent" />
               Reveal All Remaining Cards

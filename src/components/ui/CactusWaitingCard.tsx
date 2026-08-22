@@ -3,8 +3,9 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   Calendar, Clock, Copy, CheckCircle2, UserCheck, Sparkles,
   ShieldCheck, Layers, Crown, ChevronLeft, ChevronRight, BookOpen,
-  Music, X
+  Moon, Sun, X
 } from 'lucide-react'
+
 import { Button } from './Button'
 import { toast } from './Toast'
 import { SoundFX } from '../../lib/soundEffects'
@@ -53,7 +54,7 @@ export function CactusWaitingCard({
   const [quoteIndex, setQuoteIndex] = useState(0)
   const [slideDirection, setSlideDirection] = useState<1 | -1>(1)
   const [isWiggling, setIsWiggling] = useState(false)
-  const [isDancing, setIsDancing] = useState(false)
+  const [isSleeping, setIsSleeping] = useState(false)
   const [flowerSpin, setFlowerSpin] = useState(false)
   const [isBlushing, setIsBlushing] = useState(false)
 
@@ -106,7 +107,7 @@ export function CactusWaitingCard({
   }, [scheduledStartTime])
 
   const spawnParticlesAt = (x: number, y: number) => {
-    const emojiList = ['💖', '✨', '⚡', '🌟', '🎉', '🌸', '🌵', '🚀', '🔥', '👑', '💫', '🎶']
+    const emojiList = isSleeping ? ['💤', '✨', '🌙', '⭐', '💫', '🌸'] : ['💖', '✨', '⚡', '🌟', '🎉', '🌸', '🌵', '🚀', '🔥', '👑', '💫', '🎶']
     const newBurst = Array.from({ length: 5 }).map((_, i) => ({
       id: Date.now() + i + Math.random(),
       emoji: emojiList[Math.floor(Math.random() * emojiList.length)],
@@ -124,16 +125,28 @@ export function CactusWaitingCard({
   }
 
   const handleCactusClick = (e: React.MouseEvent) => {
-    setIsWiggling(true)
-    setFlowerSpin(true)
-    setIsBlushing(true)
-    setSlideDirection(1)
-    setQuoteIndex((prev) => (prev + 1) % FUN_QUOTES.length)
-    SoundFX.playCutePop()
+    if (isSleeping) {
+      setIsSleeping(false)
+      setIsWiggling(true)
+      setIsBlushing(true)
+      setFlowerSpin(true)
+      SoundFX.playCutePop()
+      toast.success("Spike woke up full of strategy energy! ☀️")
+      setTimeout(() => setIsWiggling(false), 700)
+      setTimeout(() => setFlowerSpin(false), 800)
+      setTimeout(() => setIsBlushing(false), 1000)
+    } else {
+      setIsWiggling(true)
+      setFlowerSpin(true)
+      setIsBlushing(true)
+      setSlideDirection(1)
+      setQuoteIndex((prev) => (prev + 1) % FUN_QUOTES.length)
+      SoundFX.playCutePop()
 
-    setTimeout(() => setIsWiggling(false), 600)
-    setTimeout(() => setFlowerSpin(false), 750)
-    setTimeout(() => setIsBlushing(false), 900)
+      setTimeout(() => setIsWiggling(false), 600)
+      setTimeout(() => setFlowerSpin(false), 750)
+      setTimeout(() => setIsBlushing(false), 900)
+    }
 
     const rect = e.currentTarget.getBoundingClientRect()
     spawnParticlesAt(e.clientX - rect.left, e.clientY - rect.top)
@@ -151,13 +164,25 @@ export function CactusWaitingCard({
     SoundFX.playCutePop()
   }
 
-  const toggleDance = () => {
-    setIsDancing((prev) => !prev)
-    setIsWiggling(true)
-    setFlowerSpin(true)
+  const toggleSleep = () => {
+    setIsSleeping((prev) => {
+      const next = !prev
+      if (next) {
+        toast.info("Spike is taking a cozy power nap... 💤")
+      } else {
+        setIsWiggling(true)
+        setIsBlushing(true)
+        setFlowerSpin(true)
+        setTimeout(() => setIsWiggling(false), 700)
+        setTimeout(() => setFlowerSpin(false), 800)
+        setTimeout(() => setIsBlushing(false), 1000)
+        toast.success("Spike woke up! ☀️")
+      }
+      return next
+    })
     SoundFX.playCutePop()
-    setTimeout(() => setIsWiggling(false), 800)
   }
+
 
   const currentTip = FUN_QUOTES[quoteIndex]
 
@@ -232,26 +257,60 @@ export function CactusWaitingCard({
           ))}
         </AnimatePresence>
 
+        {/* Floating Animated Zzz Sleep Bubbles */}
+        {isSleeping && (
+          <div className="absolute -top-3 right-0 sm:right-2 pointer-events-none z-30 select-none flex flex-col items-center">
+            <motion.span
+              animate={{ y: [0, -18, -30], x: [0, 8, 16], opacity: [0, 1, 0], scale: [0.6, 1.1, 1.3] }}
+              transition={{ duration: 2.2, repeat: Infinity, ease: 'easeOut', delay: 0 }}
+              className="text-cyan-300 font-display font-black text-base drop-shadow-[0_2px_8px_rgba(6,182,212,0.8)]"
+            >
+              Z
+            </motion.span>
+            <motion.span
+              animate={{ y: [0, -14, -24], x: [0, 6, 12], opacity: [0, 1, 0], scale: [0.6, 0.9, 1.1] }}
+              transition={{ duration: 2.2, repeat: Infinity, ease: 'easeOut', delay: 0.7 }}
+              className="text-teal-300 font-display font-bold text-xs -mt-1 drop-shadow-[0_2px_6px_rgba(20,184,166,0.8)]"
+            >
+              z
+            </motion.span>
+            <motion.span
+              animate={{ y: [0, -10, -18], x: [0, 4, 8], opacity: [0, 1, 0], scale: [0.5, 0.8, 0.95] }}
+              transition={{ duration: 2.2, repeat: Infinity, ease: 'easeOut', delay: 1.4 }}
+              className="text-emerald-300 font-display font-semibold text-[10px] -mt-1 drop-shadow-[0_2px_4px_rgba(16,185,129,0.8)]"
+            >
+              z
+            </motion.span>
+          </div>
+        )}
+
         <motion.div
           onClick={handleCactusClick}
-          title="Tap Spike for happy vibes and tournament tips!"
+          title={isSleeping ? 'Tap to wake Spike up!' : 'Tap Spike for happy vibes and tournament tips!'}
           animate={
-            isWiggling || isDancing
+            isSleeping
+              ? {
+                  y: [0, 4, 0],
+                  scaleY: [1, 0.98, 1],
+                }
+              : isWiggling
               ? {
                   scale: [1, 1.08, 0.96, 1.04, 1],
-                  rotate: isDancing ? [-8, 8, -8, 8, 0] : [0, -5, 5, -2, 2, 0],
+                  rotate: [0, -5, 5, -2, 2, 0],
                 }
               : undefined
           }
           transition={{
-            duration: isDancing ? 0.8 : 0.6,
-            repeat: isDancing ? Infinity : 0,
+            duration: isSleeping ? 2.8 : 0.6,
+            repeat: isSleeping ? Infinity : 0,
             ease: 'easeInOut',
           }}
           className="relative inline-flex flex-col items-center cursor-pointer group select-none touch-manipulation active:scale-95 transition-transform will-change-transform"
         >
           {/* Pulsing Mascot Aura Pedestal */}
-          <div className="absolute bottom-1 w-36 h-8 bg-emerald-500/25 rounded-full blur-lg group-hover:bg-emerald-400/45 transition-all" />
+          <div className={`absolute bottom-1 w-36 h-8 rounded-full blur-lg transition-all ${
+            isSleeping ? 'bg-indigo-500/20 group-hover:bg-indigo-400/35' : 'bg-emerald-500/25 group-hover:bg-emerald-400/45'
+          }`} />
 
           {/* Stylized Ultra-Kawaii 3D SVG Cactus (Spike 2.0) */}
           <div className="w-36 h-40 relative flex items-center justify-center filter drop-shadow-[0_14px_32px_rgba(16,185,129,0.45)] group-hover:scale-105 transition-transform will-change-transform">
@@ -277,8 +336,8 @@ export function CactusWaitingCard({
 
               {/* Left Cute Stubby Arm (Chubby Branch) */}
               <motion.g
-                animate={isWiggling || isDancing ? { rotate: [-12, 14, -12] } : undefined}
-                transition={{ repeat: isDancing ? Infinity : 1, duration: 0.35, ease: 'easeInOut' }}
+                animate={isWiggling ? { rotate: [-12, 14, -12] } : isSleeping ? { rotate: -4 } : undefined}
+                transition={{ repeat: 1, duration: 0.35, ease: 'easeInOut' }}
                 style={{ transformOrigin: '32px 64px' }}
               >
                 <path
@@ -294,8 +353,8 @@ export function CactusWaitingCard({
 
               {/* Right Cute Stubby Arm (Waving Branch) */}
               <motion.g
-                animate={isWiggling || isDancing ? { rotate: [14, -12, 14] } : undefined}
-                transition={{ repeat: isDancing ? Infinity : 2, duration: 0.3 }}
+                animate={isWiggling ? { rotate: [14, -12, 14] } : isSleeping ? { rotate: 4 } : undefined}
+                transition={{ repeat: 2, duration: 0.3 }}
                 style={{ transformOrigin: '68px 60px' }}
               >
                 <path
@@ -336,8 +395,14 @@ export function CactusWaitingCard({
                 <circle cx="50" cy="14" r="4" fill="#FEF08A" stroke="#EAB308" strokeWidth="0.8" />
               </motion.g>
 
-              {/* Big Expressive Anime Eyes with Catchlights */}
-              {isWiggling || isDancing ? (
+              {/* Big Expressive Anime Eyes with Catchlights / Sleeping Eyes */}
+              {isSleeping ? (
+                // Peaceful Slumber Eyes (∪ ∪)
+                <g>
+                  <path d="M39 44 Q43 50 47 44" stroke="#064E3B" strokeWidth="2.6" strokeLinecap="round" fill="none" />
+                  <path d="M53 44 Q57 50 61 44" stroke="#064E3B" strokeWidth="2.6" strokeLinecap="round" fill="none" />
+                </g>
+              ) : isWiggling ? (
                 // Happy Squint Eyes (^ ◡ ^)
                 <g>
                   <path d="M38 42 Q43 35 48 42" stroke="#064E3B" strokeWidth="2.8" strokeLinecap="round" fill="none" />
@@ -375,14 +440,15 @@ export function CactusWaitingCard({
                 opacity={isBlushing ? 0.95 : 0.75}
               />
 
-              {/* Sweet Kawaii Smile */}
+              {/* Sweet Kawaii Smile / Sleeping Mouth */}
               <path
-                d={isWiggling || isDancing ? 'M44 48 Q50 58 56 48 Z' : 'M45 49 Q50 56 55 49'}
+                d={isSleeping ? 'M47 52 Q50 54 53 52' : isWiggling ? 'M44 48 Q50 58 56 48 Z' : 'M45 49 Q50 56 55 49'}
                 stroke="#064E3B"
-                strokeWidth={isWiggling || isDancing ? '1.8' : '2.2'}
+                strokeWidth={isWiggling ? '1.8' : '2.2'}
                 strokeLinecap="round"
-                fill={isWiggling || isDancing ? '#F43F5E' : 'none'}
+                fill={isWiggling ? '#F43F5E' : 'none'}
               />
+
 
               {/* Cute Spines & Star Freckles */}
               <circle cx="31" cy="74" r="1.3" fill="#D1FAE5" />
@@ -395,8 +461,17 @@ export function CactusWaitingCard({
 
           {/* Interactive Mascot Tap Badge */}
           <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-[10px] sm:text-xs font-mono font-black uppercase tracking-wider mt-1.5 shadow-lg group-hover:scale-105 group-hover:bg-emerald-500/30 transition-all">
-            <Sparkles size={12} className="animate-spin text-emerald-400" />
-            <span>Tap Spike for Tips!</span>
+            {isSleeping ? (
+              <>
+                <Moon size={12} className="animate-pulse text-cyan-400" />
+                <span>Spike is Asleep (Tap to Wake)</span>
+              </>
+            ) : (
+              <>
+                <Sparkles size={12} className="animate-spin text-emerald-400" />
+                <span>Tap Spike for Tips!</span>
+              </>
+            )}
           </div>
         </motion.div>
 
@@ -453,7 +528,7 @@ export function CactusWaitingCard({
                     onClick={copyTipToClipboard}
                     className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-bwb-surface hover:bg-emerald-500/20 text-emerald-300 border border-white/10 text-[10px] font-bold transition-colors"
                   >
-                    <Copy size={11} /> Copy Tip
+                    <Copy size={12} /> Copy Tip
                   </button>
                 </div>
               </div>
@@ -470,14 +545,15 @@ export function CactusWaitingCard({
             <Sparkles size={13} className="text-emerald-400" /> Next Tip
           </button>
           <button
-            onClick={toggleDance}
+            onClick={toggleSleep}
             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold transition-all shadow-md active:scale-95 ${
-              isDancing
+              isSleeping
                 ? 'bg-amber-500/30 border-amber-400 text-amber-300'
-                : 'bg-bwb-surface-2 hover:bg-amber-500/20 border-white/10 hover:border-amber-400/40 text-bwb-text'
+                : 'bg-bwb-surface-2 hover:bg-indigo-500/20 border-white/10 hover:border-indigo-400/40 text-bwb-text'
             }`}
           >
-            <Music size={13} className="text-amber-400" /> {isDancing ? 'Stop Dance' : 'Dance Mode'}
+            {isSleeping ? <Sun size={13} className="text-amber-400" /> : <Moon size={13} className="text-indigo-400" />}
+            {isSleeping ? 'Wake Up ☀️' : 'Sleep Mode 💤'}
           </button>
           <button
             onClick={() => setShowAllTips(true)}

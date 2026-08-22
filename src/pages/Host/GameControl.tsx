@@ -958,6 +958,8 @@ export default function HostGameControlPage() {
               const colCount = visibleStages.length
               const gridClass = colCount <= 4
                 ? 'grid-cols-2 sm:grid-cols-4'
+                : colCount === 5
+                ? 'grid-cols-3 sm:grid-cols-5'
                 : 'grid-cols-3 sm:grid-cols-5 lg:grid-cols-7'
               return (
                 <div className={`grid gap-2.5 ${gridClass}`}>

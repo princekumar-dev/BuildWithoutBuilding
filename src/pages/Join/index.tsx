@@ -11,6 +11,7 @@ import { Card } from '../../components/ui/Card'
 import { Input } from '../../components/ui/Input'
 import { Button } from '../../components/ui/Button'
 import { toast } from '../../components/ui/Toast'
+import { SoundFX } from '../../lib/soundEffects'
 import { useGameStore } from '../../store/gameStore'
 import { api } from '../../lib/api'
 import type { Game, ParticipantSession } from '../../types'
@@ -292,44 +293,66 @@ export default function JoinPage() {
               </div>
             </div>
 
-            {/* Mode Switcher Tabs */}
-            <div className="grid grid-cols-2 gap-2 p-1.5 bg-bwb-bg rounded-2xl mb-6 border border-white/5">
+            {/* Mode Switcher Tabs with Spring Sliding Pill */}
+            <div className="relative grid grid-cols-2 gap-2 p-1.5 bg-bwb-bg rounded-2xl mb-6 border border-white/10 shadow-inner">
               <button
                 type="button"
-                onClick={() => { setActiveTab('register'); setError('') }}
-                className={`py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-2 ${
-                  activeTab === 'register'
-                    ? 'bg-bwb-accent text-bwb-bg shadow-md'
-                    : 'text-bwb-muted hover:text-bwb-text'
+                onClick={() => {
+                  if (activeTab !== 'register') {
+                    setActiveTab('register')
+                    setError('')
+                    SoundFX.playCutePop()
+                  }
+                }}
+                className={`relative z-10 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition-colors duration-200 flex items-center justify-center gap-2 ${
+                  activeTab === 'register' ? 'text-bwb-bg font-extrabold' : 'text-bwb-muted hover:text-bwb-text'
                 }`}
               >
-                <UserPlus size={15} />
-                <span>Register Team</span>
+                {activeTab === 'register' && (
+                  <motion.div
+                    layoutId="activeJoinTabPill"
+                    className="absolute inset-0 rounded-xl bg-bwb-accent shadow-[0_0_20px_rgba(0,229,199,0.35)]"
+                    transition={{ type: 'spring', stiffness: 420, damping: 32 }}
+                  />
+                )}
+                <UserPlus size={15} className="relative z-10" />
+                <span className="relative z-10">Register Team</span>
               </button>
 
               <button
                 type="button"
-                onClick={() => { setActiveTab('passcode'); setError('') }}
-                className={`py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-2 ${
-                  activeTab === 'passcode'
-                    ? 'bg-bwb-accent text-bwb-bg shadow-md'
-                    : 'text-bwb-muted hover:text-bwb-text'
+                onClick={() => {
+                  if (activeTab !== 'passcode') {
+                    setActiveTab('passcode')
+                    setError('')
+                    SoundFX.playCutePop()
+                  }
+                }}
+                className={`relative z-10 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition-colors duration-200 flex items-center justify-center gap-2 ${
+                  activeTab === 'passcode' ? 'text-bwb-bg font-extrabold' : 'text-bwb-muted hover:text-bwb-text'
                 }`}
               >
-                <Key size={15} />
-                <span>Passcode</span>
+                {activeTab === 'passcode' && (
+                  <motion.div
+                    layoutId="activeJoinTabPill"
+                    className="absolute inset-0 rounded-xl bg-bwb-accent shadow-[0_0_20px_rgba(0,229,199,0.35)]"
+                    transition={{ type: 'spring', stiffness: 420, damping: 32 }}
+                  />
+                )}
+                <Key size={15} className="relative z-10" />
+                <span className="relative z-10">Passcode</span>
               </button>
             </div>
 
-            <AnimatePresence mode="wait" initial={false}>
+            <AnimatePresence mode="popLayout" initial={false}>
               {/* TAB 1: FULL TEAM REGISTRATION */}
               {activeTab === 'register' && (
                 <motion.form
                   key="join-tab-register"
-                  initial={{ opacity: 0, y: 6 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -6 }}
-                  transition={{ duration: 0.18, ease: 'easeOut' }}
+                  initial={{ opacity: 0, x: -14, filter: 'blur(3px)' }}
+                  animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
+                  exit={{ opacity: 0, x: -14, filter: 'blur(3px)' }}
+                  transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
                   onSubmit={handleRegisterTeam}
                   className="space-y-5 will-change-transform gpu-layer"
                 >
@@ -473,8 +496,7 @@ export default function JoinPage() {
                             {i === 0 ? <Crown size={16} /> : <span className="font-mono text-xs font-bold">#{i + 1}</span>}
                           </div>
 
-                          {/* Text Input */}
-                          <div className="flex-1">
+                          {/* Text Input */}                          <div className="flex-1">
                             <input
                               type="text"
                               placeholder={
@@ -489,7 +511,6 @@ export default function JoinPage() {
                               className="w-full bg-transparent border-none text-bwb-text text-sm font-medium placeholder:text-bwb-muted/60 focus:outline-none"
                             />
                           </div>
-
                           {/* Delete Button (Only for 3rd member) */}
                           {i === 2 && members.length > 2 && (
                             <button
@@ -529,10 +550,10 @@ export default function JoinPage() {
               {activeTab === 'passcode' && (
                 <motion.form
                   key="join-tab-passcode"
-                  initial={{ opacity: 0, y: 6 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -6 }}
-                  transition={{ duration: 0.18, ease: 'easeOut' }}
+                  initial={{ opacity: 0, x: 14, filter: 'blur(3px)' }}
+                  animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
+                  exit={{ opacity: 0, x: 14, filter: 'blur(3px)' }}
+                  transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
                   onSubmit={handlePasscodeJoin}
                   className="space-y-6 will-change-transform gpu-layer"
                 >

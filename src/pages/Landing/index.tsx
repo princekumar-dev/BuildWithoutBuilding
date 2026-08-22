@@ -54,7 +54,7 @@ export default function LandingPage() {
   return (
     <PageLayout fullWidth className="overflow-x-hidden">
       {/* HERO SECTION WITH DEPARTMENT & MICROSOFT AI CLUB BRANDING */}
-      <section className="relative pt-12 pb-20 px-4 sm:px-6 overflow-hidden">
+      <section className="relative pt-4 sm:pt-12 pb-6 sm:pb-20 px-3 sm:px-6 overflow-hidden">
         {/* Background Atmospheric Glows */}
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[700px] h-[500px] bg-gradient-to-tr from-bwb-accent/15 via-purple-600/10 to-transparent blur-[120px] pointer-events-none" />
         <div className="absolute top-10 right-10 w-96 h-96 bg-cyan-500/10 blur-[100px] pointer-events-none" />
@@ -66,7 +66,7 @@ export default function LandingPage() {
             transition={{ duration: 0.6 }}
           >
             {/* Department Title Header */}
-            <div className="flex items-center justify-center gap-2 sm:gap-6 mb-5 sm:mb-7 px-2">
+            <div className="flex items-center justify-center gap-2 sm:gap-6 mb-3 sm:mb-6 px-2">
               <div className="hidden sm:block h-px w-10 sm:w-28 bg-gradient-to-r from-transparent via-amber-400/50 to-amber-400/80" />
               <span className="font-display font-bold text-[11px] sm:text-sm md:text-base tracking-[0.15em] sm:tracking-[0.3em] uppercase text-bwb-muted sm:text-bwb-text text-center leading-relaxed">
                 Department of Artificial Intelligence and Data Science
@@ -75,7 +75,7 @@ export default function LandingPage() {
             </div>
 
             {/* Microsoft AI Club Emblem Badge */}
-            <div className="inline-flex items-center gap-3 p-1.5 sm:p-2 pr-5 sm:pr-6 rounded-full bg-bwb-surface-2/90 border border-amber-400/30 shadow-2xl backdrop-blur-xl mb-6 sm:mb-8 group hover:border-amber-400/60 transition-colors">
+            <div className="inline-flex items-center gap-3 p-1.5 sm:p-2 pr-5 sm:pr-6 rounded-full bg-bwb-surface-2/90 border border-amber-400/30 shadow-2xl backdrop-blur-xl mb-4 sm:mb-7 group hover:border-amber-400/60 transition-colors">
               <img
                 src="/images/microsoft_ai_club_logo.jpg"
                 alt="Microsoft AI Club"
@@ -95,14 +95,14 @@ export default function LandingPage() {
             </div>
 
             {/* Main Event Title */}
-            <h1 className="font-display font-black text-4xl sm:text-7xl md:text-8xl tracking-tight leading-none mb-4 sm:mb-6 text-center">
+            <h1 className="font-display font-black text-4xl sm:text-7xl md:text-8xl tracking-tight leading-none mb-3 sm:mb-5 text-center">
               BUILD <span className="text-gradient">WITHOUT</span>
               <br />
               <span className="text-bwb-text drop-shadow-2xl">BUILDING</span>
             </h1>
 
             {/* Official Tagline Pills */}
-            <div className="inline-flex flex-wrap items-center justify-center gap-1.5 sm:gap-4 px-3.5 sm:px-5 py-1.5 sm:py-2 rounded-2xl bg-bwb-surface/80 border border-amber-400/30 text-amber-300 font-mono text-[10px] sm:text-sm font-black tracking-widest uppercase mb-6 sm:mb-8 shadow-lg">
+            <div className="inline-flex flex-wrap items-center justify-center gap-1.5 sm:gap-4 px-3.5 sm:px-5 py-1.5 sm:py-2 rounded-2xl bg-bwb-surface/80 border border-amber-400/30 text-amber-300 font-mono text-[10px] sm:text-sm font-black tracking-widest uppercase mb-4 sm:mb-7 shadow-lg">
               <span>THINK</span>
               <span className="text-bwb-muted">·</span>
               <span>DESIGN</span>
@@ -113,8 +113,8 @@ export default function LandingPage() {
             </div>
 
             {/* Event Motto Quote Box */}
-            <div className="w-full max-w-xl mx-auto mb-8 sm:mb-10 p-4 sm:p-6 rounded-3xl stereo-card border border-bwb-accent/30 bg-gradient-to-r from-cyan-950/30 via-bwb-surface to-purple-950/30 shadow-2xl relative text-center">
-              <p className="font-display font-black text-sm sm:text-xl text-bwb-text uppercase tracking-wide leading-relaxed">
+            <div className="w-full max-w-xl mx-auto mb-5 sm:mb-9 p-3.5 sm:p-5 rounded-2xl sm:rounded-3xl stereo-card border border-bwb-accent/30 bg-gradient-to-r from-cyan-950/30 via-bwb-surface to-purple-950/30 shadow-2xl relative text-center">
+              <p className="font-display font-black text-xs sm:text-xl text-bwb-text uppercase tracking-wide leading-relaxed">
                 &ldquo;You don&apos;t need to build it to solve it.
                 <br />
                 <span className="text-gradient">All you need is an idea that can.</span>&rdquo;
@@ -122,7 +122,7 @@ export default function LandingPage() {
             </div>
 
             {/* Primary Calls to Action */}
-            <div className="w-full max-w-md mx-auto space-y-3 mb-12 sm:mb-16">
+            <div className="w-full max-w-md mx-auto space-y-2.5 sm:space-y-3 mb-8 sm:mb-14">
               <Link to="/join" className="block w-full">
                 <Button fullWidth size="lg" className="shadow-xl shadow-bwb-accent/25 hover:scale-[1.02] transition-transform text-sm font-bold py-3.5">
                   <Users size={18} className="mr-2" /> Enter Live Event <ArrowRight size={16} className="ml-1.5" />
@@ -131,61 +131,60 @@ export default function LandingPage() {
 
               <div className="grid grid-cols-2 gap-2.5 sm:gap-3 w-full">
                 <Link to="/projector" className="block w-full">
-                  <Button fullWidth variant="secondary" size="lg" className="text-xs sm:text-sm font-bold border-bwb-accent/40 py-3">
+                  <Button fullWidth variant="secondary" size="lg" className="text-xs sm:text-sm font-bold border-bwb-accent/40 bg-bwb-surface-2/90 py-3 shadow-md">
                     <Radio size={15} className="mr-1.5 text-bwb-accent animate-pulse" /> Live Projector
                   </Button>
                 </Link>
 
                 <Link to="/how-to-play" className="block w-full">
-                  <Button fullWidth variant="ghost" size="lg" className="text-xs sm:text-sm font-bold border border-white/10 hover:border-white/25 py-3">
-                    <Globe size={15} className="mr-1.5" /> How to Play
+                  <Button fullWidth variant="secondary" size="lg" className="text-xs sm:text-sm font-bold border-white/15 bg-bwb-surface-2/90 hover:border-white/30 text-bwb-text py-3 shadow-md">
+                    <Globe size={15} className="mr-1.5 text-amber-400" /> How to Play
                   </Button>
                 </Link>
               </div>
             </div>
           </motion.div>
         </div>
-
       </section>
 
       {/* 3. EVENT LOGISTICS & SCHEDULE CARD */}
-      <section className="max-w-6xl mx-auto px-4 sm:px-6 mb-20">
-        <div className="stereo-card rounded-3xl p-6 sm:p-8 border border-white/10 shadow-2xl bg-gradient-to-br from-bwb-surface-2 to-bwb-surface relative overflow-hidden">
+      <section className="max-w-6xl mx-auto px-3 sm:px-6 mb-12 sm:mb-20">
+        <div className="stereo-card rounded-3xl p-5 sm:p-8 border border-white/10 shadow-2xl bg-gradient-to-br from-bwb-surface-2 to-bwb-surface relative overflow-hidden">
           <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/5 rounded-full blur-3xl pointer-events-none" />
 
-          <div className="grid md:grid-cols-3 gap-6 divide-y md:divide-y-0 md:divide-x divide-white/10">
+          <div className="grid md:grid-cols-3 gap-5 sm:gap-6 divide-y md:divide-y-0 md:divide-x divide-white/10">
             {/* Date */}
-            <div className="flex items-start gap-4 pt-4 md:pt-0">
-              <div className="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center justify-center shrink-0">
-                <Calendar size={24} />
+            <div className="flex items-start gap-4 pt-3 md:pt-0">
+              <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center justify-center shrink-0">
+                <Calendar size={22} className="sm:w-6 sm:h-6" />
               </div>
               <div>
                 <p className="text-[10px] font-mono uppercase tracking-widest text-bwb-muted font-bold">EVENT DATE</p>
-                <h4 className="font-display font-black text-2xl text-bwb-text">24th August</h4>
+                <h4 className="font-display font-black text-xl sm:text-2xl text-bwb-text">24th August</h4>
                 <p className="text-xs text-bwb-muted mt-0.5">Annual Technical Flagship</p>
               </div>
             </div>
 
             {/* Time */}
-            <div className="flex items-start gap-4 pt-4 md:pt-0 md:pl-6">
-              <div className="w-12 h-12 rounded-2xl bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 flex items-center justify-center shrink-0">
-                <Clock size={24} />
+            <div className="flex items-start gap-4 pt-3 md:pt-0 md:pl-6">
+              <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 flex items-center justify-center shrink-0">
+                <Clock size={22} className="sm:w-6 sm:h-6" />
               </div>
               <div>
                 <p className="text-[10px] font-mono uppercase tracking-widest text-bwb-muted font-bold">TIMINGS</p>
-                <h4 className="font-display font-black text-2xl text-bwb-text">12:00 PM – 4:30 PM</h4>
+                <h4 className="font-display font-black text-xl sm:text-2xl text-bwb-text">12:00 PM – 4:30 PM</h4>
                 <p className="text-xs text-bwb-muted mt-0.5">Lunch: 1:10 PM – 2:00 PM</p>
               </div>
             </div>
 
             {/* Venue */}
-            <div className="flex items-start gap-4 pt-4 md:pt-0 md:pl-6">
-              <div className="w-12 h-12 rounded-2xl bg-purple-500/20 text-purple-300 border border-purple-500/40 flex items-center justify-center shrink-0">
-                <MapPin size={24} />
+            <div className="flex items-start gap-4 pt-3 md:pt-0 md:pl-6">
+              <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-purple-500/20 text-purple-300 border border-purple-500/40 flex items-center justify-center shrink-0">
+                <MapPin size={22} className="sm:w-6 sm:h-6" />
               </div>
               <div>
                 <p className="text-[10px] font-mono uppercase tracking-widest text-bwb-muted font-bold">VENUE</p>
-                <h4 className="font-display font-black text-xl text-bwb-text">AD 5, 6 LAB</h4>
+                <h4 className="font-display font-black text-lg sm:text-xl text-bwb-text">AD 5, 6 LAB</h4>
                 <p className="text-xs text-bwb-muted mt-0.5">Main Block · 3rd Floor</p>
               </div>
             </div>
@@ -194,16 +193,17 @@ export default function LandingPage() {
       </section>
 
       {/* 4. THE 4 PILLARS OF COMPETITION */}
-      <section className="max-w-6xl mx-auto px-4 sm:px-6 mb-24">
-        <div className="text-center mb-12">
-          <Badge variant="purple" className="mb-3">Event Architecture</Badge>
-          <h2 className="font-display text-3xl sm:text-5xl font-black text-bwb-text">
+      <section className="max-w-6xl mx-auto px-3 sm:px-6 mb-12 sm:mb-24">
+        <div className="text-center mb-8 sm:mb-12">
+          <Badge variant="purple" className="mb-2 sm:mb-3">Event Architecture</Badge>
+          <h2 className="font-display text-2xl sm:text-5xl font-black text-bwb-text">
             Four Stages of Engineering
           </h2>
-          <p className="text-sm text-bwb-muted max-w-xl mx-auto mt-2">
+          <p className="text-xs sm:text-sm text-bwb-muted max-w-xl mx-auto mt-1 sm:mt-2">
             Teams navigate through high-pressure phases designed to test rapid problem solving and system thinking.
           </p>
         </div>
+
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {pillars.map(({ icon: Icon, title, desc, color, border, text, step }, idx) => (

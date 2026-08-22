@@ -169,26 +169,25 @@ export function CactusWaitingCard({
   }
 
   const toggleSleep = () => {
-    setIsSleeping((prev) => {
-      const next = !prev
-      if (next) {
-        setIsWakingUp(false)
-        toast.info("Spike is taking a cozy power nap... 💤")
-      } else {
-        setIsWakingUp(true)
-        setIsWiggling(true)
-        setIsBlushing(true)
-        setFlowerSpin(true)
-        setTimeout(() => setIsWiggling(false), 900)
-        setTimeout(() => setFlowerSpin(false), 850)
-        setTimeout(() => setIsBlushing(false), 1200)
-        setTimeout(() => setIsWakingUp(false), 1400)
-        toast.success("Spike woke up! ☀️")
-      }
-      return next
-    })
     SoundFX.playCutePop()
+    if (!isSleeping) {
+      setIsSleeping(true)
+      setIsWakingUp(false)
+      toast.info("Spike is taking a cozy power nap... 💤")
+    } else {
+      setIsSleeping(false)
+      setIsWakingUp(true)
+      setIsWiggling(true)
+      setIsBlushing(true)
+      setFlowerSpin(true)
+      toast.success("Spike woke up! ☀️")
+      setTimeout(() => setIsWiggling(false), 900)
+      setTimeout(() => setFlowerSpin(false), 850)
+      setTimeout(() => setIsBlushing(false), 1200)
+      setTimeout(() => setIsWakingUp(false), 1400)
+    }
   }
+
 
 
 

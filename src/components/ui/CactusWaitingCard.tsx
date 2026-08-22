@@ -54,8 +54,8 @@ export function CactusWaitingCard({
   const [slideDirection, setSlideDirection] = useState<1 | -1>(1)
   const [isWiggling, setIsWiggling] = useState(false)
   const [isDancing, setIsDancing] = useState(false)
-  const [isBlinking, setIsBlinking] = useState(false)
   const [petCount, setPetCount] = useState(0)
+
   const [flowerSpin, setFlowerSpin] = useState(false)
   const [isBlushing, setIsBlushing] = useState(false)
   const [showAllTips, setShowAllTips] = useState(false)
@@ -78,17 +78,9 @@ export function CactusWaitingCard({
     hasSchedule: false,
   })
 
-  // Natural mascot eye blinking
-  useEffect(() => {
-    const blinkInterval = setInterval(() => {
-      setIsBlinking(true)
-      setTimeout(() => setIsBlinking(false), 220)
-    }, 3800)
-    return () => clearInterval(blinkInterval)
-  }, [])
-
   useEffect(() => {
     if (!scheduledStartTime) {
+
       setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0, isPast: false, hasSchedule: false })
       return
     }
@@ -263,23 +255,20 @@ export function CactusWaitingCard({
                   y: [0, -32, 5, -16, 2, 0],
                   rotate: isDancing ? [-18, 18, -18, 18, 0] : [0, -15, 15, -8, 8, 0],
                 }
-              : {
-                  y: [0, -8, 0],
-                  rotate: [-1.5, 1.5, -1.5],
-                }
+              : undefined
           }
           transition={{
-            duration: isDancing ? 0.9 : isWiggling ? 0.85 : 3.5,
-            repeat: isDancing ? Infinity : isWiggling ? 0 : Infinity,
+            duration: isDancing ? 0.9 : 0.85,
+            repeat: isDancing ? Infinity : 0,
             ease: 'easeInOut',
           }}
-          className="relative inline-flex flex-col items-center cursor-pointer group select-none touch-manipulation active:scale-95"
+          className="relative inline-flex flex-col items-center cursor-pointer group select-none touch-manipulation active:scale-95 transition-transform will-change-transform"
         >
           {/* Pulsing Mascot Aura Pedestal */}
-          <div className="absolute bottom-1 w-36 h-8 bg-emerald-500/25 rounded-full blur-lg group-hover:bg-emerald-400/45 transition-all animate-pulse" />
+          <div className="absolute bottom-1 w-36 h-8 bg-emerald-500/25 rounded-full blur-lg group-hover:bg-emerald-400/45 transition-all" />
 
           {/* Stylized Ultra-Kawaii 3D SVG Cactus (Spike 2.0) */}
-          <div className="w-36 h-40 relative flex items-center justify-center filter drop-shadow-[0_14px_32px_rgba(16,185,129,0.5)] group-hover:scale-105 transition-transform">
+          <div className="w-36 h-40 relative flex items-center justify-center filter drop-shadow-[0_14px_32px_rgba(16,185,129,0.4)] group-hover:scale-105 transition-transform will-change-transform">
             <svg viewBox="0 0 100 120" className="w-full h-full">
               <defs>
                 <linearGradient id="potGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -319,8 +308,8 @@ export function CactusWaitingCard({
 
               {/* Left Bouncy Arm */}
               <motion.path
-                animate={isWiggling || isDancing ? { rotate: [-24, 28, -24] } : { rotate: [0, -8, 0] }}
-                transition={{ repeat: isWiggling || isDancing ? Infinity : Infinity, duration: isWiggling || isDancing ? 0.35 : 2.5, ease: 'easeInOut' }}
+                animate={isWiggling || isDancing ? { rotate: [-24, 28, -24] } : undefined}
+                transition={{ repeat: isDancing ? Infinity : 1, duration: 0.35, ease: 'easeInOut' }}
                 style={{ transformOrigin: '36px 56px' }}
                 d="M36 48 Q18 48 18 30 Q18 22 24 22 Q30 22 30 30 L30 54 Q30 60 36 60 Z"
                 fill="url(#armGrad2)"
@@ -328,8 +317,8 @@ export function CactusWaitingCard({
 
               {/* Right Excited Waving Arm */}
               <motion.path
-                animate={isWiggling || isDancing ? { rotate: [30, -25, 30] } : { rotate: [-12, 18, -12] }}
-                transition={{ repeat: isWiggling || isDancing ? Infinity : Infinity, duration: isWiggling || isDancing ? 0.3 : 2 }}
+                animate={isWiggling || isDancing ? { rotate: [30, -25, 30] } : undefined}
+                transition={{ repeat: isDancing ? Infinity : 2, duration: 0.3 }}
                 style={{ transformOrigin: '64px 56px' }}
                 d="M64 44 Q82 44 82 26 Q82 18 76 18 Q70 18 70 26 L70 50 Q70 56 64 56 Z"
                 fill="url(#armGrad2)"
@@ -338,8 +327,8 @@ export function CactusWaitingCard({
               {/* Golden Crown Accessory on High Level */}
               {evo.level >= 2 && (
                 <motion.g
-                  animate={{ y: [0, -3, 0], rotate: [-4, 4, -4] }}
-                  transition={{ repeat: Infinity, duration: 2.2 }}
+                  animate={isWiggling || isDancing ? { y: [0, -4, 0], rotate: [-6, 6, -6] } : undefined}
+                  transition={{ repeat: isDancing ? Infinity : 1, duration: 0.4 }}
                   style={{ transformOrigin: '50px 4px' }}
                 >
                   <path d="M42 6 L44 0 L50 4 L56 0 L58 6 Z" fill="url(#crownGrad)" stroke="#CA8A04" strokeWidth="0.8" />
@@ -351,8 +340,8 @@ export function CactusWaitingCard({
 
               {/* Top Spinning Kawaii Cherry Blossoms */}
               <motion.g
-                animate={flowerSpin ? { rotate: 360, scale: [1, 1.4, 1] } : { scale: [1, 1.1, 1] }}
-                transition={{ duration: flowerSpin ? 0.75 : 2.5, repeat: flowerSpin ? 0 : Infinity }}
+                animate={flowerSpin ? { rotate: 360, scale: [1, 1.4, 1] } : undefined}
+                transition={{ duration: 0.75, repeat: 0 }}
                 style={{ transformOrigin: '50px 10px' }}
               >
                 <circle cx="50" cy="10" r="7" fill="#F43F5E" />
@@ -371,14 +360,8 @@ export function CactusWaitingCard({
                   <path d="M41 36 Q45 30 49 36" stroke="#064E3B" strokeWidth="2.2" strokeLinecap="round" fill="none" />
                   <path d="M51 36 Q55 30 59 36" stroke="#064E3B" strokeWidth="2.2" strokeLinecap="round" fill="none" />
                 </g>
-              ) : isBlinking ? (
-                // Closed Blinking Eyes
-                <g>
-                  <line x1="41" y1="36" x2="49" y2="36" stroke="#064E3B" strokeWidth="2.2" strokeLinecap="round" />
-                  <line x1="51" y1="36" x2="59" y2="36" stroke="#064E3B" strokeWidth="2.2" strokeLinecap="round" />
-                </g>
               ) : (
-                // Giant Kawaii Anime Eyes with Dual Catchlights
+                // Giant Kawaii Anime Eyes with Dual Catchlights (Zero CPU overhead)
                 <g>
                   <ellipse cx="45" cy="35" rx="3.8" ry="4.2" fill="#064E3B" />
                   <ellipse cx="55" cy="35" rx="3.8" ry="4.2" fill="#064E3B" />
@@ -426,6 +409,7 @@ export function CactusWaitingCard({
               <circle cx="76" cy="36" r="1" fill="#D1FAE5" />
             </svg>
           </div>
+
 
           {/* Interactive Mascot Tap Badge */}
           <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-[10px] sm:text-xs font-mono font-black uppercase tracking-wider mt-1.5 shadow-lg group-hover:scale-105 group-hover:bg-emerald-500/30 transition-all">

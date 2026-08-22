@@ -2,7 +2,6 @@ import { useState } from 'react'
 import type { ScoreBreakdown } from '../../types'
 import { SCORING_CRITERIA } from '../../data/mockData'
 import { Button } from '../ui/Button'
-import { Input } from '../ui/Input'
 
 interface ScoreFormProps {
   teamName: string
@@ -47,13 +46,22 @@ export function ScoreForm({ teamName, onSubmit }: ScoreFormProps) {
         <div key={key} className="flex items-center gap-4">
           <label className="flex-1 text-sm text-bwb-muted">{label}</label>
           <span className="text-xs text-bwb-muted w-8 text-right">/{max}</span>
-          <Input
+          <input
             type="number"
             min={0}
             max={max}
-            value={scores[key as keyof ScoreBreakdown]}
-            onChange={(e) => update(key as keyof ScoreBreakdown, Number(e.target.value))}
-            className="w-20 text-center"
+            placeholder="0"
+            value={scores[key as keyof ScoreBreakdown] || ''}
+            onChange={(e) => {
+              const val = e.target.value
+              if (val === '') {
+                update(key as keyof ScoreBreakdown, 0)
+              } else {
+                update(key as keyof ScoreBreakdown, Number(val))
+              }
+            }}
+            onFocus={(e) => e.target.select()}
+            className="w-20 text-center px-3 py-2 rounded-xl bg-bwb-surface border border-bwb-border text-bwb-text font-display font-bold placeholder:text-bwb-muted/50 focus:outline-none focus:border-bwb-accent/60 focus:ring-1 focus:ring-bwb-accent/30 transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
           />
         </div>
       ))}

@@ -268,19 +268,19 @@ export function CactusWaitingCard({
           <div className="absolute bottom-1 w-36 h-8 bg-emerald-500/25 rounded-full blur-lg group-hover:bg-emerald-400/45 transition-all" />
 
           {/* Stylized Ultra-Kawaii 3D SVG Cactus (Spike 2.0) */}
-          <div className="w-36 h-40 relative flex items-center justify-center filter drop-shadow-[0_14px_32px_rgba(16,185,129,0.4)] group-hover:scale-105 transition-transform will-change-transform">
+          <div className="w-36 h-40 relative flex items-center justify-center filter drop-shadow-[0_14px_32px_rgba(16,185,129,0.45)] group-hover:scale-105 transition-transform will-change-transform">
             <svg viewBox="0 0 100 134" className="w-full h-full overflow-visible">
               <defs>
                 <linearGradient id="potGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#FCD34D" />
-                  <stop offset="40%" stopColor="#F59E0B" />
-                  <stop offset="100%" stopColor="#B45309" />
+                  <stop offset="0%" stopColor="#FDBA74" />
+                  <stop offset="50%" stopColor="#F97316" />
+                  <stop offset="100%" stopColor="#C2410C" />
                 </linearGradient>
                 <linearGradient id="cactusGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
                   <stop offset="0%" stopColor="#6EE7B7" />
-                  <stop offset="35%" stopColor="#10B981" />
-                  <stop offset="85%" stopColor="#047857" />
-                  <stop offset="100%" stopColor="#064E3B" />
+                  <stop offset="30%" stopColor="#34D399" />
+                  <stop offset="75%" stopColor="#10B981" />
+                  <stop offset="100%" stopColor="#047857" />
                 </linearGradient>
                 <linearGradient id="crownGrad" x1="0%" y1="0%" x2="100%" y2="100%">
                   <stop offset="0%" stopColor="#FDE047" />
@@ -289,129 +289,142 @@ export function CactusWaitingCard({
               </defs>
 
               {/* Pot Base with 3D Bevel & Shadow */}
-              <path d="M26 94 L33 122 Q50 126 67 122 L74 94 Z" fill="url(#potGrad2)" />
-              <path d="M22 90 Q50 86 78 90 L76 95 Q50 92 24 95 Z" fill="#F59E0B" />
-              <ellipse cx="50" cy="91" rx="26" ry="3.5" fill="#78350F" opacity="0.6" />
+              <path d="M22 92 L29 122 Q50 126 71 122 L78 92 Z" fill="url(#potGrad2)" stroke="#9A3412" strokeWidth="2" strokeLinejoin="round" />
+              <path d="M18 87 Q50 82 82 87 L80 93 Q50 88 20 93 Z" fill="#FB923C" stroke="#9A3412" strokeWidth="2" strokeLinejoin="round" />
+              <ellipse cx="50" cy="88" rx="28" ry="3.5" fill="#7C2D12" opacity="0.7" />
 
-              {/* Left Classic U-Branch Arm (Same Cactus Body Gradient) */}
+              {/* Left Cute Stubby Arm (Chubby Branch) */}
               <motion.g
-                animate={isWiggling || isDancing ? { rotate: [-15, 20, -15] } : undefined}
+                animate={isWiggling || isDancing ? { rotate: [-18, 22, -18] } : undefined}
                 transition={{ repeat: isDancing ? Infinity : 1, duration: 0.35, ease: 'easeInOut' }}
-                style={{ transformOrigin: '36px 60px' }}
+                style={{ transformOrigin: '32px 64px' }}
               >
                 <path
-                  d="M36 62 C24 62 16 62 16 50 L16 34 C16 26 24 26 24 34 L24 46 C24 50 30 50 36 50 Z"
+                  d="M32 66 C18 66 10 66 10 50 L10 38 C10 28 20 28 20 38 L20 48 C20 54 26 54 32 54 Z"
                   fill="url(#cactusGrad2)"
+                  stroke="#064E3B"
+                  strokeWidth="2.2"
+                  strokeLinejoin="round"
                 />
-                <path d="M20 34 L20 46 C20 49 23 50 28 50" stroke="#D1FAE5" strokeWidth="1.6" strokeLinecap="round" fill="none" opacity="0.45" />
+                <path d="M15 38 L15 48 C15 51 18 52 24 52" stroke="#A7F3D0" strokeWidth="1.8" strokeLinecap="round" fill="none" opacity="0.6" />
+                <circle cx="8" cy="46" r="1.2" fill="#D1FAE5" />
               </motion.g>
 
-              {/* Right Classic U-Branch Arm (Same Cactus Body Gradient) */}
+              {/* Right Cute Stubby Arm (Waving Branch) */}
               <motion.g
-                animate={isWiggling || isDancing ? { rotate: [20, -15, 20] } : undefined}
+                animate={isWiggling || isDancing ? { rotate: [22, -18, 22] } : undefined}
                 transition={{ repeat: isDancing ? Infinity : 2, duration: 0.3 }}
-                style={{ transformOrigin: '64px 60px' }}
+                style={{ transformOrigin: '68px 60px' }}
               >
                 <path
-                  d="M64 50 C70 50 76 50 76 46 L76 28 C76 20 84 20 84 28 L84 44 C84 56 76 56 64 56 Z"
+                  d="M68 54 C74 54 80 54 80 48 L80 32 C80 22 90 22 90 32 L90 46 C90 62 82 62 68 62 Z"
                   fill="url(#cactusGrad2)"
+                  stroke="#064E3B"
+                  strokeWidth="2.2"
+                  strokeLinejoin="round"
                 />
-                <path d="M80 28 L80 44 C80 48 76 50 70 50" stroke="#D1FAE5" strokeWidth="1.6" strokeLinecap="round" fill="none" opacity="0.45" />
+                <path d="M85 32 L85 46 C85 52 80 54 74 54" stroke="#A7F3D0" strokeWidth="1.8" strokeLinecap="round" fill="none" opacity="0.6" />
+                <circle cx="92" cy="40" r="1.2" fill="#D1FAE5" />
               </motion.g>
 
-              {/* Main Cactus Trunk (Smooth rounded cylinder) */}
+              {/* Chubby Round Cactus Body (Plump Capsule with Outlines) */}
               <path
-                d="M34 30 C34 14 66 14 66 30 L66 92 Q50 96 34 92 Z"
+                d="M28 36 C28 14 72 14 72 36 L72 89 Q50 93 28 89 Z"
                 fill="url(#cactusGrad2)"
+                stroke="#064E3B"
+                strokeWidth="2.5"
+                strokeLinejoin="round"
               />
-              {/* Highlight Center Ridge */}
-              <path d="M47 16 Q53 16 53 94 L47 94 Z" fill="#D1FAE5" opacity="0.45" />
+              {/* Highlight Curved Ridges */}
+              <path d="M42 20 Q48 18 48 90" stroke="#A7F3D0" strokeWidth="2.2" strokeLinecap="round" fill="none" opacity="0.45" />
+              <path d="M58 20 Q52 18 52 90" stroke="#047857" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.3" />
 
-              {/* Golden Crown Accessory on High Level */}
+              {/* Golden Crown on Mascot Evolution */}
               {evo.level >= 2 && (
                 <motion.g
                   animate={isWiggling || isDancing ? { y: [0, -4, 0], rotate: [-6, 6, -6] } : undefined}
                   transition={{ repeat: isDancing ? Infinity : 1, duration: 0.4 }}
                   style={{ transformOrigin: '50px 4px' }}
                 >
-                  <path d="M42 6 L44 0 L50 4 L56 0 L58 6 Z" fill="url(#crownGrad)" stroke="#CA8A04" strokeWidth="0.8" />
-                  <circle cx="44" cy="0" r="1" fill="#EF4444" />
-                  <circle cx="50" cy="4" r="1" fill="#3B82F6" />
-                  <circle cx="56" cy="0" r="1" fill="#10B981" />
+                  <path d="M40 8 L43 1 L50 6 L57 1 L60 8 Z" fill="url(#crownGrad)" stroke="#B45309" strokeWidth="1.2" strokeLinejoin="round" />
+                  <circle cx="43" cy="1" r="1.3" fill="#EF4444" />
+                  <circle cx="50" cy="6" r="1.3" fill="#3B82F6" />
+                  <circle cx="57" cy="1" r="1.3" fill="#10B981" />
                 </motion.g>
               )}
 
-              {/* Top Spinning Kawaii Cherry Blossoms (Fully inside canvas) */}
+              {/* Top Spinning Kawaii Cherry Blossom Cluster */}
               <motion.g
-                animate={flowerSpin ? { rotate: 360, scale: [1, 1.4, 1] } : undefined}
+                animate={flowerSpin ? { rotate: 360, scale: [1, 1.35, 1] } : undefined}
                 transition={{ duration: 0.75, repeat: 0 }}
                 style={{ transformOrigin: '50px 14px' }}
               >
-                <circle cx="50" cy="14" r="7" fill="#F43F5E" />
-                <circle cx="43" cy="11" r="5" fill="#FB7185" />
-                <circle cx="57" cy="11" r="5" fill="#FB7185" />
-                <circle cx="50" cy="7" r="5" fill="#FDA4AF" />
-                <circle cx="44" cy="18" r="4.5" fill="#FDA4AF" />
-                <circle cx="56" cy="18" r="4.5" fill="#FDA4AF" />
-                <circle cx="50" cy="14" r="3.5" fill="#FEF08A" />
+                <circle cx="50" cy="14" r="7.5" fill="#F43F5E" stroke="#BE123C" strokeWidth="1" />
+                <circle cx="42" cy="11" r="5.5" fill="#FB7185" />
+                <circle cx="58" cy="11" r="5.5" fill="#FB7185" />
+                <circle cx="50" cy="6" r="5.5" fill="#FDA4AF" />
+                <circle cx="43" cy="19" r="5" fill="#FDA4AF" />
+                <circle cx="57" cy="19" r="5" fill="#FDA4AF" />
+                <circle cx="50" cy="14" r="4" fill="#FEF08A" stroke="#EAB308" strokeWidth="0.8" />
               </motion.g>
 
-              {/* Cute Sparkly Anime Eyes */}
+              {/* Big Expressive Anime Eyes with Catchlights */}
               {isWiggling || isDancing ? (
-                // Happy Arc Squint Eyes (^ ◡ ^)
+                // Happy Squint Eyes (^ ◡ ^)
                 <g>
-                  <path d="M41 40 Q45 34 49 40" stroke="#064E3B" strokeWidth="2.2" strokeLinecap="round" fill="none" />
-                  <path d="M51 40 Q55 34 59 40" stroke="#064E3B" strokeWidth="2.2" strokeLinecap="round" fill="none" />
+                  <path d="M38 42 Q43 35 48 42" stroke="#064E3B" strokeWidth="2.8" strokeLinecap="round" fill="none" />
+                  <path d="M52 42 Q57 35 62 42" stroke="#064E3B" strokeWidth="2.8" strokeLinecap="round" fill="none" />
                 </g>
               ) : (
-                // Giant Kawaii Anime Eyes with Dual Catchlights
+                // Giant Anime Eyes
                 <g>
-                  <ellipse cx="45" cy="39" rx="3.8" ry="4.2" fill="#064E3B" />
-                  <ellipse cx="55" cy="39" rx="3.8" ry="4.2" fill="#064E3B" />
+                  <ellipse cx="43" cy="41" rx="4.5" ry="5.2" fill="#064E3B" />
+                  <ellipse cx="57" cy="41" rx="4.5" ry="5.2" fill="#064E3B" />
                   {/* Primary Large Highlight */}
-                  <circle cx="43.8" cy="37.5" r="1.6" fill="#FFFFFF" />
-                  <circle cx="53.8" cy="37.5" r="1.6" fill="#FFFFFF" />
+                  <circle cx="41.5" cy="39" r="2" fill="#FFFFFF" />
+                  <circle cx="55.5" cy="39" r="2" fill="#FFFFFF" />
                   {/* Secondary Sparkle Catchlight */}
-                  <circle cx="46.5" cy="41" r="0.8" fill="#FFFFFF" />
-                  <circle cx="56.5" cy="41" r="0.8" fill="#FFFFFF" />
+                  <circle cx="44.8" cy="43.5" r="1" fill="#FFFFFF" />
+                  <circle cx="58.8" cy="43.5" r="1" fill="#FFFFFF" />
                 </g>
               )}
 
-              {/* Glowing Rosy Cheeks */}
+              {/* Soft Blushing Rosy Cheeks */}
               <ellipse
-                cx="40"
-                cy="46"
-                rx={isBlushing ? 4.2 : 3.4}
-                ry={isBlushing ? 2.6 : 2}
+                cx="36"
+                cy="49"
+                rx={isBlushing ? 5 : 4}
+                ry={isBlushing ? 3.2 : 2.5}
                 fill={isBlushing ? '#F43F5E' : '#FB7185'}
                 opacity={isBlushing ? 0.95 : 0.75}
               />
               <ellipse
-                cx="60"
-                cy="46"
-                rx={isBlushing ? 4.2 : 3.4}
-                ry={isBlushing ? 2.6 : 2}
+                cx="64"
+                cy="49"
+                rx={isBlushing ? 5 : 4}
+                ry={isBlushing ? 3.2 : 2.5}
                 fill={isBlushing ? '#F43F5E' : '#FB7185'}
                 opacity={isBlushing ? 0.95 : 0.75}
               />
 
-              {/* Kawaii Happy Open Mouth */}
+              {/* Sweet Kawaii Smile */}
               <path
-                d={isWiggling || isDancing ? 'M44 44 Q50 53 56 44 Z' : 'M45 45 Q50 51 55 45'}
+                d={isWiggling || isDancing ? 'M44 48 Q50 58 56 48 Z' : 'M45 49 Q50 56 55 49'}
                 stroke="#064E3B"
-                strokeWidth={isWiggling || isDancing ? '1.5' : '1.8'}
+                strokeWidth={isWiggling || isDancing ? '1.8' : '2.2'}
                 strokeLinecap="round"
                 fill={isWiggling || isDancing ? '#F43F5E' : 'none'}
               />
 
-              {/* Cute Little Needles & Spines */}
-              <circle cx="34" cy="74" r="1" fill="#D1FAE5" />
-              <circle cx="66" cy="74" r="1" fill="#D1FAE5" />
-              <circle cx="50" cy="66" r="1" fill="#D1FAE5" />
-              <circle cx="20" cy="44" r="0.9" fill="#D1FAE5" />
-              <circle cx="80" cy="38" r="0.9" fill="#D1FAE5" />
+              {/* Cute Spines & Star Freckles */}
+              <circle cx="31" cy="74" r="1.3" fill="#D1FAE5" />
+              <circle cx="69" cy="74" r="1.3" fill="#D1FAE5" />
+              <circle cx="50" cy="68" r="1.3" fill="#D1FAE5" />
+              <circle cx="35" cy="30" r="1.2" fill="#D1FAE5" />
+              <circle cx="65" cy="30" r="1.2" fill="#D1FAE5" />
             </svg>
           </div>
+
 
 
 

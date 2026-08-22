@@ -487,7 +487,7 @@ export default function ProjectorPage() {
               {/* STAGE CENTER: GRAND COUNTDOWN OR STANDBY RADAR */}
               {timeLeft.hasSchedule && !timeLeft.isPast ? (
                 <div className="mb-8 p-6 rounded-2xl bg-bwb-bg/90 border border-amber-400/40 shadow-inner relative overflow-hidden text-center">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+                  <div className="flex flex-col items-center gap-1 mb-4">
                     <p className="text-xs uppercase tracking-widest text-amber-400 font-mono font-bold flex items-center gap-2">
                       <Clock size={15} className="animate-spin text-amber-400" />
                       <span>TOURNAMENT STARTS IN</span>

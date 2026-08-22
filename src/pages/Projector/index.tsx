@@ -615,14 +615,14 @@ export default function ProjectorPage() {
 
             {/* Live Teams & Players Arena Wall (NO PASSCODES DISPLAYED) */}
             <div className="w-full max-w-6xl">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-5 pb-3 border-b border-bwb-border gap-3">
-                <div className="flex items-center gap-3">
+              <div className="mb-5 pb-3 border-b border-bwb-border">
+                <div className="flex items-center justify-center gap-3 mb-2">
                   <Users className="text-bwb-accent shrink-0" size={24} />
                   <h2 className="font-display text-xl sm:text-2xl font-bold text-bwb-text">
                     {game.currentRound === 3 ? 'Grand Finalists (Top 8)' : `Registered Arena Teams (${lobbyTeams.length})`}
                   </h2>
                 </div>
-                <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs font-mono text-bwb-muted pl-9 sm:pl-0">
+                <div className="flex items-center justify-center gap-3 sm:gap-4 text-xs font-mono text-bwb-muted">
                   <span className="flex items-center gap-1.5 text-emerald-400 font-bold">
                     <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                     Live in Room: {lobbyTeams.filter((t) => t.isOnline).length} / {lobbyTeams.length}

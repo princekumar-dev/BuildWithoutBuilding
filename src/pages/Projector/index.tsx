@@ -55,7 +55,10 @@ export default function ProjectorPage() {
   // Stage Mascot & Announcer States
   const [announcementIndex, setAnnouncementIndex] = useState(0)
   const [mascotWiggle, setMascotWiggle] = useState(false)
+  const [flowerSpin, setFlowerSpin] = useState(false)
+  const [isBlushing, setIsBlushing] = useState(false)
   const [stageParticles, setStageParticles] = useState<{ id: number; emoji: string; x: number; y: number }[]>([])
+
 
   // Live Stage Countdown State
   const [timeLeft, setTimeLeft] = useState<{
@@ -148,14 +151,18 @@ export default function ProjectorPage() {
 
   const handleMascotClick = (e: React.MouseEvent) => {
     setMascotWiggle(true)
+    setFlowerSpin(true)
+    setIsBlushing(true)
     SoundFX.playCutePop()
     setTimeout(() => setMascotWiggle(false), 800)
+    setTimeout(() => setFlowerSpin(false), 850)
+    setTimeout(() => setIsBlushing(false), 1100)
 
     const rect = e.currentTarget.getBoundingClientRect()
     const x = e.clientX - rect.left
     const y = e.clientY - rect.top
 
-    const burst = ['✨', '⚡', '🏆', '🔥', '💖', '🎉'].map((emoji, i) => ({
+    const burst = ['✨', '⚡', '🏆', '🔥', '💖', '🎉', '🌸', '🌵', '💫'].map((emoji, i) => ({
       id: Date.now() + i + Math.random(),
       emoji,
       x: x + (Math.random() * 40 - 20),
@@ -277,50 +284,126 @@ export default function ProjectorPage() {
                           ? { duration: 0.75, ease: 'easeOut' }
                           : { repeat: Infinity, duration: 3.2, ease: 'easeInOut' }
                       }
-                      className="w-24 h-28 sm:w-28 sm:h-32 relative inline-flex items-center justify-center filter drop-shadow-[0_15px_30px_rgba(16,185,129,0.45)]"
+                      className="w-28 h-32 sm:w-32 sm:h-36 relative inline-flex items-center justify-center filter drop-shadow-[0_15px_30px_rgba(16,185,129,0.45)] group-hover:scale-105 transition-transform will-change-transform"
                     >
-                      <svg viewBox="0 0 100 120" className="w-full h-full">
+                      <svg viewBox="0 0 100 134" className="w-full h-full overflow-visible">
                         <defs>
-                          <linearGradient id="projStagePot" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stopColor="#FBBF24" />
-                            <stop offset="100%" stopColor="#D97706" />
+                          <linearGradient id="projPotGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stopColor="#FDBA74" />
+                            <stop offset="50%" stopColor="#F97316" />
+                            <stop offset="100%" stopColor="#C2410C" />
                           </linearGradient>
-                          <linearGradient id="projStageCactus" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stopColor="#34D399" />
-                            <stop offset="50%" stopColor="#10B981" />
-                            <stop offset="100%" stopColor="#059669" />
+                          <linearGradient id="projCactusGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stopColor="#6EE7B7" />
+                            <stop offset="30%" stopColor="#34D399" />
+                            <stop offset="75%" stopColor="#10B981" />
+                            <stop offset="100%" stopColor="#047857" />
                           </linearGradient>
                         </defs>
-                        {/* Pot */}
-                        <path d="M28 88 L34 116 Q50 119 66 116 L72 88 Z" fill="url(#projStagePot)" />
-                        <path d="M24 84 Q50 81 76 84 L74 89 Q50 86 26 89 Z" fill="#F59E0B" />
-                        {/* Body */}
-                        <path d="M38 28 Q38 12 50 12 Q62 12 62 28 L62 86 Q50 89 38 86 Z" fill="url(#projStageCactus)" />
-                        {/* Left Arm */}
-                        <path d="M38 48 Q20 48 20 32 Q20 25 26 25 Q32 25 32 32 L32 54 Q32 60 38 60 Z" fill="url(#projStageCactus)" />
-                        {/* Right Animated Wave Arm */}
-                        <motion.path
+
+                        {/* Pot Base with 3D Bevel & Shadow */}
+                        <path d="M22 92 L29 122 Q50 126 71 122 L78 92 Z" fill="url(#projPotGrad)" stroke="#9A3412" strokeWidth="2" strokeLinejoin="round" />
+                        <path d="M18 87 Q50 82 82 87 L80 93 Q50 88 20 93 Z" fill="#FB923C" stroke="#9A3412" strokeWidth="2" strokeLinejoin="round" />
+                        <ellipse cx="50" cy="88" rx="28" ry="3.5" fill="#7C2D12" opacity="0.7" />
+
+                        {/* Left Cute Stubby Arm (Chubby Branch) */}
+                        <motion.g
+                          animate={mascotWiggle ? { rotate: [-12, 14, -12] } : undefined}
+                          transition={{ repeat: 1, duration: 0.35, ease: 'easeInOut' }}
+                          style={{ transformOrigin: '32px 64px' }}
+                        >
+                          <path
+                            d="M32 66 C18 66 10 66 10 50 L10 38 C10 28 20 28 20 38 L20 48 C20 54 26 54 32 54 Z"
+                            fill="url(#projCactusGrad)"
+                            stroke="#064E3B"
+                            strokeWidth="2.2"
+                            strokeLinejoin="round"
+                          />
+                          <path d="M15 38 L15 48 C15 51 18 52 24 52" stroke="#A7F3D0" strokeWidth="1.8" strokeLinecap="round" fill="none" opacity="0.6" />
+                          <circle cx="8" cy="46" r="1.2" fill="#D1FAE5" />
+                        </motion.g>
+
+                        {/* Right Cute Stubby Arm (Waving Branch) */}
+                        <motion.g
                           animate={{ rotate: [-10, 18, -10] }}
                           transition={{ repeat: Infinity, duration: 2.2, ease: 'easeInOut' }}
-                          style={{ transformOrigin: '62px 58px' }}
-                          d="M62 44 Q80 44 80 28 Q80 21 74 21 Q68 21 68 28 L68 50 Q68 56 62 56 Z"
-                          fill="url(#projStageCactus)"
+                          style={{ transformOrigin: '68px 60px' }}
+                        >
+                          <path
+                            d="M68 54 C74 54 80 54 80 48 L80 32 C80 22 90 22 90 32 L90 46 C90 62 82 62 68 62 Z"
+                            fill="url(#projCactusGrad)"
+                            stroke="#064E3B"
+                            strokeWidth="2.2"
+                            strokeLinejoin="round"
+                          />
+                          <path d="M85 32 L85 46 C85 52 80 54 74 54" stroke="#A7F3D0" strokeWidth="1.8" strokeLinecap="round" fill="none" opacity="0.6" />
+                          <circle cx="92" cy="40" r="1.2" fill="#D1FAE5" />
+                        </motion.g>
+
+                        {/* Chubby Round Cactus Body (Plump Capsule with Outlines) */}
+                        <path
+                          d="M28 36 C28 14 72 14 72 36 L72 89 Q50 93 28 89 Z"
+                          fill="url(#projCactusGrad)"
+                          stroke="#064E3B"
+                          strokeWidth="2.5"
+                          strokeLinejoin="round"
                         />
-                        {/* Flower Crown */}
-                        <circle cx="50" cy="12" r="6" fill="#F43F5E" />
-                        <circle cx="45" cy="10" r="4" fill="#FB7185" />
-                        <circle cx="55" cy="10" r="4" fill="#FB7185" />
-                        <circle cx="50" cy="12" r="2" fill="#FEF08A" />
-                        {/* Kawaii Eyes */}
-                        <circle cx="45" cy="36" r="3" fill="#064E3B" />
-                        <circle cx="55" cy="36" r="3" fill="#064E3B" />
-                        <circle cx="44" cy="35" r="1.2" fill="#FFFFFF" />
-                        <circle cx="54" cy="35" r="1.2" fill="#FFFFFF" />
-                        {/* Blushing Cheeks */}
-                        <ellipse cx="41" cy="42" rx="3" ry="1.8" fill="#FB7185" opacity="0.85" />
-                        <ellipse cx="59" cy="42" rx="3" ry="1.8" fill="#FB7185" opacity="0.85" />
-                        {/* Cute Smile */}
-                        <path d="M47 41 Q50 46 53 41" stroke="#064E3B" strokeWidth="1.8" strokeLinecap="round" fill="none" />
+                        {/* Highlight Curved Ridges */}
+                        <path d="M42 20 Q48 18 48 90" stroke="#A7F3D0" strokeWidth="2.2" strokeLinecap="round" fill="none" opacity="0.45" />
+                        <path d="M58 20 Q52 18 52 90" stroke="#047857" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.3" />
+
+                        {/* Top Spinning Kawaii Cherry Blossom Cluster */}
+                        <motion.g
+                          animate={flowerSpin ? { rotate: 360, scale: [1, 1.25, 1] } : undefined}
+                          transition={{ duration: 0.75, repeat: 0 }}
+                          style={{ transformOrigin: '50px 14px' }}
+                        >
+                          <circle cx="50" cy="14" r="7.5" fill="#F43F5E" stroke="#BE123C" strokeWidth="1" />
+                          <circle cx="42" cy="11" r="5.5" fill="#FB7185" />
+                          <circle cx="58" cy="11" r="5.5" fill="#FB7185" />
+                          <circle cx="50" cy="6" r="5.5" fill="#FDA4AF" />
+                          <circle cx="43" cy="19" r="5" fill="#FDA4AF" />
+                          <circle cx="57" cy="19" r="5" fill="#FDA4AF" />
+                          <circle cx="50" cy="14" r="4" fill="#FEF08A" stroke="#EAB308" strokeWidth="0.8" />
+                        </motion.g>
+
+                        {/* Big Glossy Anime Eyes with Catchlights */}
+                        {mascotWiggle ? (
+                          <g>
+                            <path d="M38 42 Q43 35 48 42" stroke="#064E3B" strokeWidth="2.8" strokeLinecap="round" fill="none" />
+                            <path d="M52 42 Q57 35 62 42" stroke="#064E3B" strokeWidth="2.8" strokeLinecap="round" fill="none" />
+                          </g>
+                        ) : (
+                          <g>
+                            <ellipse cx="43" cy="41" rx="4.5" ry="5.2" fill="#064E3B" />
+                            <ellipse cx="57" cy="41" rx="4.5" ry="5.2" fill="#064E3B" />
+                            <circle cx="41.5" cy="39" r="2" fill="#FFFFFF" />
+                            <circle cx="55.5" cy="39" r="2" fill="#FFFFFF" />
+                            <circle cx="44.8" cy="43.5" r="1" fill="#FFFFFF" />
+                            <circle cx="58.8" cy="43.5" r="1" fill="#FFFFFF" />
+                          </g>
+                        )}
+
+                        {/* Soft Blushing Rosy Cheeks */}
+                        <ellipse
+                          cx="36"
+                          cy="49"
+                          rx={isBlushing ? 5 : 4}
+                          ry={isBlushing ? 3.2 : 2.5}
+                          fill={isBlushing ? '#F43F5E' : '#FB7185'}
+                          opacity={isBlushing ? 0.95 : 0.75}
+                        />
+                        <ellipse
+                          cx="64"
+                          cy="49"
+                          rx={isBlushing ? 5 : 4}
+                          ry={isBlushing ? 3.2 : 2.5}
+                          fill={isBlushing ? '#F43F5E' : '#FB7185'}
+                          opacity={isBlushing ? 0.95 : 0.75}
+                        />
+
+                        {/* Sweet Happy Anime Smile */}
+                        <path d="M46 47 Q50 53 54 47" stroke="#064E3B" strokeWidth="2.4" strokeLinecap="round" fill="none" />
                       </svg>
 
                       {/* Click Burst Particles */}

@@ -53,33 +53,35 @@ const pillars = [
 export default function LandingPage() {
   return (
     <PageLayout fullWidth className="overflow-x-hidden">
-      {/* HERO SECTION WITH DEPARTMENT & MICROSOFT AI CLUB BRANDING */}
-      <section className="relative pt-4 sm:pt-12 pb-6 sm:pb-20 px-3 sm:px-6 overflow-hidden">
-        {/* Background Atmospheric Glows */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[700px] h-[500px] bg-gradient-to-tr from-bwb-accent/15 via-purple-600/10 to-transparent blur-[120px] pointer-events-none" />
-        <div className="absolute top-10 right-10 w-96 h-96 bg-cyan-500/10 blur-[100px] pointer-events-none" />
+      {/* HERO SECTION AS A FULL-SCREEN KEYNOTE POSTER */}
+      <section className="relative min-h-[calc(100dvh-4.5rem)] flex flex-col justify-center items-center py-6 sm:py-16 px-4 sm:px-6 overflow-hidden">
+        {/* Background Atmospheric Poster Glows */}
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[700px] h-[550px] bg-gradient-to-tr from-bwb-accent/20 via-purple-600/15 to-transparent blur-[140px] pointer-events-none" />
+        <div className="absolute top-8 right-8 w-96 h-96 bg-cyan-500/15 blur-[110px] pointer-events-none" />
+        <div className="absolute bottom-8 left-8 w-96 h-96 bg-amber-500/10 blur-[120px] pointer-events-none" />
 
-        <div className="max-w-6xl mx-auto text-center relative z-10">
+        <div className="max-w-4xl w-full mx-auto text-center relative z-10 my-auto flex flex-col items-center justify-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.7 }}
+            className="w-full flex flex-col items-center"
           >
             {/* Department Title Header */}
-            <div className="flex items-center justify-center gap-2 sm:gap-6 mb-3 sm:mb-6 px-2">
-              <div className="hidden sm:block h-px w-10 sm:w-28 bg-gradient-to-r from-transparent via-amber-400/50 to-amber-400/80" />
-              <span className="font-display font-bold text-[11px] sm:text-sm md:text-base tracking-[0.15em] sm:tracking-[0.3em] uppercase text-bwb-muted sm:text-bwb-text text-center leading-relaxed">
+            <div className="flex items-center justify-center gap-3 sm:gap-6 mb-4 sm:mb-6 px-2">
+              <div className="h-px w-8 sm:w-28 bg-gradient-to-r from-transparent via-amber-400/60 to-amber-400/90" />
+              <span className="font-display font-black text-xs sm:text-sm md:text-base tracking-[0.15em] sm:tracking-[0.3em] uppercase text-amber-300/90 text-center leading-tight drop-shadow-md">
                 Department of Artificial Intelligence and Data Science
               </span>
-              <div className="hidden sm:block h-px w-10 sm:w-28 bg-gradient-to-l from-transparent via-amber-400/50 to-amber-400/80" />
+              <div className="h-px w-8 sm:w-28 bg-gradient-to-l from-transparent via-amber-400/60 to-amber-400/90" />
             </div>
 
             {/* Microsoft AI Club Emblem Badge */}
-            <div className="inline-flex items-center gap-3 p-1.5 sm:p-2 pr-5 sm:pr-6 rounded-full bg-bwb-surface-2/90 border border-amber-400/30 shadow-2xl backdrop-blur-xl mb-4 sm:mb-7 group hover:border-amber-400/60 transition-colors">
+            <div className="inline-flex items-center gap-3 p-1.5 sm:p-2 pr-5 sm:pr-6 rounded-full bg-bwb-surface-2/95 border border-amber-400/40 shadow-2xl backdrop-blur-xl mb-5 sm:mb-7 group hover:border-amber-400/70 transition-colors">
               <img
                 src="/images/microsoft_ai_club_logo.jpg"
                 alt="Microsoft AI Club"
-                className="w-9 h-9 sm:w-11 sm:h-11 rounded-full object-cover border-2 border-amber-400/60 shadow-lg shrink-0"
+                className="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover border-2 border-amber-400/70 shadow-lg shrink-0"
                 onError={(e) => {
                   (e.target as HTMLElement).style.display = 'none'
                 }}
@@ -88,21 +90,21 @@ export default function LandingPage() {
                 <p className="text-[10px] sm:text-[11px] font-mono uppercase tracking-widest text-amber-400 font-black">
                   MICROSOFT AI CLUB
                 </p>
-                <p className="text-[11px] sm:text-xs font-bold text-bwb-text tracking-wider">
+                <p className="text-xs font-bold text-bwb-text tracking-wider">
                   PROUDLY PRESENTS
                 </p>
               </div>
             </div>
 
-            {/* Main Event Title */}
-            <h1 className="font-display font-black text-4xl sm:text-7xl md:text-8xl tracking-tight leading-none mb-3 sm:mb-5 text-center">
+            {/* Main Event Poster Title (Big, Majestic & Centered) */}
+            <h1 className="font-display font-black text-5xl sm:text-7xl md:text-8xl tracking-tight leading-[1.05] mb-4 sm:mb-6 text-center">
               BUILD <span className="text-gradient">WITHOUT</span>
               <br />
-              <span className="text-bwb-text drop-shadow-2xl">BUILDING</span>
+              <span className="text-bwb-text drop-shadow-[0_10px_25px_rgba(0,0,0,0.8)]">BUILDING</span>
             </h1>
 
             {/* Official Tagline Pills */}
-            <div className="inline-flex flex-wrap items-center justify-center gap-1.5 sm:gap-4 px-3.5 sm:px-5 py-1.5 sm:py-2 rounded-2xl bg-bwb-surface/80 border border-amber-400/30 text-amber-300 font-mono text-[10px] sm:text-sm font-black tracking-widest uppercase mb-4 sm:mb-7 shadow-lg">
+            <div className="inline-flex flex-wrap items-center justify-center gap-2 sm:gap-4 px-4 sm:px-6 py-2 rounded-2xl bg-bwb-surface/90 border border-amber-400/40 text-amber-300 font-mono text-xs sm:text-sm font-black tracking-widest uppercase mb-5 sm:mb-7 shadow-xl">
               <span>THINK</span>
               <span className="text-bwb-muted">·</span>
               <span>DESIGN</span>
@@ -112,9 +114,9 @@ export default function LandingPage() {
               <span>IMPACT</span>
             </div>
 
-            {/* Event Motto Quote Box */}
-            <div className="w-full max-w-xl mx-auto mb-5 sm:mb-9 p-3.5 sm:p-5 rounded-2xl sm:rounded-3xl stereo-card border border-bwb-accent/30 bg-gradient-to-r from-cyan-950/30 via-bwb-surface to-purple-950/30 shadow-2xl relative text-center">
-              <p className="font-display font-black text-xs sm:text-xl text-bwb-text uppercase tracking-wide leading-relaxed">
+            {/* Event Motto Quote Plaque */}
+            <div className="w-full max-w-xl mx-auto mb-6 sm:mb-8 p-4 sm:p-6 rounded-3xl stereo-card border border-bwb-accent/40 bg-gradient-to-r from-cyan-950/40 via-bwb-surface to-purple-950/40 shadow-2xl relative text-center">
+              <p className="font-display font-black text-sm sm:text-xl text-bwb-text uppercase tracking-wide leading-relaxed">
                 &ldquo;You don&apos;t need to build it to solve it.
                 <br />
                 <span className="text-gradient">All you need is an idea that can.</span>&rdquo;
@@ -122,23 +124,23 @@ export default function LandingPage() {
             </div>
 
             {/* Primary Calls to Action */}
-            <div className="w-full max-w-md mx-auto space-y-2.5 sm:space-y-3 mb-8 sm:mb-14">
+            <div className="w-full max-w-md mx-auto space-y-3">
               <Link to="/join" className="block w-full">
-                <Button fullWidth size="lg" className="shadow-xl shadow-bwb-accent/25 hover:scale-[1.02] transition-transform text-sm font-bold py-3.5">
-                  <Users size={18} className="mr-2" /> Enter Live Event <ArrowRight size={16} className="ml-1.5" />
+                <Button fullWidth size="lg" className="shadow-2xl shadow-bwb-accent/30 hover:scale-[1.02] transition-transform text-sm sm:text-base font-black py-4">
+                  <Users size={19} className="mr-2" /> Enter Live Event <ArrowRight size={17} className="ml-1.5" />
                 </Button>
               </Link>
 
-              <div className="grid grid-cols-2 gap-2.5 sm:gap-3 w-full">
+              <div className="grid grid-cols-2 gap-3 w-full">
                 <Link to="/projector" className="block w-full">
-                  <Button fullWidth variant="secondary" size="lg" className="text-xs sm:text-sm font-bold border-bwb-accent/40 bg-bwb-surface-2/90 py-3 shadow-md">
-                    <Radio size={15} className="mr-1.5 text-bwb-accent animate-pulse" /> Live Projector
+                  <Button fullWidth variant="secondary" size="lg" className="text-xs sm:text-sm font-bold border-bwb-accent/40 bg-bwb-surface-2/95 py-3.5 shadow-xl">
+                    <Radio size={16} className="mr-1.5 text-bwb-accent animate-pulse" /> Live Projector
                   </Button>
                 </Link>
 
                 <Link to="/how-to-play" className="block w-full">
-                  <Button fullWidth variant="secondary" size="lg" className="text-xs sm:text-sm font-bold border-white/15 bg-bwb-surface-2/90 hover:border-white/30 text-bwb-text py-3 shadow-md">
-                    <Globe size={15} className="mr-1.5 text-amber-400" /> How to Play
+                  <Button fullWidth variant="secondary" size="lg" className="text-xs sm:text-sm font-bold border-white/20 bg-bwb-surface-2/95 hover:border-white/40 text-bwb-text py-3.5 shadow-xl">
+                    <Globe size={16} className="mr-1.5 text-amber-400" /> How to Play
                   </Button>
                 </Link>
               </div>
@@ -148,6 +150,7 @@ export default function LandingPage() {
       </section>
 
       {/* 3. EVENT LOGISTICS & SCHEDULE CARD */}
+
       <section className="max-w-6xl mx-auto px-3 sm:px-6 mb-12 sm:mb-20">
         <div className="stereo-card rounded-3xl p-5 sm:p-8 border border-white/10 shadow-2xl bg-gradient-to-br from-bwb-surface-2 to-bwb-surface relative overflow-hidden">
           <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/5 rounded-full blur-3xl pointer-events-none" />

@@ -269,7 +269,7 @@ export function CactusWaitingCard({
 
           {/* Stylized Ultra-Kawaii 3D SVG Cactus (Spike 2.0) */}
           <div className="w-36 h-40 relative flex items-center justify-center filter drop-shadow-[0_14px_32px_rgba(16,185,129,0.4)] group-hover:scale-105 transition-transform will-change-transform">
-            <svg viewBox="0 0 100 120" className="w-full h-full">
+            <svg viewBox="0 0 100 134" className="w-full h-full overflow-visible">
               <defs>
                 <linearGradient id="potGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
                   <stop offset="0%" stopColor="#FCD34D" />
@@ -283,8 +283,8 @@ export function CactusWaitingCard({
                   <stop offset="100%" stopColor="#064E3B" />
                 </linearGradient>
                 <linearGradient id="armGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#A7F3D0" />
-                  <stop offset="50%" stopColor="#10B981" />
+                  <stop offset="0%" stopColor="#6EE7B7" />
+                  <stop offset="45%" stopColor="#10B981" />
                   <stop offset="100%" stopColor="#047857" />
                 </linearGradient>
                 <linearGradient id="crownGrad" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -294,35 +294,35 @@ export function CactusWaitingCard({
               </defs>
 
               {/* Pot Base with 3D Bevel & Shadow */}
-              <path d="M26 88 L33 116 Q50 120 67 116 L74 88 Z" fill="url(#potGrad2)" />
-              <path d="M22 84 Q50 80 78 84 L76 89 Q50 86 24 89 Z" fill="#F59E0B" />
-              <ellipse cx="50" cy="85" rx="26" ry="3.5" fill="#78350F" opacity="0.6" />
+              <path d="M26 94 L33 122 Q50 126 67 122 L74 94 Z" fill="url(#potGrad2)" />
+              <path d="M22 90 Q50 86 78 90 L76 95 Q50 92 24 95 Z" fill="#F59E0B" />
+              <ellipse cx="50" cy="91" rx="26" ry="3.5" fill="#78350F" opacity="0.6" />
+
+              {/* Left Bouncy Arm (Seamless organic joint) */}
+              <motion.path
+                animate={isWiggling || isDancing ? { rotate: [-20, 25, -20] } : undefined}
+                transition={{ repeat: isDancing ? Infinity : 1, duration: 0.35, ease: 'easeInOut' }}
+                style={{ transformOrigin: '36px 60px' }}
+                d="M38 52 C26 52 20 40 20 30 C20 22 26 22 30 30 L30 54 C30 62 38 64 40 64 Z"
+                fill="url(#armGrad2)"
+              />
+
+              {/* Right Excited Waving Arm (Seamless organic joint) */}
+              <motion.path
+                animate={isWiggling || isDancing ? { rotate: [25, -20, 25] } : undefined}
+                transition={{ repeat: isDancing ? Infinity : 2, duration: 0.3 }}
+                style={{ transformOrigin: '64px 60px' }}
+                d="M62 52 C74 52 80 40 80 30 C80 22 74 22 70 30 L70 54 C70 62 62 64 60 64 Z"
+                fill="url(#armGrad2)"
+              />
 
               {/* Chubby Round Cactus Body */}
               <path
-                d="M36 28 Q36 10 50 10 Q64 10 64 28 L64 86 Q50 90 36 86 Z"
+                d="M36 32 Q36 14 50 14 Q64 14 64 32 L64 92 Q50 96 36 92 Z"
                 fill="url(#cactusGrad2)"
               />
               {/* Highlight Ridge with Mint Glow */}
-              <path d="M47 12 Q53 12 53 88 L47 88 Z" fill="#D1FAE5" opacity="0.45" />
-
-              {/* Left Bouncy Arm */}
-              <motion.path
-                animate={isWiggling || isDancing ? { rotate: [-24, 28, -24] } : undefined}
-                transition={{ repeat: isDancing ? Infinity : 1, duration: 0.35, ease: 'easeInOut' }}
-                style={{ transformOrigin: '36px 56px' }}
-                d="M36 48 Q18 48 18 30 Q18 22 24 22 Q30 22 30 30 L30 54 Q30 60 36 60 Z"
-                fill="url(#armGrad2)"
-              />
-
-              {/* Right Excited Waving Arm */}
-              <motion.path
-                animate={isWiggling || isDancing ? { rotate: [30, -25, 30] } : undefined}
-                transition={{ repeat: isDancing ? Infinity : 2, duration: 0.3 }}
-                style={{ transformOrigin: '64px 56px' }}
-                d="M64 44 Q82 44 82 26 Q82 18 76 18 Q70 18 70 26 L70 50 Q70 56 64 56 Z"
-                fill="url(#armGrad2)"
-              />
+              <path d="M47 16 Q53 16 53 94 L47 94 Z" fill="#D1FAE5" opacity="0.45" />
 
               {/* Golden Crown Accessory on High Level */}
               {evo.level >= 2 && (
@@ -338,46 +338,46 @@ export function CactusWaitingCard({
                 </motion.g>
               )}
 
-              {/* Top Spinning Kawaii Cherry Blossoms */}
+              {/* Top Spinning Kawaii Cherry Blossoms (Fully inside canvas) */}
               <motion.g
                 animate={flowerSpin ? { rotate: 360, scale: [1, 1.4, 1] } : undefined}
                 transition={{ duration: 0.75, repeat: 0 }}
-                style={{ transformOrigin: '50px 10px' }}
+                style={{ transformOrigin: '50px 14px' }}
               >
-                <circle cx="50" cy="10" r="7" fill="#F43F5E" />
-                <circle cx="43" cy="7" r="5" fill="#FB7185" />
-                <circle cx="57" cy="7" r="5" fill="#FB7185" />
-                <circle cx="50" cy="3" r="5" fill="#FDA4AF" />
-                <circle cx="44" cy="14" r="4.5" fill="#FDA4AF" />
-                <circle cx="56" cy="14" r="4.5" fill="#FDA4AF" />
-                <circle cx="50" cy="10" r="3.5" fill="#FEF08A" />
+                <circle cx="50" cy="14" r="7" fill="#F43F5E" />
+                <circle cx="43" cy="11" r="5" fill="#FB7185" />
+                <circle cx="57" cy="11" r="5" fill="#FB7185" />
+                <circle cx="50" cy="7" r="5" fill="#FDA4AF" />
+                <circle cx="44" cy="18" r="4.5" fill="#FDA4AF" />
+                <circle cx="56" cy="18" r="4.5" fill="#FDA4AF" />
+                <circle cx="50" cy="14" r="3.5" fill="#FEF08A" />
               </motion.g>
 
-              {/* Cute Sparkly Blinking Anime Eyes */}
+              {/* Cute Sparkly Anime Eyes */}
               {isWiggling || isDancing ? (
                 // Happy Arc Squint Eyes (^ ◡ ^)
                 <g>
-                  <path d="M41 36 Q45 30 49 36" stroke="#064E3B" strokeWidth="2.2" strokeLinecap="round" fill="none" />
-                  <path d="M51 36 Q55 30 59 36" stroke="#064E3B" strokeWidth="2.2" strokeLinecap="round" fill="none" />
+                  <path d="M41 40 Q45 34 49 40" stroke="#064E3B" strokeWidth="2.2" strokeLinecap="round" fill="none" />
+                  <path d="M51 40 Q55 34 59 40" stroke="#064E3B" strokeWidth="2.2" strokeLinecap="round" fill="none" />
                 </g>
               ) : (
-                // Giant Kawaii Anime Eyes with Dual Catchlights (Zero CPU overhead)
+                // Giant Kawaii Anime Eyes with Dual Catchlights
                 <g>
-                  <ellipse cx="45" cy="35" rx="3.8" ry="4.2" fill="#064E3B" />
-                  <ellipse cx="55" cy="35" rx="3.8" ry="4.2" fill="#064E3B" />
+                  <ellipse cx="45" cy="39" rx="3.8" ry="4.2" fill="#064E3B" />
+                  <ellipse cx="55" cy="39" rx="3.8" ry="4.2" fill="#064E3B" />
                   {/* Primary Large Highlight */}
-                  <circle cx="43.8" cy="33.5" r="1.6" fill="#FFFFFF" />
-                  <circle cx="53.8" cy="33.5" r="1.6" fill="#FFFFFF" />
+                  <circle cx="43.8" cy="37.5" r="1.6" fill="#FFFFFF" />
+                  <circle cx="53.8" cy="37.5" r="1.6" fill="#FFFFFF" />
                   {/* Secondary Sparkle Catchlight */}
-                  <circle cx="46.5" cy="37" r="0.8" fill="#FFFFFF" />
-                  <circle cx="56.5" cy="37" r="0.8" fill="#FFFFFF" />
+                  <circle cx="46.5" cy="41" r="0.8" fill="#FFFFFF" />
+                  <circle cx="56.5" cy="41" r="0.8" fill="#FFFFFF" />
                 </g>
               )}
 
               {/* Glowing Rosy Cheeks */}
               <ellipse
                 cx="40"
-                cy="42"
+                cy="46"
                 rx={isBlushing ? 4.2 : 3.4}
                 ry={isBlushing ? 2.6 : 2}
                 fill={isBlushing ? '#F43F5E' : '#FB7185'}
@@ -385,7 +385,7 @@ export function CactusWaitingCard({
               />
               <ellipse
                 cx="60"
-                cy="42"
+                cy="46"
                 rx={isBlushing ? 4.2 : 3.4}
                 ry={isBlushing ? 2.6 : 2}
                 fill={isBlushing ? '#F43F5E' : '#FB7185'}
@@ -394,7 +394,7 @@ export function CactusWaitingCard({
 
               {/* Kawaii Happy Open Mouth */}
               <path
-                d={isWiggling || isDancing ? 'M44 40 Q50 49 56 40 Z' : 'M45 41 Q50 47 55 41'}
+                d={isWiggling || isDancing ? 'M44 44 Q50 53 56 44 Z' : 'M45 45 Q50 51 55 45'}
                 stroke="#064E3B"
                 strokeWidth={isWiggling || isDancing ? '1.5' : '1.8'}
                 strokeLinecap="round"
@@ -402,13 +402,14 @@ export function CactusWaitingCard({
               />
 
               {/* Cute Little Needles & Spines */}
-              <circle cx="34" cy="70" r="1" fill="#D1FAE5" />
-              <circle cx="66" cy="70" r="1" fill="#D1FAE5" />
-              <circle cx="50" cy="62" r="1" fill="#D1FAE5" />
-              <circle cx="24" cy="38" r="1" fill="#D1FAE5" />
-              <circle cx="76" cy="36" r="1" fill="#D1FAE5" />
+              <circle cx="34" cy="74" r="1" fill="#D1FAE5" />
+              <circle cx="66" cy="74" r="1" fill="#D1FAE5" />
+              <circle cx="50" cy="66" r="1" fill="#D1FAE5" />
+              <circle cx="24" cy="42" r="1" fill="#D1FAE5" />
+              <circle cx="76" cy="40" r="1" fill="#D1FAE5" />
             </svg>
           </div>
+
 
 
           {/* Interactive Mascot Tap Badge */}

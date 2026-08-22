@@ -62,7 +62,8 @@ export function CactusWaitingCard({
 
   const [showAllTips, setShowAllTips] = useState(false)
   const [particles, setParticles] = useState<{ id: number; emoji: string; x: number; y: number; vx: number; vy: number; rot: number }[]>([])
-  const [activeTab, setActiveTab] = useState<'passcode' | 'playbook' | 'checklist'>('passcode')
+  const [activeTab, setActiveTab] = useState<'passcode' | 'playbook' | 'checklist'>(currentPasscode ? 'passcode' : 'playbook')
+
 
   const [timeLeft, setTimeLeft] = useState<{
     days: number
@@ -711,57 +712,67 @@ export function CactusWaitingCard({
       )}
 
       {/* INTERACTIVE NAVIGATION TABS WITH SMOOTH SLIDING PILL */}
-      <div className="w-full max-w-xl mx-auto mb-4 relative flex rounded-xl bg-bwb-bg p-1 border border-white/10 text-xs font-mono font-bold shadow-inner">
-        <button
-          type="button"
-          onClick={() => {
-            if (activeTab !== 'passcode') {
-              setActiveTab('passcode')
-              SoundFX.playCutePop()
-            }
-          }}
-          className={`relative z-10 flex-1 py-2 sm:py-2.5 rounded-lg transition-colors duration-200 flex items-center justify-center gap-1.5 ${
-            activeTab === 'passcode' ? 'text-amber-300' : 'text-bwb-muted hover:text-bwb-text'
-          }`}
-        >
-          {activeTab === 'passcode' && (
-            <motion.div
-              layoutId="activeWaitingTabPill"
-              className="absolute inset-0 rounded-lg bg-amber-400/20 border border-amber-400/50 shadow-[0_0_15px_rgba(251,191,36,0.25)]"
-              transition={{ type: 'spring', stiffness: 420, damping: 32 }}
-            />
-          )}
-          <Sparkles size={13} className="relative z-10" />
-          <span className="relative z-10">Team Passcode</span>
-        </button>
+      {currentPasscode ? (
+        <div className="w-full max-w-xl mx-auto mb-4 relative flex rounded-xl bg-bwb-bg p-1 border border-white/10 text-xs font-mono font-bold shadow-inner">
+          <button
+            type="button"
+            onClick={() => {
+              if (activeTab !== 'passcode') {
+                setActiveTab('passcode')
+                SoundFX.playCutePop()
+              }
+            }}
+            className={`relative z-10 flex-1 py-2 sm:py-2.5 rounded-lg transition-colors duration-200 flex items-center justify-center gap-1.5 ${
+              activeTab === 'passcode' ? 'text-amber-300' : 'text-bwb-muted hover:text-bwb-text'
+            }`}
+          >
+            {activeTab === 'passcode' && (
+              <motion.div
+                layoutId="activeWaitingTabPill"
+                className="absolute inset-0 rounded-lg bg-amber-400/20 border border-amber-400/50 shadow-[0_0_15px_rgba(251,191,36,0.25)]"
+                transition={{ type: 'spring', stiffness: 420, damping: 32 }}
+              />
+            )}
+            <Sparkles size={13} className="relative z-10" />
+            <span className="relative z-10">Team Passcode</span>
+          </button>
 
-        <button
-          type="button"
-          onClick={() => {
-            if (activeTab !== 'playbook') {
-              setActiveTab('playbook')
-              SoundFX.playCutePop()
-            }
-          }}
-          className={`relative z-10 flex-1 py-2 sm:py-2.5 rounded-lg transition-colors duration-200 flex items-center justify-center gap-1.5 ${
-            activeTab === 'playbook' ? 'text-bwb-accent' : 'text-bwb-muted hover:text-bwb-text'
-          }`}
-        >
-          {activeTab === 'playbook' && (
-            <motion.div
-              layoutId="activeWaitingTabPill"
-              className="absolute inset-0 rounded-lg bg-bwb-accent/20 border border-bwb-accent/50 shadow-[0_0_15px_rgba(0,229,199,0.25)]"
-              transition={{ type: 'spring', stiffness: 420, damping: 32 }}
-            />
-          )}
-          <Layers size={13} className="relative z-10" />
-          <span className="relative z-10">Tournament Playbook</span>
-        </button>
-      </div>
+          <button
+            type="button"
+            onClick={() => {
+              if (activeTab !== 'playbook') {
+                setActiveTab('playbook')
+                SoundFX.playCutePop()
+              }
+            }}
+            className={`relative z-10 flex-1 py-2 sm:py-2.5 rounded-lg transition-colors duration-200 flex items-center justify-center gap-1.5 ${
+              activeTab === 'playbook' ? 'text-bwb-accent' : 'text-bwb-muted hover:text-bwb-text'
+            }`}
+          >
+            {activeTab === 'playbook' && (
+              <motion.div
+                layoutId="activeWaitingTabPill"
+                className="absolute inset-0 rounded-lg bg-bwb-accent/20 border border-bwb-accent/50 shadow-[0_0_15px_rgba(0,229,199,0.25)]"
+                transition={{ type: 'spring', stiffness: 420, damping: 32 }}
+              />
+            )}
+            <Layers size={13} className="relative z-10" />
+            <span className="relative z-10">Tournament Playbook</span>
+          </button>
+        </div>
+      ) : (
+        <div className="w-full max-w-xl mx-auto mb-4 flex items-center justify-center">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-xl bg-bwb-bg border border-bwb-accent/30 text-bwb-accent font-mono text-xs font-bold shadow-inner">
+            <Layers size={14} />
+            <span>Tournament Playbook & Rules</span>
+          </div>
+        </div>
+      )}
 
       {/* GPU ACCELERATED CINEMATIC TAB PANELS WITH SMOOTH LAYOUT EXPANSION */}
       <motion.div layout transition={{ duration: 0.24, ease: [0.25, 1, 0.5, 1] }} className="w-full max-w-xl mx-auto overflow-hidden mb-6">
         <AnimatePresence mode="wait" initial={false}>
+
 
           {/* TAB 1: PASSCODE & ROSTER VAULT */}
           {activeTab === 'passcode' && currentPasscode ? (

@@ -282,11 +282,6 @@ export function CactusWaitingCard({
                   <stop offset="85%" stopColor="#047857" />
                   <stop offset="100%" stopColor="#064E3B" />
                 </linearGradient>
-                <linearGradient id="armGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#6EE7B7" />
-                  <stop offset="45%" stopColor="#10B981" />
-                  <stop offset="100%" stopColor="#047857" />
-                </linearGradient>
                 <linearGradient id="crownGrad" x1="0%" y1="0%" x2="100%" y2="100%">
                   <stop offset="0%" stopColor="#FDE047" />
                   <stop offset="100%" stopColor="#EAB308" />
@@ -298,30 +293,38 @@ export function CactusWaitingCard({
               <path d="M22 90 Q50 86 78 90 L76 95 Q50 92 24 95 Z" fill="#F59E0B" />
               <ellipse cx="50" cy="91" rx="26" ry="3.5" fill="#78350F" opacity="0.6" />
 
-              {/* Left Bouncy Arm (Seamless organic joint) */}
-              <motion.path
-                animate={isWiggling || isDancing ? { rotate: [-20, 25, -20] } : undefined}
+              {/* Left Classic U-Branch Arm (Same Cactus Body Gradient) */}
+              <motion.g
+                animate={isWiggling || isDancing ? { rotate: [-15, 20, -15] } : undefined}
                 transition={{ repeat: isDancing ? Infinity : 1, duration: 0.35, ease: 'easeInOut' }}
                 style={{ transformOrigin: '36px 60px' }}
-                d="M38 52 C26 52 20 40 20 30 C20 22 26 22 30 30 L30 54 C30 62 38 64 40 64 Z"
-                fill="url(#armGrad2)"
-              />
+              >
+                <path
+                  d="M36 62 C24 62 16 62 16 50 L16 34 C16 26 24 26 24 34 L24 46 C24 50 30 50 36 50 Z"
+                  fill="url(#cactusGrad2)"
+                />
+                <path d="M20 34 L20 46 C20 49 23 50 28 50" stroke="#D1FAE5" strokeWidth="1.6" strokeLinecap="round" fill="none" opacity="0.45" />
+              </motion.g>
 
-              {/* Right Excited Waving Arm (Seamless organic joint) */}
-              <motion.path
-                animate={isWiggling || isDancing ? { rotate: [25, -20, 25] } : undefined}
+              {/* Right Classic U-Branch Arm (Same Cactus Body Gradient) */}
+              <motion.g
+                animate={isWiggling || isDancing ? { rotate: [20, -15, 20] } : undefined}
                 transition={{ repeat: isDancing ? Infinity : 2, duration: 0.3 }}
                 style={{ transformOrigin: '64px 60px' }}
-                d="M62 52 C74 52 80 40 80 30 C80 22 74 22 70 30 L70 54 C70 62 62 64 60 64 Z"
-                fill="url(#armGrad2)"
-              />
+              >
+                <path
+                  d="M64 50 C70 50 76 50 76 46 L76 28 C76 20 84 20 84 28 L84 44 C84 56 76 56 64 56 Z"
+                  fill="url(#cactusGrad2)"
+                />
+                <path d="M80 28 L80 44 C80 48 76 50 70 50" stroke="#D1FAE5" strokeWidth="1.6" strokeLinecap="round" fill="none" opacity="0.45" />
+              </motion.g>
 
-              {/* Chubby Round Cactus Body */}
+              {/* Main Cactus Trunk (Smooth rounded cylinder) */}
               <path
-                d="M36 32 Q36 14 50 14 Q64 14 64 32 L64 92 Q50 96 36 92 Z"
+                d="M34 30 C34 14 66 14 66 30 L66 92 Q50 96 34 92 Z"
                 fill="url(#cactusGrad2)"
               />
-              {/* Highlight Ridge with Mint Glow */}
+              {/* Highlight Center Ridge */}
               <path d="M47 16 Q53 16 53 94 L47 94 Z" fill="#D1FAE5" opacity="0.45" />
 
               {/* Golden Crown Accessory on High Level */}
@@ -405,10 +408,11 @@ export function CactusWaitingCard({
               <circle cx="34" cy="74" r="1" fill="#D1FAE5" />
               <circle cx="66" cy="74" r="1" fill="#D1FAE5" />
               <circle cx="50" cy="66" r="1" fill="#D1FAE5" />
-              <circle cx="24" cy="42" r="1" fill="#D1FAE5" />
-              <circle cx="76" cy="40" r="1" fill="#D1FAE5" />
+              <circle cx="20" cy="44" r="0.9" fill="#D1FAE5" />
+              <circle cx="80" cy="38" r="0.9" fill="#D1FAE5" />
             </svg>
           </div>
+
 
 
 

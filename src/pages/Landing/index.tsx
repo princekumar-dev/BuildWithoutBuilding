@@ -67,34 +67,31 @@ export default function LandingPage() {
             transition={{ duration: 0.7 }}
             className="w-full flex flex-col items-center"
           >
-            {/* Department Title Header */}
-            <div className="flex items-center justify-center gap-3 sm:gap-6 mb-4 sm:mb-6 px-2">
-              <div className="h-px w-8 sm:w-28 bg-gradient-to-r from-transparent via-amber-400/60 to-amber-400/90" />
-              <span className="font-display font-black text-xs sm:text-sm md:text-base tracking-[0.15em] sm:tracking-[0.3em] uppercase text-amber-300/90 text-center leading-tight drop-shadow-md">
+            {/* TOP HIERARCHY: DEPARTMENT & CLUB PRESENTER */}
+            <div className="flex flex-col items-center gap-2 mb-6 sm:mb-8">
+              {/* Department Name (Tiny, Elegant, High-Hierarchy Subtitle) */}
+              <p className="font-mono text-[10px] sm:text-xs tracking-[0.2em] sm:tracking-[0.3em] uppercase text-amber-400/90 font-bold text-center px-4">
                 Department of Artificial Intelligence and Data Science
-              </span>
-              <div className="h-px w-8 sm:w-28 bg-gradient-to-l from-transparent via-amber-400/60 to-amber-400/90" />
-            </div>
+              </p>
 
-            {/* Microsoft AI Club Emblem Badge */}
-            <div className="inline-flex items-center gap-3 p-1.5 sm:p-2 pr-5 sm:pr-6 rounded-full bg-bwb-surface-2/95 border border-amber-400/40 shadow-2xl backdrop-blur-xl mb-5 sm:mb-7 group hover:border-amber-400/70 transition-colors">
-              <img
-                src="/images/microsoft_ai_club_logo.jpg"
-                alt="Microsoft AI Club"
-                className="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover border-2 border-amber-400/70 shadow-lg shrink-0"
-                onError={(e) => {
-                  (e.target as HTMLElement).style.display = 'none'
-                }}
-              />
-              <div className="text-left">
-                <p className="text-[10px] sm:text-[11px] font-mono uppercase tracking-widest text-amber-400 font-black">
-                  MICROSOFT AI CLUB
-                </p>
-                <p className="text-xs font-bold text-bwb-text tracking-wider">
-                  PROUDLY PRESENTS
-                </p>
+              {/* Microsoft AI Club Presenter Pill (Compact & Sleek) */}
+              <div className="inline-flex items-center gap-2.5 px-3 sm:px-4 py-1.5 rounded-full bg-bwb-surface-2/90 border border-amber-400/30 shadow-lg backdrop-blur-xl group hover:border-amber-400/60 transition-colors">
+                <img
+                  src="/images/microsoft_ai_club_logo.jpg"
+                  alt="Microsoft AI Club"
+                  className="w-5 h-5 sm:w-6 sm:h-6 rounded-full object-cover border border-amber-400/60 shadow-sm shrink-0"
+                  onError={(e) => {
+                    (e.target as HTMLElement).style.display = 'none'
+                  }}
+                />
+                <div className="flex items-center gap-1.5 font-mono text-[10px] sm:text-xs">
+                  <span className="font-black text-amber-300 tracking-wider">MICROSOFT AI CLUB</span>
+                  <span className="text-bwb-muted font-normal">·</span>
+                  <span className="font-medium text-bwb-text/80 uppercase tracking-widest text-[9px] sm:text-[10px]">Presents</span>
+                </div>
               </div>
             </div>
+
 
             {/* Main Event Poster Title (Big, Majestic & Centered) */}
             <h1 className="font-display font-black text-5xl sm:text-7xl md:text-8xl tracking-tight leading-[1.05] mb-4 sm:mb-6 text-center">

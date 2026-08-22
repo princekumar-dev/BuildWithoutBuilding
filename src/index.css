@@ -46,6 +46,46 @@ button, a, input, select, textarea {
   touch-action: manipulation;
 }
 
+/* Small screens are the primary participant and control surface. */
+@media (max-width: 639px) {
+  html {
+    overflow-x: hidden;
+  }
+
+  body {
+    overscroll-behavior-y: none;
+  }
+
+  button, a, input, select, textarea {
+    min-height: 44px;
+  }
+
+  .host-mobile-view [class*="overflow-x-auto"],
+  .projector-mobile-view [class*="overflow-x-auto"] {
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x proximity;
+  }
+
+  .host-mobile-view [class*="overflow-x-auto"] > *,
+  .projector-mobile-view [class*="overflow-x-auto"] > * {
+    scroll-snap-align: start;
+  }
+
+  .projector-mobile-view > header {
+    padding: 0.75rem 1rem;
+    gap: 0.75rem;
+  }
+
+  .projector-mobile-view > main {
+    padding: 1rem;
+    justify-content: flex-start;
+  }
+
+  .projector-mobile-view .min-w-\[280px\] {
+    min-width: min(280px, calc(100vw - 2rem));
+  }
+}
+
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-display);
 }

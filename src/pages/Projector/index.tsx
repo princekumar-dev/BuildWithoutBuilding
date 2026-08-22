@@ -188,7 +188,7 @@ export default function ProjectorPage() {
   const currentAnnouncement = STADIUM_ANNOUNCEMENTS[announcementIndex]
 
   return (
-    <div className="min-h-screen bg-bwb-bg grid-bg text-bwb-text flex flex-col select-none overflow-x-hidden font-sans">
+    <div className="projector-mobile-view min-h-screen bg-bwb-bg grid-bg text-bwb-text flex flex-col select-none overflow-x-hidden font-sans">
       {/* Top HUD & Projectionist Bar */}
       <header className="px-6 py-3 bg-bwb-surface/80 backdrop-blur-xl border-b border-bwb-border flex flex-wrap items-center justify-between gap-4 z-50">
         <div className="flex items-center gap-4">

@@ -211,7 +211,7 @@ export default function ProblemSelectPage() {
                 dragConstraints={{ left: 0, right: 0 }}
                 dragElastic={0.25}
                 onDragEnd={handleDragEnd}
-                className={`rounded-3xl border ${currentTheme.border} bg-gradient-to-br ${currentTheme.bg} stereo-card p-6 sm:p-8 min-h-[380px] flex flex-col justify-between relative overflow-hidden cursor-grab active:cursor-grabbing select-none shadow-2xl`}
+                className={`rounded-3xl border ${currentTheme.border} bg-gradient-to-br ${currentTheme.bg} stereo-card p-4 sm:p-8 min-h-[380px] flex flex-col justify-between relative overflow-hidden cursor-grab active:cursor-grabbing touch-pan-y select-none shadow-2xl`}
               >
                 {/* Background glow circle */}
                 <div className="absolute -right-16 -top-16 w-48 h-48 rounded-full bg-bwb-accent/5 blur-3xl pointer-events-none" />
@@ -290,7 +290,7 @@ export default function ProblemSelectPage() {
                 <button
                   type="button"
                   onClick={prevProblem}
-                  className="absolute left-2 top-1/2 -translate-y-1/2 -translate-x-3 sm:-translate-x-5 z-20 w-11 h-11 rounded-full glass border border-bwb-border flex items-center justify-center text-bwb-muted hover:text-bwb-accent hover:border-bwb-accent/50 transition-all shadow-xl"
+                  className="absolute left-2 top-1/2 -translate-y-1/2 sm:-translate-x-5 z-20 w-11 h-11 rounded-full glass border border-bwb-border flex items-center justify-center text-bwb-muted hover:text-bwb-accent hover:border-bwb-accent/50 transition-all shadow-xl touch-manipulation"
                   aria-label="Previous Challenge"
                 >
                   <ChevronLeft size={22} />

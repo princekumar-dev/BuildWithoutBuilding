@@ -1,4 +1,4 @@
-import { useState, useRef, type ReactNode } from 'react'
+import { useEffect, useState, useRef, type ReactNode } from 'react'
 import { motion, AnimatePresence, type PanInfo } from 'framer-motion'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
@@ -25,6 +25,10 @@ export function SwipeCarousel<T>({
   const [direction, setDirection] = useState(0)
   const constraintsRef = useRef(null)
 
+  useEffect(() => {
+    setActive((current) => Math.min(current, Math.max(0, items.length - 1)))
+  }, [items.length])
+
   const paginate = (newDirection: number) => {
     setDirection(newDirection)
     setActive((prev) => {
@@ -36,9 +40,9 @@ export function SwipeCarousel<T>({
   }
 
   const handleDragEnd = (_: unknown, info: PanInfo) => {
-    const threshold = 50
-    if (info.offset.x < -threshold) paginate(1)
-    else if (info.offset.x > threshold) paginate(-1)
+    const threshold = 48
+    if (info.offset.x < -threshold || info.velocity.x < -500) paginate(1)
+    else if (info.offset.x > threshold || info.velocity.x > 500) paginate(-1)
   }
 
   const variants = {
@@ -51,7 +55,7 @@ export function SwipeCarousel<T>({
 
   return (
     <div className={`relative ${className}`} ref={constraintsRef}>
-      <div className="relative h-[420px] overflow-hidden">
+      <div className="relative min-h-[320px] sm:min-h-[420px] overflow-hidden">
         <AnimatePresence initial={false} custom={direction} mode="popLayout">
           <motion.div
             key={active}
@@ -65,8 +69,16 @@ export function SwipeCarousel<T>({
             dragConstraints={{ left: 0, right: 0 }}
             dragElastic={0.2}
             onDragEnd={handleDragEnd}
-            className="absolute inset-0 cursor-grab active:cursor-grabbing"
+            className="absolute inset-0 cursor-grab active:cursor-grabbing touch-pan-y select-none"
             onClick={() => onSelect?.(items[active], active)}
+            onKeyDown={(event) => {
+              if (event.key === 'ArrowLeft') paginate(-1)
+              if (event.key === 'ArrowRight') paginate(1)
+            }}
+            role="group"
+            tabIndex={0}
+            aria-roledescription="carousel"
+            aria-label={`Card ${active + 1} of ${items.length}`}
           >
             {renderItem(items[active], active, true)}
           </motion.div>
@@ -78,7 +90,7 @@ export function SwipeCarousel<T>({
           <button
             type="button"
             onClick={() => paginate(-1)}
-            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2 z-10 w-10 h-10 rounded-full glass flex items-center justify-center text-bwb-muted hover:text-bwb-accent transition-colors"
+            className="absolute left-1 sm:left-0 top-1/2 -translate-y-1/2 sm:-translate-x-2 z-10 w-11 h-11 rounded-full glass flex items-center justify-center text-bwb-muted hover:text-bwb-accent transition-colors touch-manipulation"
             aria-label="Previous"
           >
             <ChevronLeft size={20} />
@@ -86,7 +98,7 @@ export function SwipeCarousel<T>({
           <button
             type="button"
             onClick={() => paginate(1)}
-            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-2 z-10 w-10 h-10 rounded-full glass flex items-center justify-center text-bwb-muted hover:text-bwb-accent transition-colors"
+            className="absolute right-1 sm:right-0 top-1/2 -translate-y-1/2 sm:translate-x-2 z-10 w-11 h-11 rounded-full glass flex items-center justify-center text-bwb-muted hover:text-bwb-accent transition-colors touch-manipulation"
             aria-label="Next"
           >
             <ChevronRight size={20} />

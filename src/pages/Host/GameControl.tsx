@@ -216,8 +216,8 @@ export default function HostGameControlPage() {
 
 
   return (
-    <PageLayout fullWidth>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
+    <PageLayout fullWidth className="host-mobile-view">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 py-4 sm:py-6">
         {/* Top Breadcrumb & Quick Action Buttons */}
         <PageTransition>
           <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
@@ -336,7 +336,7 @@ export default function HostGameControlPage() {
                   className="mt-4 p-5 rounded-2xl bg-bwb-bg border border-amber-400/40 overflow-hidden shadow-2xl"
                 >
                   <div className="flex flex-wrap items-end gap-3 mb-4">
-                    <div className="flex-1 min-w-[280px]">
+                    <div className="flex-1 min-w-0 sm:min-w-[280px]">
                       <label className="text-xs font-mono uppercase text-amber-400 font-bold block mb-1.5 flex items-center gap-1.5">
                         <Calendar size={13} /> Select Tournament Date & Time
                       </label>
@@ -507,7 +507,7 @@ export default function HostGameControlPage() {
                     </div>
 
                     {/* Presets */}
-                    <div className="grid grid-cols-6 gap-2">
+                    <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
                       {[8, 16, 24, 32, 48, 64].map((count) => (
                         <button
                           key={count}

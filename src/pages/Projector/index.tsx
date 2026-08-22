@@ -716,16 +716,30 @@ export default function ProjectorPage() {
             ============================================================ */}
         {currentPhase === 'PROBLEM_REVEAL' && (
           <div className="w-full flex flex-col items-center justify-center my-auto">
-            <div className="w-full max-w-6xl mb-6 flex flex-wrap items-center justify-between gap-4">
-              <div>
-                <Badge variant="accent" className="mb-1 text-xs">Phase 1 of 4</Badge>
-                <h2 className="font-display text-3xl sm:text-4xl font-bold">
-                  Problem Statements Showcase
-                </h2>
-                <p className="text-bwb-muted text-sm mt-1">
-                  8 challenges revealed · Teams are currently selecting on their devices
-                </p>
+            <div className="w-full max-w-6xl mb-8 text-center">
+              <div className="flex items-center justify-center gap-2 mb-3">
+                <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                  {currentRound === 1
+                    ? 'Round 1 · Open Qualifier (No Elimination)'
+                    : currentRound === 2
+                    ? 'Round 2 · Problem Showdown (Top 8 Qualify)'
+                    : 'Round 3 · Grand Finals (Top 4 Prized)'}
+                </span>
+                <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                  Problem Reveal
+                </span>
               </div>
+              <h1 className="font-display text-3xl sm:text-5xl font-black flex items-center justify-center gap-3 text-gradient">
+                <Sparkles className="text-emerald-400" size={36} />
+                Problem Statements Showcase
+              </h1>
+              <p className="text-bwb-muted mt-2">{game.name || 'Build Without Building Tournament'}</p>
+              <p className="text-bwb-muted text-sm mt-1">
+                8 challenges revealed · Teams are currently selecting on their devices
+              </p>
+            </div>
+
+            <div className="w-full max-w-6xl mb-6 flex flex-wrap items-center justify-end gap-4">
 
               {/* Showcase Controls */}
               <div className="flex items-center gap-2">
@@ -878,16 +892,30 @@ export default function ProjectorPage() {
             ============================================================ */}
         {currentPhase === 'CARD_REVEAL' && (
           <div className="w-full flex flex-col items-center justify-center my-auto">
-            <div className="w-full max-w-6xl mb-6 flex flex-wrap items-center justify-between gap-4">
-              <div>
-                <Badge variant="accent" className="mb-1 text-xs">Phase 2 of 4</Badge>
-                <h2 className="font-display text-3xl sm:text-4xl font-bold">
-                  Holographic Tech Card Matrix
-                </h2>
-                <p className="text-bwb-muted text-sm mt-1">
-                  Live feed of teams drafting and revealing their 3 technology cards
-                </p>
+            <div className="w-full max-w-6xl mb-8 text-center">
+              <div className="flex items-center justify-center gap-2 mb-3">
+                <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                  {currentRound === 1
+                    ? 'Round 1 · Open Qualifier (No Elimination)'
+                    : currentRound === 2
+                    ? 'Round 2 · Problem Showdown (Top 8 Qualify)'
+                    : 'Round 3 · Grand Finals (Top 4 Prized)'}
+                </span>
+                <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                  Card Draft
+                </span>
               </div>
+              <h1 className="font-display text-3xl sm:text-5xl font-black flex items-center justify-center gap-3 text-gradient">
+                <Layers className="text-cyan-400" size={36} />
+                Holographic Tech Card Matrix
+              </h1>
+              <p className="text-bwb-muted mt-2">{game.name || 'Build Without Building Tournament'}</p>
+              <p className="text-bwb-muted text-sm mt-1">
+                Live feed of teams drafting and revealing their 3 technology cards
+              </p>
+            </div>
+
+            <div className="w-full max-w-6xl mb-6 flex flex-wrap items-center justify-end gap-4">
 
               <div className="flex items-center gap-4 text-sm bg-bwb-surface-2 px-4 py-2 rounded-2xl border border-bwb-border">
                 <div>
@@ -1001,12 +1029,28 @@ export default function ProjectorPage() {
             ============================================================ */}
         {currentPhase === 'BUILDING' && (
           <div className="w-full max-w-7xl mx-auto flex flex-col items-center justify-center my-auto px-4">
-            {/* Countdown Hero */}
+            {/* Round & Phase Badges + Title */}
             <div className="w-full text-center mb-8">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-bwb-accent/15 border border-bwb-accent/30 text-bwb-accent text-xs font-mono font-bold uppercase tracking-widest mb-4">
-                <Activity size={14} className="animate-pulse" />
-                <span>Live Engineering Arena · Build Phase Active</span>
+              <div className="flex items-center justify-center gap-2 mb-3">
+                <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                  {currentRound === 1
+                    ? 'Round 1 · Open Qualifier (No Elimination)'
+                    : currentRound === 2
+                    ? 'Round 2 · Problem Showdown (Top 8 Qualify)'
+                    : 'Round 3 · Grand Finals (Top 4 Prized)'}
+                </span>
+                <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-bwb-accent/20 text-bwb-accent border border-bwb-accent/30">
+                  Build Phase
+                </span>
               </div>
+              <h1 className="font-display text-3xl sm:text-5xl font-black flex items-center justify-center gap-3 text-gradient">
+                <Zap className="text-amber-400" size={36} />
+                Live Engineering Arena
+              </h1>
+              <p className="text-bwb-muted mt-2">{game.name || 'Build Without Building Tournament'}</p>
+            </div>
+
+            {/* Countdown Hero */}
 
               <div className="stereo-card rounded-3xl p-6 sm:p-8 max-w-2xl mx-auto border-2 border-bwb-accent/40 shadow-2xl mb-6 relative overflow-hidden">
                 <div className="absolute -top-20 -right-20 w-48 h-48 rounded-full bg-bwb-accent/10 blur-3xl pointer-events-none" />
@@ -1139,6 +1183,27 @@ export default function ProjectorPage() {
             ============================================================ */}
         {(currentPhase === 'PITCHING' || currentPhase === 'JUDGE_ATTACK') && (
           <div className="w-full max-w-6xl mx-auto my-auto flex flex-col items-center justify-center px-4">
+            {/* Round & Phase Badges + Title */}
+            <div className="w-full text-center mb-6 pb-3 border-b border-white/10">
+              <div className="flex items-center justify-center gap-2 mb-3">
+                <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                  {currentRound === 1
+                    ? 'Round 1 · Open Qualifier (No Elimination)'
+                    : currentRound === 2
+                    ? 'Round 2 · Problem Showdown (Top 8 Qualify)'
+                    : 'Round 3 · Grand Finals (Top 4 Prized)'}
+                </span>
+                <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                  {currentPhase === 'JUDGE_ATTACK' ? 'Defense & Q&A' : 'Pitch Presentations'}
+                </span>
+              </div>
+              <h1 className="font-display text-3xl sm:text-5xl font-black flex items-center justify-center gap-3 text-gradient">
+                <Mic className="text-purple-400" size={36} />
+                {currentPhase === 'JUDGE_ATTACK' ? 'Defense & Judge Q&A Arena' : 'Live Solution Presentations'}
+              </h1>
+              <p className="text-bwb-muted mt-2">{game.name || 'Build Without Building Tournament'}</p>
+            </div>
+
             {/* Top Pitch Round Header */}
             <div className="w-full flex flex-wrap items-center justify-between gap-4 mb-6 pb-3 border-b border-white/10">
               <div>
@@ -1296,13 +1361,23 @@ export default function ProjectorPage() {
           <div className="w-full max-w-5xl mx-auto my-auto px-4">
             {/* Top Judging Banner */}
             <div className="text-center mb-6">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-purple-500/20 border border-purple-500/40 text-purple-300 text-xs font-mono font-bold uppercase tracking-widest mb-3 shadow-lg">
-                <Sparkles size={14} className="animate-spin text-purple-400" />
-                <span>Round {game.currentRound || 1} · Official Jury Deliberation</span>
+              <div className="flex items-center justify-center gap-2 mb-3">
+                <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                  {currentRound === 1
+                    ? 'Round 1 · Open Qualifier (No Elimination)'
+                    : currentRound === 2
+                    ? 'Round 2 · Problem Showdown (Top 8 Qualify)'
+                    : 'Round 3 · Grand Finals (Top 4 Prized)'}
+                </span>
+                <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                  Jury Deliberation
+                </span>
               </div>
-              <h2 className="font-display text-4xl sm:text-6xl font-black text-bwb-text">
+              <h1 className="font-display text-3xl sm:text-5xl font-black flex items-center justify-center gap-3 text-gradient">
+                <Sparkles className="text-purple-400" size={36} />
                 Jury Evaluating Architectures
-              </h2>
+              </h1>
+              <p className="text-bwb-muted mt-2">{game.name || 'Build Without Building Tournament'}</p>
               <p className="text-sm sm:text-base text-bwb-muted font-medium mt-1">
                 Evaluating technical feasibility, creativity, problem understanding, and team defenses.
               </p>

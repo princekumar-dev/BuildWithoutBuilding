@@ -403,35 +403,21 @@ export function CactusWaitingCard({
                 <circle cx="50" cy="14" r="4" fill="#FEF08A" stroke="#EAB308" strokeWidth="0.8" />
               </motion.g>
 
-              {/* Big Expressive Anime Eyes with Catchlights / Sleeping Eyes / Sparkle Star Eyes */}
+              {/* Big Expressive Anime Eyes with Catchlights / Sleeping Eyes */}
               {isSleeping ? (
                 // Peaceful Slumber Eyes (∪ ∪)
                 <g>
                   <path d="M39 44 Q43 50 47 44" stroke="#064E3B" strokeWidth="2.6" strokeLinecap="round" fill="none" />
                   <path d="M53 44 Q57 50 61 44" stroke="#064E3B" strokeWidth="2.6" strokeLinecap="round" fill="none" />
                 </g>
-              ) : isWakingUp ? (
-                // Dazzling Sparkle Star Eyes (✦ ✦) on Wake Up!
-                <g>
-                  <ellipse cx="43" cy="41" rx="4.8" ry="5.5" fill="#064E3B" />
-                  <ellipse cx="57" cy="41" rx="4.8" ry="5.5" fill="#064E3B" />
-                  {/* Big Golden Sparkle Stars */}
-                  <path d="M43 37 L44 40 L47 41 L44 42 L43 45 L42 42 L39 41 L42 40 Z" fill="#FDE047" />
-                  <path d="M57 37 L58 40 L61 41 L58 42 L57 45 L56 42 L53 41 L56 40 Z" fill="#FDE047" />
-                  {/* Diamond Catchlights */}
-                  <circle cx="41" cy="38" r="1.5" fill="#FFFFFF" />
-                  <circle cx="55" cy="38" r="1.5" fill="#FFFFFF" />
-                  <circle cx="44.8" cy="43.5" r="1" fill="#FFFFFF" />
-                  <circle cx="58.8" cy="43.5" r="1" fill="#FFFFFF" />
-                </g>
-              ) : isWiggling ? (
+              ) : isWiggling || isWakingUp ? (
                 // Happy Squint Eyes (^ ◡ ^)
                 <g>
                   <path d="M38 42 Q43 35 48 42" stroke="#064E3B" strokeWidth="2.8" strokeLinecap="round" fill="none" />
                   <path d="M52 42 Q57 35 62 42" stroke="#064E3B" strokeWidth="2.8" strokeLinecap="round" fill="none" />
                 </g>
               ) : (
-                // Giant Anime Eyes
+                // Giant Glossy Anime Eyes
                 <g>
                   <ellipse cx="43" cy="41" rx="4.5" ry="5.2" fill="#064E3B" />
                   <ellipse cx="57" cy="41" rx="4.5" ry="5.2" fill="#064E3B" />
@@ -443,6 +429,7 @@ export function CactusWaitingCard({
                   <circle cx="58.8" cy="43.5" r="1" fill="#FFFFFF" />
                 </g>
               )}
+
 
 
               {/* Soft Blushing Rosy Cheeks */}

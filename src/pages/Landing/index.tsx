@@ -157,7 +157,7 @@ export default function LandingPage() {
               <div>
                 <p className="text-[10px] font-mono uppercase tracking-widest text-bwb-muted font-bold">EVENT DATE</p>
                 <h4 className="font-display font-black text-xl sm:text-2xl text-bwb-text">24th August</h4>
-                <p className="text-xs text-bwb-muted mt-0.5">Annual Technical Flagship</p>
+                <p className="text-xs text-bwb-muted mt-0.5">First Annual Technical Flagship</p>
               </div>
             </div>
 

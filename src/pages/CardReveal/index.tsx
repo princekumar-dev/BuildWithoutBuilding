@@ -110,7 +110,7 @@ export default function CardRevealPage() {
         </motion.div>
 
         {/* 3 Interactive Tech Card Slots */}
-        <div className="grid sm:grid-cols-3 gap-4 mb-8">
+        <div className="grid sm:grid-cols-3 gap-4 mb-1">
           {[0, 1, 2].map((slotIndex) => {
             const isRevealed = revealed.includes(slotIndex)
             const tech = myTechs[slotIndex]

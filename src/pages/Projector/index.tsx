@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   Users, Sparkles, Trophy, Play, Pause,
   ChevronLeft, ChevronRight, CheckCircle2, Radio, Activity,
-  Crown, Clock, Layers, Zap, Mic
+  Crown, Clock, Layers, Zap, Mic, Award
 } from 'lucide-react'
 import { CountdownTimer } from '../../components/timer/CountdownTimer'
 import { LeaderboardTable } from '../../components/leaderboard/LeaderboardTable'
@@ -174,6 +174,8 @@ export default function ProjectorPage() {
 
   // Active display phase (auto follows game phase unless manually overridden)
   const currentPhase: GamePhase = manualOverridePhase ?? game.phase ?? 'LOBBY'
+  const currentRound = game.currentRound || (game.isFinalRound ? 3 : 1)
+  const isResults = currentPhase === 'RESULTS' || game.currentRound === 3
   const activeProblem = catalog.problems[activeProblemIndex] ?? game.currentProblem ?? catalog.problems[0]
   const activeProblemTheme = activeProblem ? categoryThemes[activeProblem.category] : null
   const pitchTeam = game.teams.find((t) => t.id === game.currentPitchTeamId) ?? null
@@ -1371,13 +1373,25 @@ export default function ProjectorPage() {
             ============================================================ */}
         {(currentPhase === 'LEADERBOARD' || currentPhase === 'FINAL_ROUND' || currentPhase === 'RESULTS') && (
           <div className="w-full max-w-5xl mx-auto my-auto px-4">
-            <div className="text-center mb-6">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-bwb-gold/15 border border-bwb-gold/30 text-bwb-gold text-xs font-mono font-bold uppercase tracking-widest mb-3 shadow-lg">
-                <Trophy size={14} /> Round {game.currentRound || (game.isFinalRound ? 3 : 1)} Official Standings
+            <div className="text-center mb-8">
+              <div className="flex items-center justify-center gap-2 mb-3">
+                <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                  {currentRound === 1
+                    ? 'Round 1 · Open Qualifier (No Elimination)'
+                    : currentRound === 2
+                    ? 'Round 2 · Problem Showdown (Top 8 Qualify)'
+                    : 'Round 3 · Grand Finals (Top 4 Prized)'}
+                </span>
+                <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-bwb-accent/20 text-bwb-accent border border-bwb-accent/30">
+                  Leaderboard
+                </span>
               </div>
-              <h2 className="font-display text-4xl sm:text-6xl font-black text-gradient">
-                {(currentPhase === 'RESULTS' || game.currentRound === 3) ? 'Tournament Grand Finals' : `Round ${game.currentRound || 1} Leaderboard`}
-              </h2>
+
+              <h1 className="font-display text-4xl sm:text-6xl font-black flex items-center justify-center gap-3 text-gradient">
+                <Trophy className="text-bwb-gold" size={48} />
+                {isResults || currentRound === 3 ? 'Grand Finals Championship Results' : `Round ${currentRound} Leaderboard`}
+              </h1>
+              <p className="text-bwb-muted mt-2">{game.name || 'Build Without Building Tournament'}</p>
             </div>
 
             {/* 3D Animated Esports Podium for Finals / Results */}
@@ -1386,17 +1400,32 @@ export default function ProjectorPage() {
             )}
 
             {/* Complete Rank Breakdown */}
-            <div className="stereo-card rounded-3xl p-6 border border-bwb-border shadow-2xl">
-              <h3 className="font-display font-bold text-base text-bwb-text mb-4 flex items-center gap-2">
-                <Trophy size={16} className="text-bwb-gold" />
-                Tournament Scoreboard
-              </h3>
-              <LeaderboardTable
-                teams={game.teams}
-                showMovement
-                round={game.currentRound || (game.isFinalRound ? 3 : 1)}
-                isFinalResults={currentPhase === 'RESULTS' || game.currentRound === 3}
-              />
+            <LeaderboardTable
+              teams={game.teams}
+              showMovement
+              round={currentRound}
+              isFinalResults={currentPhase === 'RESULTS' || game.currentRound === 3}
+            />
+
+            {/* Round Explanatory Card */}
+            <div className="mt-6 rounded-2xl border border-purple-500/20 bg-gradient-to-r from-bwb-surface via-bwb-surface-2 to-bwb-surface p-4 text-center">
+              {currentRound === 1 ? (
+                <p className="text-xs sm:text-sm text-bwb-text">
+                  ✨ <strong className="text-bwb-accent">Round 1 (No Elimination)</strong>: All registered teams advance to Round 2 to compete across the 8 Problem Statements (max 2 teams per problem).
+                </p>
+              ) : currentRound === 2 ? (
+                <p className="text-xs sm:text-sm text-bwb-text">
+                  ⚡ <strong className="text-emerald-400">Round 2 Showdown</strong>: The <strong className="text-bwb-accent">Top 8 teams</strong> on this leaderboard advance to the Grand Finals (Round 3).
+                </p>
+              ) : (
+                <div className="flex flex-wrap items-center justify-center gap-4 text-xs font-mono font-bold text-bwb-text">
+                  <span className="flex items-center gap-1 text-bwb-gold"><Trophy size={14} /> 1st: Champion (1)</span>
+                  <span>·</span>
+                  <span className="flex items-center gap-1 text-slate-300"><Award size={14} /> 2nd: Runner-Up (1)</span>
+                  <span>·</span>
+                  <span className="flex items-center gap-1 text-amber-400"><Award size={14} /> 3rd: Dual Bronze (2)</span>
+                </div>
+              )}
             </div>
           </div>
         )}

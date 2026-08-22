@@ -3,8 +3,9 @@ import { motion } from 'framer-motion'
 import {
   ArrowRight, Lightbulb, PenTool, Cpu,
   Presentation, Calendar, Clock, MapPin,
-  Play, Shield, Users, Radio, Globe
+  Play, Shield, Users, Radio, Globe, Trophy
 } from 'lucide-react'
+
 import { PageLayout } from '../../components/layout/PageLayout'
 import { Button } from '../../components/ui/Button'
 import { Card } from '../../components/ui/Card'
@@ -227,9 +228,80 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* 4.5 TOURNAMENT MATCH FLOW BREAKDOWN */}
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 mb-24">
+        <div className="stereo-card rounded-3xl p-6 sm:p-8 border-2 border-bwb-accent/30 bg-gradient-to-br from-purple-950/30 via-bwb-surface-2 to-bwb-surface shadow-2xl">
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-400/15 border border-amber-400/30 text-amber-300 font-mono text-xs font-bold uppercase tracking-widest mb-2">
+              <Trophy size={14} className="text-amber-400" /> Official Championship Match Flow
+            </div>
+            <h2 className="font-display font-black text-2xl sm:text-4xl text-bwb-text">
+              3-Round Tournament Progression
+            </h2>
+            <p className="text-xs sm:text-sm text-bwb-muted max-w-lg mx-auto mt-1">
+              From open qualification to the 8-problem showdown and grand championship podium.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-4">
+            {/* Round 1 */}
+            <div className="p-4 sm:p-5 rounded-2xl bg-bwb-surface border border-purple-500/30 flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-2xl">🚀</span>
+                  <span className="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                    No Elimination
+                  </span>
+                </div>
+                <p className="text-[10px] font-mono text-bwb-muted uppercase font-bold">ROUND 01</p>
+                <h3 className="font-display font-bold text-base text-bwb-text mb-1">Open Qualifier</h3>
+                <p className="text-xs text-bwb-muted leading-relaxed">
+                  All registered squads receive tech cards, formulate system blueprints, and pitch on stage. All squads advance!
+                </p>
+              </div>
+            </div>
+
+            {/* Round 2 */}
+            <div className="p-4 sm:p-5 rounded-2xl bg-bwb-surface border border-bwb-accent/30 flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-2xl">⚡</span>
+                  <span className="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-bwb-accent/20 text-bwb-accent border border-bwb-accent/30">
+                    Top 8 Qualify
+                  </span>
+                </div>
+                <p className="text-[10px] font-mono text-bwb-muted uppercase font-bold">ROUND 02</p>
+                <h3 className="font-display font-bold text-base text-bwb-text mb-1">8 Challenges Showdown</h3>
+                <p className="text-xs text-bwb-muted leading-relaxed">
+                  8 real-world challenge tracks (strictly max 2 teams per problem). Top 8 ranked squads punch their ticket to the Finals.
+                </p>
+              </div>
+            </div>
+
+            {/* Round 3 */}
+            <div className="p-4 sm:p-5 rounded-2xl bg-bwb-surface border border-amber-500/30 flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-2xl">🏆</span>
+                  <span className="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                    Top 4 Awarded
+                  </span>
+                </div>
+                <p className="text-[10px] font-mono text-bwb-muted uppercase font-bold">ROUND 03</p>
+                <h3 className="font-display font-bold text-base text-bwb-text mb-1">Grand Finals & Podium</h3>
+                <p className="text-xs text-bwb-muted leading-relaxed">
+                  Top 8 battle on stage. Top 4 teams awarded: 🥇 1st Champion, 🥈 2nd Runner-Up, 🥉 3rd Dual Bronze Winners!
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* 5. ROLE PORTALS QUICK ACCESS */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 mb-24">
         <Card glow padding="lg" className="text-center border-bwb-accent/30 bg-gradient-to-br from-bwb-surface-2 to-bwb-surface">
+
           <h2 className="font-display text-2xl sm:text-4xl font-black mb-3">
             Enter Your Competition Station
           </h2>

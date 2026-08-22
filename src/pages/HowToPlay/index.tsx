@@ -30,14 +30,13 @@ const tournamentRounds = [
 ]
 
 const steps = [
-  { num: '01', title: 'Join & Roster', desc: 'Enter the Room PIN provided by your host. Register a team of 2–3 members.' },
-  { num: '02', title: 'Pick Your Challenge', desc: 'In Round 2, select from 8 Problem Statements (strictly max 2 teams per problem statement).' },
-  { num: '03', title: 'Draft Tech Cards', desc: 'Each team receives 3 randomized core technology cards matched to their challenge.' },
-  { num: '04', title: 'Build Architecture', desc: 'You have 15 minutes to architect a full system solution explaining how every tech card fits.' },
-  { num: '05', title: 'Pitch (60 sec)', desc: 'Present your solution verbally to the judging panel. When timer reaches zero, pitch ends.' },
-  { num: '06', title: 'Judge Attack (20 sec)', desc: 'Judges fire challenging defense questions. Your team defends under pressure.' },
-  { num: '07', title: 'Score & Leaderboard', desc: 'Judges score across 7 rubric criteria (100 pts total) to determine rank.' },
-  { num: '08', title: 'Finals & Podium', desc: 'Top 8 squads battle in Round 3, where the Top 4 receive official championship awards!' },
+  { num: '01', title: 'Join & Roster Entry', desc: 'Enter the Room PIN provided by your host. Register your squad of 2–3 members and receive your unique Team Passcode.' },
+  { num: '02', title: 'Pick Your Challenge', desc: 'Select 1 of 8 Problem Statements (strictly max 2 teams per problem statement capacity).' },
+  { num: '03', title: 'Draft 3 Tech Cards', desc: 'Each team receives 3 randomized core technology cards that must be incorporated into the solution architecture.' },
+  { num: '04', title: '15m Build Architecture Sprint', desc: 'You have 15 minutes to architect a full system solution explaining data flow, edge telemetry, and component integration.' },
+  { num: '05', title: '60s Live Pitch & 20s Defense', desc: 'Present your solution verbally on stage. When the timer ends, defend against targeted technical judge attacks.' },
+  { num: '06', title: 'Judging Deliberation', desc: 'The jury panel scores teams across 7 rubric dimensions (100 points total) during live deliberation.' },
+  { num: '07', title: 'Rankings & Championship Podium', desc: 'Standings revealed! Round 1 (No elimination), Round 2 (Top 8 qualify), Round 3 (Top 4 awarded 1st, 2nd, and dual 3rd prizes).' },
 ]
 
 const rubric = [
@@ -53,23 +52,23 @@ const rubric = [
 export default function HowToPlayPage() {
   return (
     <PageLayout>
-      <div className="max-w-4xl mx-auto pb-12">
+      <div className="max-w-4xl mx-auto px-1 sm:px-4 pb-12">
         <Badge variant="accent" className="mb-4">Official Tournament Rules</Badge>
-        <h1 className="font-display text-4xl sm:text-5xl font-black mb-3 text-gradient">
+        <h1 className="font-display text-3xl sm:text-5xl font-black mb-3 text-gradient">
           3-Round Tournament System
         </h1>
-        <p className="text-bwb-muted mb-10 leading-relaxed text-sm sm:text-base">
+        <p className="text-bwb-muted mb-8 sm:mb-10 leading-relaxed text-xs sm:text-base">
           BUILD WITHOUT BUILDING is a competitive architecture and technical innovation tournament. You don&apos;t write code — you design, architect, and defend real engineering solutions under strict constraints.
         </p>
 
         {/* 3-Round Tournament Overview */}
-        <h2 className="font-display text-2xl font-bold mb-4 flex items-center gap-2">
+        <h2 className="font-display text-xl sm:text-2xl font-bold mb-4 flex items-center gap-2">
           <Trophy className="text-bwb-gold" size={22} />
           Tournament Progression Format
         </h2>
-        <div className="grid md:grid-cols-3 gap-4 mb-12">
+        <div className="grid md:grid-cols-3 gap-3.5 sm:gap-4 mb-10 sm:mb-12">
           {tournamentRounds.map((r) => (
-            <Card key={r.num} padding="lg" className="border-purple-500/20 flex flex-col justify-between">
+            <Card key={r.num} padding="md" className="border-purple-500/20 flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-2xl">{r.icon}</span>
@@ -90,6 +89,7 @@ export default function HowToPlayPage() {
             </Card>
           ))}
         </div>
+
 
         {/* Prize Distribution Card */}
         <Card padding="lg" className="mb-12 border-bwb-gold/30 bg-gradient-to-r from-amber-950/20 via-bwb-surface-2 to-bwb-surface">

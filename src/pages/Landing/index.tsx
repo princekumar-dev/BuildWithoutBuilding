@@ -54,28 +54,28 @@ export default function LandingPage() {
   return (
     <PageLayout fullWidth className="overflow-x-hidden">
       {/* HERO SECTION AS A FULL-SCREEN KEYNOTE POSTER */}
-      <section className="relative min-h-[calc(100dvh-4.5rem)] flex flex-col justify-center items-center py-6 sm:py-16 px-4 sm:px-6 overflow-hidden">
+      <section className="relative pt-2 sm:pt-8 pb-8 sm:pb-20 px-3 sm:px-6 overflow-hidden flex flex-col items-center">
         {/* Background Atmospheric Poster Glows */}
-        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[700px] h-[550px] bg-gradient-to-tr from-bwb-accent/20 via-purple-600/15 to-transparent blur-[140px] pointer-events-none" />
-        <div className="absolute top-8 right-8 w-96 h-96 bg-cyan-500/15 blur-[110px] pointer-events-none" />
-        <div className="absolute bottom-8 left-8 w-96 h-96 bg-amber-500/10 blur-[120px] pointer-events-none" />
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[700px] h-[550px] bg-gradient-to-tr from-bwb-accent/20 via-purple-600/15 to-transparent blur-[140px] pointer-events-none" />
+        <div className="absolute top-4 right-6 w-96 h-96 bg-cyan-500/15 blur-[110px] pointer-events-none" />
+        <div className="absolute bottom-6 left-6 w-96 h-96 bg-amber-500/10 blur-[120px] pointer-events-none" />
 
-        <div className="max-w-4xl w-full mx-auto text-center relative z-10 my-auto flex flex-col items-center justify-center">
+        <div className="max-w-4xl w-full mx-auto text-center relative z-10 flex flex-col items-center">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7 }}
+            transition={{ duration: 0.6 }}
             className="w-full flex flex-col items-center"
           >
             {/* TOP HIERARCHY: DEPARTMENT & CLUB PRESENTER */}
-            <div className="flex flex-col items-center gap-2 mb-6 sm:mb-8">
-              {/* Department Name (Tiny, Elegant, High-Hierarchy Subtitle) */}
-              <p className="font-mono text-[10px] sm:text-xs tracking-[0.2em] sm:tracking-[0.3em] uppercase text-amber-400/90 font-bold text-center px-4">
+            <div className="flex flex-col items-center gap-2 mb-4 sm:mb-6 mt-1 sm:mt-2">
+              {/* Department Name (Positioned cleanly at top) */}
+              <p className="font-mono text-[10px] sm:text-xs tracking-[0.08em] sm:tracking-[0.25em] uppercase text-amber-400 font-bold text-center px-2">
                 Department of Artificial Intelligence and Data Science
               </p>
 
               {/* Microsoft AI Club Presenter Pill (Compact & Sleek) */}
-              <div className="inline-flex items-center gap-2.5 px-3 sm:px-4 py-1.5 rounded-full bg-bwb-surface-2/90 border border-amber-400/30 shadow-lg backdrop-blur-xl group hover:border-amber-400/60 transition-colors">
+              <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-full bg-bwb-surface-2/90 border border-amber-400/30 shadow-lg backdrop-blur-xl group hover:border-amber-400/60 transition-colors">
                 <img
                   src="/images/microsoft_ai_club_logo.jpg"
                   alt="Microsoft AI Club"
@@ -92,13 +92,13 @@ export default function LandingPage() {
               </div>
             </div>
 
-
             {/* Main Event Poster Title (Big, Majestic & Centered) */}
             <h1 className="font-display font-black text-5xl sm:text-7xl md:text-8xl tracking-tight leading-[1.05] mb-4 sm:mb-6 text-center">
               BUILD <span className="text-gradient">WITHOUT</span>
               <br />
               <span className="text-bwb-text drop-shadow-[0_10px_25px_rgba(0,0,0,0.8)]">BUILDING</span>
             </h1>
+
 
             {/* Official Tagline Pills */}
             <div className="inline-flex flex-wrap items-center justify-center gap-2 sm:gap-4 px-4 sm:px-6 py-2 rounded-2xl bg-bwb-surface/90 border border-amber-400/40 text-amber-300 font-mono text-xs sm:text-sm font-black tracking-widest uppercase mb-5 sm:mb-7 shadow-xl">

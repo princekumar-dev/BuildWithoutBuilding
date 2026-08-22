@@ -22,12 +22,13 @@ export function LeaderboardTable({
   const sorted = [...teams].sort((a, b) => (a.rank ?? 99) - (b.rank ?? 99))
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-bwb-border bg-bwb-surface">
-      <table className="w-full">
+    <div className="overflow-x-auto -mx-2 sm:mx-0 rounded-2xl border border-bwb-border bg-bwb-surface shadow-xl">
+      <table className="w-full min-w-[340px]">
         <thead>
           <tr className="bg-bwb-surface-2 text-left">
-            <th className="px-4 py-3 text-xs font-display uppercase tracking-wider text-bwb-muted">Rank</th>
-            <th className="px-4 py-3 text-xs font-display uppercase tracking-wider text-bwb-muted">Team</th>
+            <th className="px-3 sm:px-4 py-3 text-[11px] sm:text-xs font-display uppercase tracking-wider text-bwb-muted">Rank</th>
+            <th className="px-3 sm:px-4 py-3 text-[11px] sm:text-xs font-display uppercase tracking-wider text-bwb-muted">Team</th>
+
             {!compact && (
               <th className="px-4 py-3 text-xs font-display uppercase tracking-wider text-bwb-muted hidden sm:table-cell">Members</th>
             )}

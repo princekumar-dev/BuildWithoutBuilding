@@ -9,11 +9,12 @@ interface CountdownTimerProps {
 }
 
 const sizeClasses = {
-  sm: 'text-2xl',
-  md: 'text-4xl',
-  lg: 'text-6xl',
-  xl: 'text-8xl',
+  sm: 'text-xl sm:text-2xl',
+  md: 'text-2xl sm:text-4xl',
+  lg: 'text-4xl sm:text-6xl',
+  xl: 'text-5xl sm:text-8xl',
 }
+
 
 export function CountdownTimer({
   initialSeconds,

@@ -295,26 +295,40 @@ export default function ProjectorPage() {
           </div>
         </div>
 
-        {/* Manual Phase Switcher for Stage Director */}
+        {/* Round-Aware Stage Director Phase Bar */}
         <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto justify-end">
-          <div className="hidden xl:flex items-center gap-1 bg-bwb-surface-2/60 p-1 rounded-xl border border-white/5 text-[11px] font-mono font-bold">
-            {(['LOBBY', 'PROBLEM_REVEAL', 'CARD_REVEAL', 'BUILDING', 'PITCHING', 'JUDGING', 'LEADERBOARD', 'RESULTS'] as GamePhase[]).map((p) => (
-              <button
-                key={p}
-                type="button"
-                onClick={() => setManualOverridePhase(p === game.phase ? null : p)}
-                className={`px-2.5 py-1 rounded-lg transition-all ${
-                  currentPhase === p
-                    ? 'bg-bwb-accent text-bwb-bg shadow-sm'
-                    : 'text-bwb-muted hover:text-bwb-text'
-                }`}
-              >
-                {p.replace('_', ' ')}
-              </button>
-            ))}
+          <div className="hidden lg:flex items-center gap-1 bg-bwb-surface-2/80 p-1 rounded-xl border border-white/10 text-[11px] font-mono font-bold">
+            <span className="px-2 py-0.5 text-[10px] text-purple-300 bg-purple-500/20 rounded-md mr-1 border border-purple-500/30">
+              Round {currentRound}
+            </span>
+            {(() => {
+              const activeRoundPhases: GamePhase[] =
+                currentRound === 1
+                  ? ['LOBBY', 'PROBLEM_REVEAL', 'CARD_REVEAL', 'BUILDING', 'PITCHING', 'JUDGING', 'LEADERBOARD']
+                  : currentRound === 2
+                  ? ['LOBBY', 'BUILDING', 'PITCHING', 'JUDGING', 'LEADERBOARD']
+                  : ['LOBBY', 'BUILDING', 'PITCHING', 'JUDGING', 'RESULTS']
+
+              return activeRoundPhases.map((p) => (
+                <button
+                  key={p}
+                  type="button"
+                  onClick={() => setManualOverridePhase(p === game.phase ? null : p)}
+                  className={`px-2.5 py-1 rounded-lg transition-all ${
+                    currentPhase === p
+                      ? 'bg-bwb-accent text-bwb-bg shadow-sm font-black'
+                      : 'text-bwb-muted hover:text-bwb-text hover:bg-white/5'
+                  }`}
+                >
+                  {p.replace('_', ' ')}
+                </button>
+              ))
+            })()}
           </div>
 
-          <PhaseIndicator phase={currentPhase} />
+          <div className="lg:hidden">
+            <PhaseIndicator phase={currentPhase} />
+          </div>
         </div>
       </header>
 

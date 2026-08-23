@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   UserPlus, Key, ArrowRight, CheckCircle2,
   Copy, Sparkles, UserCheck, Plus, Trash2, Crown, Radio,
-  Mail, Phone, GraduationCap, Users, AlertTriangle, ShieldAlert, ChevronDown
+  Mail, Phone, GraduationCap, Users, AlertTriangle, ShieldAlert, ChevronDown, Lock
 } from 'lucide-react'
 import { PageLayout } from '../../components/layout/PageLayout'
 import { Card } from '../../components/ui/Card'
@@ -14,6 +14,7 @@ import { toast } from '../../components/ui/Toast'
 import { SoundFX } from '../../lib/soundEffects'
 import { useGameStore } from '../../store/gameStore'
 import { api } from '../../lib/api'
+import { WhatsAppGroupCard, WhatsAppIcon, OFFICIAL_WHATSAPP_GROUP_URL } from '../../components/ui/WhatsAppGroupCard'
 import type { Game, ParticipantSession } from '../../types'
 
 type JoinTab = 'register' | 'passcode'
@@ -49,26 +50,33 @@ export default function JoinPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  // Auto-fetch active games and poll every 4 seconds for real-time capacity quota updates
+  // Auto-fetch active games and poll every 3 seconds for real-time room & registration updates
   useEffect(() => {
     const fetchGames = () => {
       api.listGames().then((games) => {
         setActiveGames(games)
-        if (games.length > 0 && !code) {
-          const latest = games[games.length - 1]
-          setCode(latest.code)
+        const openRooms = games.filter((g) => g.phase !== 'RESULTS' && g.isRegistrationOpen !== false)
+        if (openRooms.length > 0) {
+          if (!code || !openRooms.some((g) => g.code === code)) {
+            setCode(openRooms[openRooms.length - 1].code)
+          }
+        } else if (games.length > 0 && !code) {
+          setCode(games[games.length - 1].code)
         }
       }).catch(() => {})
     }
     fetchGames()
-    const interval = setInterval(fetchGames, 4000)
+    const interval = setInterval(fetchGames, 3000)
     return () => clearInterval(interval)
   }, [code])
 
-  const currentTargetGame = activeGames.find((g) => g.code === code) || (activeGames.length > 0 ? activeGames[activeGames.length - 1] : null)
+  const openGames = activeGames.filter((g) => g.phase !== 'RESULTS' && g.isRegistrationOpen !== false)
+  const currentTargetGame = openGames.find((g) => g.code === code)
+    || (openGames.length > 0 ? openGames[openGames.length - 1] : (activeGames.find((g) => g.code === code) || (activeGames.length > 0 ? activeGames[activeGames.length - 1] : null)))
   const roomMaxTeams = currentTargetGame ? (currentTargetGame.maxTeams || 32) : 32
   const roomRegisteredCount = currentTargetGame ? currentTargetGame.teams.length : 0
   const isRoomFull = currentTargetGame ? roomRegisteredCount >= roomMaxTeams : false
+  const isRegistrationClosedByHost = currentTargetGame ? currentTargetGame.isRegistrationOpen === false : (openGames.length === 0)
   const slotsRemaining = Math.max(0, roomMaxTeams - roomRegisteredCount)
 
   const handleAddMember = () => {
@@ -93,6 +101,11 @@ export default function JoinPage() {
   const handleRegisterTeam = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+
+    if (isRegistrationClosedByHost) {
+      setError(`New team registrations for "${currentTargetGame?.name || 'this room'}" are currently closed by the tournament host.`)
+      return
+    }
 
     if (isRoomFull) {
       setError(`We sincerely apologize! Registration for this room is full (${roomRegisteredCount}/${roomMaxTeams} teams).`)
@@ -276,6 +289,13 @@ export default function JoinPage() {
                   </div>
                 </div>
 
+                {/* Direct Official WhatsApp Group Card with Room-Specific Link */}
+                <WhatsAppGroupCard
+                  className="mb-6"
+                  teamName={registeredSession.session.teamName}
+                  groupUrl={registeredSession.game.whatsappGroupUrl || currentTargetGame?.whatsappGroupUrl || OFFICIAL_WHATSAPP_GROUP_URL}
+                />
+
                 {/* Direct Action Button */}
                 <Button
                   fullWidth
@@ -298,54 +318,110 @@ export default function JoinPage() {
               <div className="absolute top-0 right-0 w-48 h-full bg-gradient-to-l from-bwb-accent/10 to-transparent pointer-events-none" />
 
               <div className="relative z-10 space-y-2.5">
-                {/* Top Mini Bar: Status Tag & PIN Badge */}
-                <div className="flex items-center justify-between gap-2">
+                {/* Top Mini Bar: Status Tag, Room Selector, & PIN Badge */}
+                <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="flex items-center gap-1.5">
-                    <span className={`inline-block w-2 h-2 rounded-full ${isRoomFull ? 'bg-rose-400' : 'bg-emerald-400'} animate-pulse shrink-0`} />
+                    <span className={`inline-block w-2 h-2 rounded-full ${openGames.length === 0 ? 'bg-rose-400' : isRoomFull ? 'bg-amber-400' : 'bg-emerald-400'} animate-pulse shrink-0`} />
                     <span className="text-[10px] font-mono uppercase text-bwb-muted font-bold tracking-widest">
-                      {isRoomFull ? 'Room At Capacity' : 'Active Event Arena'}
+                      {openGames.length === 0
+                        ? 'Registration Closed'
+                        : isRoomFull
+                        ? 'Room At Capacity'
+                        : 'Active Event Arena'}
                     </span>
                   </div>
 
                   {/* Room Code Badge */}
                   <div className="px-2.5 py-1 rounded-xl bg-bwb-surface-2 border border-bwb-accent/40 font-mono text-xs tracking-wider font-black text-bwb-accent shadow-sm flex items-center gap-1.5 select-all shrink-0">
                     <Radio size={12} className="text-bwb-accent animate-pulse shrink-0" />
-                    <span>{code || currentTargetGame?.code || 'BWB-LIVE'}</span>
+                    <span>{openGames.length > 0 ? (currentTargetGame?.code || code) : 'CLOSED'}</span>
                   </div>
                 </div>
+
+                {/* Room Selector Dropdown: ONLY when 2 or more OPEN rooms exist */}
+                {openGames.length > 1 && (
+                  <div className="pt-1">
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="text-[10px] font-mono uppercase text-bwb-muted font-bold tracking-wider">
+                        Select Tournament Room / Event:
+                      </label>
+                      <span className="text-[10px] font-mono text-emerald-400 font-bold">
+                        {openGames.length} Open {openGames.length === 1 ? 'Room' : 'Rooms'}
+                      </span>
+                    </div>
+                    <div className="relative">
+                      <select
+                        value={code}
+                        onChange={(e) => {
+                          setCode(e.target.value)
+                          setError('')
+                          SoundFX.playCutePop()
+                        }}
+                        aria-label="Select Tournament Room"
+                        className="w-full pl-3 pr-8 py-2 rounded-xl bg-bwb-surface border border-emerald-500/30 text-bwb-text text-xs sm:text-sm font-semibold focus:border-bwb-accent outline-none appearance-none cursor-pointer"
+                      >
+                        {openGames.map((g) => {
+                          const openCount = Math.max(0, (g.maxTeams || 32) - g.teams.length)
+                          return (
+                            <option key={g.code} value={g.code} className="bg-bwb-bg text-bwb-text">
+                              {g.name} ({g.code}) — {g.teams.length}/{g.maxTeams || 32} Squads ({openCount} slots open)
+                            </option>
+                          )
+                        })}
+                      </select>
+                      <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-bwb-muted">
+                        <ChevronDown size={14} />
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 {/* Main Event Title */}
                 <div>
                   <h3 className="font-display text-base sm:text-lg font-black text-bwb-text tracking-tight truncate">
-                    {currentTargetGame?.name || 'Build Without Building Championship'}
+                    {openGames.length === 0
+                      ? (activeGames.length === 1 ? `${activeGames[0].name} (Registration Closed)` : activeGames.length > 1 ? 'All Tournament Rooms Closed' : 'No Tournament Rooms Available')
+                      : (currentTargetGame?.name || 'Build Without Building Championship')}
                   </h3>
                 </div>
 
-                {/* Bottom Meta Row: Capacity Quota & Round Tag */}
-                <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-white/5 text-xs font-mono">
-                  <div className={`px-2.5 py-1 rounded-xl border flex items-center gap-1.5 text-xs ${
-                    isRoomFull
-                      ? 'bg-rose-500/15 text-rose-300 border-rose-500/30 font-bold'
-                      : 'bg-bwb-surface-2/80 border-white/10 text-bwb-muted'
-                  }`}>
-                    {isRoomFull ? (
-                      <>
-                        <AlertTriangle size={12} className="text-rose-400 shrink-0" />
-                        <span className="text-rose-300 font-bold">Room Full ({roomRegisteredCount}/{roomMaxTeams})</span>
-                      </>
-                    ) : (
-                      <>
-                        <Users size={12} className="text-bwb-accent shrink-0" />
-                        <span className="text-bwb-text font-bold">{roomRegisteredCount}/{roomMaxTeams} Squads</span>
-                        <span className="text-emerald-400 text-[11px] font-bold">({slotsRemaining} open)</span>
-                      </>
-                    )}
-                  </div>
+                {/* Bottom Meta Row: Capacity Quota, WhatsApp Link Preview & Round Tag */}
+                {openGames.length > 0 && currentTargetGame ? (
+                  <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-white/5 text-xs font-mono">
+                    <div className={`px-2.5 py-1 rounded-xl border flex items-center gap-1.5 text-xs ${
+                      isRoomFull
+                        ? 'bg-rose-500/15 text-rose-300 border-rose-500/30 font-bold'
+                        : 'bg-bwb-surface-2/80 border-white/10 text-bwb-muted'
+                    }`}>
+                      {isRoomFull ? (
+                        <>
+                          <AlertTriangle size={12} className="text-rose-400 shrink-0" />
+                          <span className="text-rose-300 font-bold">Room Full ({roomRegisteredCount}/{roomMaxTeams})</span>
+                        </>
+                      ) : (
+                        <>
+                          <Users size={12} className="text-bwb-accent shrink-0" />
+                          <span className="text-bwb-text font-bold">{roomRegisteredCount}/{roomMaxTeams} Squads</span>
+                          <span className="text-emerald-400 text-[11px] font-bold">({slotsRemaining} open)</span>
+                        </>
+                      )}
+                    </div>
 
-                  <span className="px-2 py-0.5 rounded-lg text-[10px] font-mono font-bold bg-purple-500/15 text-purple-300 border border-purple-500/30 shrink-0">
-                    Round {currentTargetGame?.currentRound || 1} · {currentTargetGame?.phase ? currentTargetGame.phase.replace('_', ' ') : 'LOBBY'}
-                  </span>
-                </div>
+                    <div className="flex items-center gap-2">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-mono font-bold bg-[#25D366]/15 text-[#25D366] border border-[#25D366]/30 shrink-0">
+                        <WhatsAppIcon className="w-3 h-3" /> WhatsApp Enabled
+                      </span>
+                      <span className="px-2 py-0.5 rounded-lg text-[10px] font-mono font-bold bg-purple-500/15 text-purple-300 border border-purple-500/30 shrink-0">
+                        Round {currentTargetGame?.currentRound || 1} · {currentTargetGame?.phase ? currentTargetGame.phase.replace('_', ' ') : 'LOBBY'}
+                      </span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="pt-2 border-t border-white/5 text-xs font-mono text-bwb-muted flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-rose-400 animate-pulse" />
+                    <span>Awaiting host to open tournament rooms for registration...</span>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -375,7 +451,11 @@ export default function JoinPage() {
                 <UserPlus size={15} className="relative z-10" />
                 <span className="relative z-10 flex items-center gap-1.5">
                   Register Team
-                  {isRoomFull && <span className="w-2 h-2 rounded-full bg-rose-400 inline-block" title="Full" />}
+                  {isRegistrationClosedByHost ? (
+                    <span className="w-2 h-2 rounded-full bg-amber-400 inline-block" title="Registration Closed by Host" />
+                  ) : isRoomFull ? (
+                    <span className="w-2 h-2 rounded-full bg-rose-400 inline-block" title="Full" />
+                  ) : null}
                 </span>
               </button>
 
@@ -408,7 +488,65 @@ export default function JoinPage() {
               <AnimatePresence mode="wait" initial={false}>
                 {/* TAB 1: FULL TEAM REGISTRATION */}
                 {activeTab === 'register' && (
-                  isRoomFull ? (
+                  isRegistrationClosedByHost ? (
+                    /* NOTICE WHEN REGISTRATION IS CLOSED BY HOST */
+                    <motion.div
+                      key="join-tab-closed-by-host"
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -6 }}
+                      transition={{ duration: 0.2, ease: [0.25, 1, 0.5, 1] }}
+                      className="p-5 sm:p-7 rounded-3xl bg-gradient-to-br from-amber-500/10 via-rose-500/5 to-bwb-bg border border-amber-400/30 text-center space-y-4 shadow-xl will-change-transform gpu-layer"
+                    >
+                      <div className="w-14 h-14 mx-auto rounded-2xl bg-amber-400/15 border border-amber-400/30 flex items-center justify-center text-amber-400 shadow-lg shadow-amber-400/10">
+                        <Lock size={28} />
+                      </div>
+
+                      <div>
+                        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-400/15 border border-amber-400/30 text-amber-300 font-mono text-[11px] font-bold uppercase tracking-wider mb-2">
+                          <Lock size={13} /> {activeGames.length === 0 ? 'No Active Rooms' : 'Registration Closed by Host'}
+                        </div>
+                        <h3 className="font-display text-xl sm:text-2xl font-black text-bwb-text">
+                          {activeGames.length === 0
+                            ? 'No Tournament Rooms Available Yet'
+                            : activeGames.length === 1
+                            ? `Registration Closed for "${activeGames[0].name}"`
+                            : 'All Tournament Registrations Are Paused'}
+                        </h3>
+                        <p className="text-xs sm:text-sm text-bwb-muted mt-2 max-w-md mx-auto leading-relaxed">
+                          {activeGames.length === 0
+                            ? "The host has not launched an active tournament room yet. Please check back shortly or wait for the organizer's announcement."
+                            : activeGames.length === 1
+                            ? `The host has closed/paused new team registrations for "${activeGames[0].name}". If your squad registered earlier, you can connect directly with your Team Passcode.`
+                            : `The host has closed/paused new team registrations across all ${activeGames.length} tournament rooms. If your squad registered earlier, you can connect directly with your Team Passcode.`}
+                        </p>
+                      </div>
+
+                      {/* Guidance Box for Already Registered Squads */}
+                      <div className="p-4 rounded-2xl bg-bwb-surface-2/90 border border-white/10 text-left space-y-1.5 shadow-inner">
+                        <p className="text-xs font-mono font-bold text-amber-300 flex items-center gap-1.5">
+                          <Key size={14} className="shrink-0 text-amber-400" /> Already Registered Your Team?
+                        </p>
+                        <p className="text-xs text-bwb-muted leading-relaxed">
+                          Your spot is safe! Switch to the <strong>Passcode</strong> tab to enter the lobby as your full team with all members.
+                        </p>
+                      </div>
+
+                      <Button
+                        fullWidth
+                        size="lg"
+                        onClick={() => {
+                          setActiveTab('passcode')
+                          setError('')
+                          SoundFX.playCutePop()
+                        }}
+                        className="bg-amber-400 text-bwb-bg hover:bg-amber-300 font-bold text-sm shadow-xl shadow-amber-400/20"
+                      >
+                        <Key size={16} className="mr-2" />
+                        Switch to Passcode Quick Join <ArrowRight size={16} className="ml-2" />
+                      </Button>
+                    </motion.div>
+                  ) : isRoomFull ? (
                     /* APOLOGY NOTICE & CAPACITY REACHED EXPLANATION */
                     <motion.div
                       key="join-tab-full-apology"

@@ -46,13 +46,14 @@ export default function LobbyPage() {
           <PhaseIndicator phase={game.phase} />
         </div>
 
-        {/* CUTE CACTUS WAITING & COUNTDOWN CARD */}
+        {/* CUTE CACTUS WAITING & COUNTDOWN CARD WITH WHATSAPP COMMUNITY */}
         <CactusWaitingCard
           scheduledStartTime={game.scheduledStartTime}
           currentPasscode={currentPasscode}
           myTeam={myTeam}
           gameName={game.name}
           gameCode={game.code}
+          whatsappGroupUrl={game.whatsappGroupUrl}
         />
 
         {/* PITCH CALL ALERT */}

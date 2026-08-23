@@ -391,6 +391,8 @@ function publicGame(game) {
   game.currentPitchTeamId = game.currentPitchTeamId || null;
   game.problemTeamCounts = counts;
   game.maxTeams = Number(game.maxTeams) || 32;
+  game.whatsappGroupUrl = game.whatsappGroupUrl || null;
+  game.isRegistrationOpen = game.isRegistrationOpen !== false;
 
   const ranked = [...game.teams].sort((a, b) => (b.score ?? 0) - (a.score ?? 0)).map((team, index) => {
     const isFinalist = game.finalistTeamIds.length > 0
@@ -534,6 +536,8 @@ createServer(async (request, response) => {
       buildDurationMinutes: Number(input.buildDurationMinutes) || 15,
       maxTeams: Math.max(2, Math.min(128, Number(input.maxTeams) || 32)),
       scheduledStartTime: input.scheduledStartTime || null,
+      whatsappGroupUrl: input.whatsappGroupUrl?.trim() || null,
+      isRegistrationOpen: input.isRegistrationOpen !== false,
       isFinalRound: false,
       createdAt: new Date().toISOString()
     };
@@ -578,6 +582,13 @@ createServer(async (request, response) => {
 
     if (!team) {
       if (!input.teamName?.trim()) return json(response, 400, { error: 'Team name is required.' });
+      if (game.isRegistrationOpen === false) {
+        return json(response, 403, {
+          error: `Registration Closed: The host has paused/closed registrations for "${game.name}".`,
+          isRegistrationClosed: true,
+          message: `New team registrations for "${game.name}" are currently closed by the tournament host. If your squad registered previously, you can connect directly with your Team Passcode.`
+        });
+      }
       const roomMax = Number(game.maxTeams) || 32;
       if (game.teams.length >= roomMax) {
         return json(response, 409, {
@@ -690,6 +701,12 @@ createServer(async (request, response) => {
     }
     if (input.name && typeof input.name === 'string' && input.name.trim()) {
       game.name = input.name.trim();
+    }
+    if (input.whatsappGroupUrl !== undefined) {
+      game.whatsappGroupUrl = typeof input.whatsappGroupUrl === 'string' && input.whatsappGroupUrl.trim() ? input.whatsappGroupUrl.trim() : null;
+    }
+    if (input.isRegistrationOpen !== undefined) {
+      game.isRegistrationOpen = !!input.isRegistrationOpen;
     }
     save(database);
     return json(response, 200, publicGame(game));

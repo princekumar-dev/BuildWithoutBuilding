@@ -8,6 +8,7 @@ import {
 
 import { Button } from './Button'
 import { toast } from './Toast'
+import { WhatsAppGroupCard } from './WhatsAppGroupCard'
 import { SoundFX } from '../../lib/soundEffects'
 import type { Team } from '../../types'
 
@@ -18,6 +19,7 @@ interface CactusWaitingCardProps {
   myTeam?: Team
   gameName: string
   gameCode: string
+  whatsappGroupUrl?: string
 }
 
 const FUN_QUOTES = [
@@ -49,6 +51,7 @@ export function CactusWaitingCard({
   myTeam,
   gameName,
   gameCode,
+  whatsappGroupUrl,
 }: CactusWaitingCardProps) {
   const [copied, setCopied] = useState(false)
   const [quoteIndex, setQuoteIndex] = useState(0)
@@ -936,6 +939,14 @@ export function CactusWaitingCard({
           ) : null}
         </AnimatePresence>
       </motion.div>
+
+      {/* WhatsApp Community Banner for Lobby */}
+      <WhatsAppGroupCard
+        variant="banner"
+        className="w-full max-w-xl mx-auto mb-2 text-left"
+        teamName={myTeam?.name}
+        groupUrl={whatsappGroupUrl}
+      />
 
       {/* Footer Meta */}
       <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-xs text-bwb-muted font-mono pt-2">

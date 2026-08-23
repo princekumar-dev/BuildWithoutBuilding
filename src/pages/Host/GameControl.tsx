@@ -1,7 +1,7 @@
 import { useParams, Link } from 'react-router-dom'
 import { useState, useEffect, useRef } from 'react'
 import {
-  Play, SkipForward, Eye, Lock, AlertTriangle, Users,
+  Play, SkipForward, Eye, Lock, Unlock, AlertTriangle, Users,
   ChevronLeft, Timer, Zap, Shield, Trophy, CheckCircle2,
   ExternalLink, Copy, Trash2, Key, UserCheck, Crown,
   Calendar, Edit3, Clock, Rocket
@@ -19,6 +19,7 @@ import { useGameStore } from '../../store/gameStore'
 import { PHASE_LABELS } from '../../data/mockData'
 import type { GamePhase, Problem } from '../../types'
 import { api } from '../../lib/api'
+import { WhatsAppIcon, OFFICIAL_WHATSAPP_GROUP_URL } from '../../components/ui/WhatsAppGroupCard'
 import { getPhaseDuration, setPhaseDuration, TIMER_CHANGE_EVENT } from '../../lib/phaseTimers'
 import { useRealtimeGame } from '../../hooks/useRealtimeGame'
 
@@ -67,6 +68,10 @@ export default function HostGameControlPage() {
   const [isEditingMaxTeams, setIsEditingMaxTeams] = useState(false)
   const [maxTeamsInput, setMaxTeamsInput] = useState<number>(game.maxTeams || 32)
 
+  // WhatsApp Group URL state
+  const [isEditingWhatsapp, setIsEditingWhatsapp] = useState(false)
+  const [whatsappInput, setWhatsappInput] = useState<string>(game.whatsappGroupUrl || OFFICIAL_WHATSAPP_GROUP_URL)
+
   // Phase Timer Duration editing
   const [isEditingTimer, setIsEditingTimer] = useState(false)
   const [buildMinutes, setBuildMinutes] = useState(15)
@@ -89,7 +94,10 @@ export default function HostGameControlPage() {
     if (game.maxTeams) {
       setMaxTeamsInput(game.maxTeams)
     }
-  }, [game.maxTeams])
+    if (game.whatsappGroupUrl !== undefined) {
+      setWhatsappInput(game.whatsappGroupUrl || OFFICIAL_WHATSAPP_GROUP_URL)
+    }
+  }, [game.maxTeams, game.whatsappGroupUrl])
 
   useEffect(() => {
     if (game.scheduledStartTime) {
@@ -130,6 +138,33 @@ export default function HostGameControlPage() {
     }
   }
 
+  const handleSaveWhatsappUrl = async (urlVal: string) => {
+    if (!game.id) return
+    try {
+      const cleanUrl = urlVal.trim() || null
+      const updated = await api.updateConfig(game.id, { whatsappGroupUrl: cleanUrl })
+      setGame(updated)
+      setIsEditingWhatsapp(false)
+      toast.success('Room WhatsApp Group URL updated successfully!')
+    } catch {
+      toast.error('Unable to update WhatsApp Group URL.')
+    }
+  }
+
+  const handleToggleRegistration = async () => {
+    if (!game.id) return
+    const nextState = game.isRegistrationOpen === false ? true : false
+    try {
+      const updated = await api.toggleRegistration(game.id, nextState)
+      setGame(updated)
+      toast.success(nextState ? 'Team registration is now OPEN for this room!' : 'Team registration has been PAUSED/CLOSED for this room.')
+    } catch {
+      toast.error('Unable to update registration status.')
+    }
+  }
+
+  const currentRound = game.currentRound || (game.isFinalRound ? 3 : 1)
+
   const handleSavePhaseTimers = () => {
     if (!game.id) return
     if (buildMinutes < 1 || buildMinutes > 120) {
@@ -145,7 +180,6 @@ export default function HostGameControlPage() {
     setIsEditingTimer(false)
     toast.success(`Round ${currentRound} timers updated: Build ${buildMinutes}m, Pitch ${pitchSeconds / 60}m.`)
   }
-
 
   useEffect(() => {
     const refreshTimer = () => setTimerRevision((revision) => revision + 1)
@@ -241,7 +275,6 @@ export default function HostGameControlPage() {
     }
   }
 
-  const currentRound = game.currentRound || (game.isFinalRound ? 3 : 1)
   const stages = stagesForRound(currentRound, buildMinutes, pitchSeconds)
   const currentStageIndex = stages.findIndex((s) => s.phase === game.phase)
   const nextStage = currentStageIndex >= 0 && currentStageIndex < stages.length - 1 ? stages[currentStageIndex + 1] : null
@@ -613,6 +646,154 @@ export default function HostGameControlPage() {
                 </motion.div>
               )}
             </AnimatePresence>
+
+            {/* Room WhatsApp Group URL Widget */}
+            <div className="mt-4 pt-4 border-t border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="p-2.5 rounded-xl bg-[#25D366]/15 border border-[#25D366]/30 text-[#25D366] shrink-0">
+                  <WhatsAppIcon className="w-5 h-5" />
+                </div>
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2">
+                    <p className="text-[10px] font-mono uppercase text-bwb-muted font-bold tracking-wider">
+                      Tournament WhatsApp Group Link
+                    </p>
+                    <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[#25D366]/15 text-[#25D366] border border-[#25D366]/30">
+                      Live
+                    </span>
+                  </div>
+                  <p className="text-xs font-mono font-bold text-white/90 truncate mt-0.5 max-w-md">
+                    {game.whatsappGroupUrl || OFFICIAL_WHATSAPP_GROUP_URL}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 shrink-0">
+                <a
+                  href={game.whatsappGroupUrl || OFFICIAL_WHATSAPP_GROUP_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white/80 transition-colors"
+                  title="Open WhatsApp Group in New Tab"
+                >
+                  <ExternalLink size={14} />
+                </a>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={() => setIsEditingWhatsapp(!isEditingWhatsapp)}
+                  className="text-xs border-white/10 justify-center"
+                >
+                  <Edit3 size={13} className="mr-1.5 text-[#25D366]" />
+                  {isEditingWhatsapp ? 'Close Editor' : 'Edit WhatsApp Link'}
+                </Button>
+              </div>
+            </div>
+
+            {/* Inline WhatsApp URL Editor */}
+            <AnimatePresence>
+              {isEditingWhatsapp && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="mt-4 p-4 sm:p-5 rounded-2xl bg-bwb-bg border border-[#25D366]/40 overflow-hidden shadow-2xl"
+                >
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-mono uppercase text-[#25D366] font-bold flex items-center gap-1.5">
+                        <WhatsAppIcon className="w-4 h-4" /> Room WhatsApp Group Invite Link
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => setWhatsappInput(OFFICIAL_WHATSAPP_GROUP_URL)}
+                        className="text-[10px] font-mono font-bold text-bwb-muted hover:text-white underline"
+                      >
+                        Reset to Default
+                      </button>
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+                      <input
+                        type="url"
+                        value={whatsappInput}
+                        onChange={(e) => setWhatsappInput(e.target.value)}
+                        className="flex-1 px-4 py-2.5 rounded-xl bg-bwb-surface border border-bwb-border text-bwb-text text-xs font-mono focus:border-[#25D366] outline-none"
+                        placeholder="https://chat.whatsapp.com/..."
+                      />
+
+                      <Button
+                        size="md"
+                        onClick={() => handleSaveWhatsappUrl(whatsappInput)}
+                        className="text-xs font-bold bg-[#25D366] text-white hover:bg-[#20bd5a] shadow-md shadow-[#25D366]/20 shrink-0 justify-center"
+                      >
+                        <CheckCircle2 size={14} className="mr-1" />
+                        Save WhatsApp Link
+                      </Button>
+                    </div>
+
+                    <p className="text-[11px] text-bwb-muted">
+                      All registered participants in this room will automatically receive this WhatsApp link on registration confirmation and in the lobby.
+                    </p>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Room Team Registration Active Control Widget */}
+            <div className="mt-4 pt-4 border-t border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className={`p-2.5 rounded-xl border shrink-0 ${
+                  game.isRegistrationOpen !== false
+                    ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-400'
+                    : 'bg-rose-500/15 border-rose-500/30 text-rose-400'
+                }`}>
+                  {game.isRegistrationOpen !== false ? <Unlock size={18} /> : <Lock size={18} />}
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <p className="text-[10px] font-mono uppercase text-bwb-muted font-bold tracking-wider">
+                      Live Registration Gateway
+                    </p>
+                    <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border ${
+                      game.isRegistrationOpen !== false
+                        ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/40'
+                        : 'bg-rose-500/15 text-rose-300 border-rose-500/40 animate-pulse'
+                    }`}>
+                      {game.isRegistrationOpen !== false ? '🟢 REGISTRATIONS OPEN' : '🔒 REGISTRATIONS CLOSED'}
+                    </span>
+                  </div>
+                  <p className="text-xs font-mono text-bwb-text mt-0.5">
+                    {game.isRegistrationOpen !== false
+                      ? 'Teams can freely register for this room.'
+                      : 'New team registrations are paused by host. Existing teams can still enter via Passcode.'}
+                  </p>
+                </div>
+              </div>
+
+              <Button
+                size="sm"
+                variant={game.isRegistrationOpen !== false ? 'secondary' : 'primary'}
+                onClick={handleToggleRegistration}
+                className={`text-xs font-bold shrink-0 justify-center ${
+                  game.isRegistrationOpen !== false
+                    ? 'border-rose-500/40 text-rose-300 hover:bg-rose-500/15'
+                    : 'bg-emerald-500 text-bwb-bg hover:bg-emerald-400 shadow-md shadow-emerald-500/20'
+                }`}
+              >
+                {game.isRegistrationOpen !== false ? (
+                  <>
+                    <Lock size={13} className="mr-1.5" />
+                    Pause Registrations
+                  </>
+                ) : (
+                  <>
+                    <Unlock size={13} className="mr-1.5" />
+                    Re-Open Registrations
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
 
           {/* 3-ROUND TOURNAMENT CONTROLLER BAR */}

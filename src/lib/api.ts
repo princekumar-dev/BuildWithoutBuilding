@@ -35,7 +35,7 @@ export const api = {
   judgeLogin: (pin: string) => request<{ token: string }>('/auth/judge/login', { method: 'POST', body: JSON.stringify({ pin }) }),
   listGames: () => request<Game[]>('/games', undefined, true),
   getGame: (idOrCode: string) => request<Game>(`/games/${encodeURIComponent(idOrCode)}`),
-  createGame: (name: string, scheduledStartTime?: string | null, maxTeams?: number) => request<Game>('/games', { method: 'POST', body: JSON.stringify({ name, scheduledStartTime, maxTeams }) }, true),
+  createGame: (name: string, scheduledStartTime?: string | null, maxTeams?: number, whatsappGroupUrl?: string | null, isRegistrationOpen?: boolean) => request<Game>('/games', { method: 'POST', body: JSON.stringify({ name, scheduledStartTime, maxTeams, whatsappGroupUrl, isRegistrationOpen }) }, true),
   deleteGame: (gameId: string) => request<{ ok: boolean }>(`/games/${gameId}`, { method: 'DELETE' }, true),
   getCatalog: () => request<{ technologies: Technology[]; problems: Problem[] }>('/catalog'),
   joinGame: (code: string, input: {
@@ -61,7 +61,8 @@ export const api = {
   setRound: (gameId: string, round: number, phase?: GamePhase) => request<Game>(`/games/${gameId}/round`, { method: 'PATCH', body: JSON.stringify({ round, phase }) }, true),
   setFinalists: (gameId: string, teamIds: string[]) => request<Game>(`/games/${gameId}/finalists`, { method: 'POST', body: JSON.stringify({ teamIds }) }, true),
   updateSchedule: (gameId: string, scheduledStartTime: string | null) => request<Game>(`/games/${gameId}/schedule`, { method: 'PATCH', body: JSON.stringify({ scheduledStartTime }) }, true),
-  updateConfig: (gameId: string, config: { maxTeams?: number; scheduledStartTime?: string | null; name?: string }) => request<Game>(`/games/${gameId}/config`, { method: 'PATCH', body: JSON.stringify(config) }, true),
+  updateConfig: (gameId: string, config: { maxTeams?: number; scheduledStartTime?: string | null; name?: string; whatsappGroupUrl?: string | null; isRegistrationOpen?: boolean }) => request<Game>(`/games/${gameId}/config`, { method: 'PATCH', body: JSON.stringify(config) }, true),
+  toggleRegistration: (gameId: string, isRegistrationOpen: boolean) => request<Game>(`/games/${gameId}/config`, { method: 'PATCH', body: JSON.stringify({ isRegistrationOpen }) }, true),
   setCurrentPitchTeam: (gameId: string, teamId: string | null) => request<Game>(`/games/${gameId}/pitch-team`, { method: 'PATCH', body: JSON.stringify({ teamId }) }, true),
   markTeamPitched: (gameId: string, teamId: string) => request<Game>(`/games/${gameId}/mark-pitched`, { method: 'POST', body: JSON.stringify({ teamId }) }, true),
 }

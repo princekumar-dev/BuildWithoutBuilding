@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import { Plus, Play, Users, Layers, LogOut, Trash2, Copy, CheckCircle2, Sliders, Tv, Clock } from 'lucide-react'
+import { Plus, Play, Users, Layers, LogOut, Trash2, Copy, CheckCircle2, Sliders, Tv, Clock, Lock, Unlock } from 'lucide-react'
 import { PageLayout } from '../../components/layout/PageLayout'
 import { Button } from '../../components/ui/Button'
 import { Badge } from '../../components/ui/Badge'
@@ -10,6 +10,7 @@ import { toast } from '../../components/ui/Toast'
 import { PageTransition, StaggerChildren, StaggerItem } from '../../components/ui/PageTransition'
 import { useCountUp } from '../../hooks/useCountUp'
 import { api } from '../../lib/api'
+import { WhatsAppIcon, OFFICIAL_WHATSAPP_GROUP_URL } from '../../components/ui/WhatsAppGroupCard'
 import type { Game } from '../../types'
 
 function StatCard({ icon: Icon, label, value }: { icon: typeof Play; label: string; value: number }) {
@@ -36,6 +37,8 @@ export default function HostDashboardPage() {
   const [newGameName, setNewGameName] = useState('')
   const [newGameSchedule, setNewGameSchedule] = useState('')
   const [newGameMaxTeams, setNewGameMaxTeams] = useState<number>(32)
+  const [newGameWhatsappUrl, setNewGameWhatsappUrl] = useState(OFFICIAL_WHATSAPP_GROUP_URL)
+  const [newGameRegistrationOpen, setNewGameRegistrationOpen] = useState(true)
   const [creating, setCreating] = useState(false)
   const [deleteTarget, setDeleteTarget] = useState<Game | null>(null)
   const [deleting, setDeleting] = useState(false)
@@ -50,17 +53,36 @@ export default function HostDashboardPage() {
     setCreating(true)
     try {
       const scheduleIso = newGameSchedule ? new Date(newGameSchedule).toISOString() : null
-      const game = await api.createGame(newGameName.trim(), scheduleIso, Number(newGameMaxTeams) || 32)
+      const game = await api.createGame(
+        newGameName.trim(),
+        scheduleIso,
+        Number(newGameMaxTeams) || 32,
+        newGameWhatsappUrl.trim() || undefined,
+        newGameRegistrationOpen
+      )
       toast.success(`Game "${game.name}" created with max ${game.maxTeams || 32} teams!`)
       setShowCreateModal(false)
       setNewGameName('')
       setNewGameSchedule('')
       setNewGameMaxTeams(32)
+      setNewGameWhatsappUrl(OFFICIAL_WHATSAPP_GROUP_URL)
+      setNewGameRegistrationOpen(true)
       navigate(`/host/game/${game.id}`)
     } catch (reason) {
       toast.error(reason instanceof Error ? reason.message : 'Unable to create game.')
     } finally {
       setCreating(false)
+    }
+  }
+
+  const handleToggleRegistration = async (game: Game) => {
+    const nextState = game.isRegistrationOpen === false ? true : false
+    try {
+      const updated = await api.toggleRegistration(game.id, nextState)
+      setGames((prev) => prev.map((g) => (g.id === game.id ? updated : g)))
+      toast.success(nextState ? `Registration OPENED for "${game.name}"!` : `Registration PAUSED/CLOSED for "${game.name}".`)
+    } catch {
+      toast.error('Unable to toggle registration status.')
     }
   }
 
@@ -237,6 +259,30 @@ export default function HostDashboardPage() {
                             <span>{new Date(game.scheduledStartTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                           </div>
                         )}
+
+                        {/* Registration Status Live Pill with Instant Toggle */}
+                        <button
+                          type="button"
+                          onClick={() => handleToggleRegistration(game)}
+                          className={`px-2.5 py-1 rounded-xl border flex items-center gap-1.5 transition-all text-xs font-bold active:scale-95 ${
+                            game.isRegistrationOpen !== false
+                              ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30 hover:bg-emerald-500/25'
+                              : 'bg-rose-500/15 text-rose-300 border-rose-500/30 hover:bg-rose-500/25'
+                          }`}
+                          title={game.isRegistrationOpen !== false ? 'Registration is OPEN (Click to Pause)' : 'Registration is CLOSED (Click to Open)'}
+                        >
+                          {game.isRegistrationOpen !== false ? (
+                            <>
+                              <Unlock size={12} className="text-emerald-400" />
+                              <span>Registration Open</span>
+                            </>
+                          ) : (
+                            <>
+                              <Lock size={12} className="text-rose-400" />
+                              <span>Registration Closed</span>
+                            </>
+                          )}
+                        </button>
                       </div>
 
                       {/* Action Bar (Mobile-first grid & flex) */}
@@ -351,6 +397,49 @@ export default function HostDashboardPage() {
             <p className="text-[11px] text-bwb-muted mt-1">
               Once reached, registration closes and newly arriving teams see a friendly apology card.
             </p>
+          </div>
+
+          <div>
+            <label className="text-xs font-mono uppercase text-bwb-muted font-bold block mb-1.5 flex items-center gap-1.5">
+              <WhatsAppIcon className="w-4 h-4 text-[#25D366]" />
+              WhatsApp Group Invite Link
+            </label>
+            <input
+              type="url"
+              value={newGameWhatsappUrl}
+              onChange={(e) => setNewGameWhatsappUrl(e.target.value)}
+              placeholder="https://chat.whatsapp.com/..."
+              className="w-full px-3.5 py-2.5 rounded-xl bg-bwb-surface border border-bwb-border text-bwb-text text-xs font-mono focus:border-[#25D366] outline-none"
+            />
+            <p className="text-[11px] text-bwb-muted mt-1">
+              Teams who register for this room will see this direct link on their success card &amp; lobby waiting room.
+            </p>
+          </div>
+
+          {/* Registration Status Toggle for New Room */}
+          <div className="p-3.5 rounded-2xl bg-bwb-surface border border-white/10 flex items-center justify-between gap-3">
+            <div>
+              <p className="text-xs font-mono font-bold text-bwb-text">
+                Team Registration Status
+              </p>
+              <p className="text-[11px] text-bwb-muted mt-0.5">
+                {newGameRegistrationOpen
+                  ? 'Accepting new team registrations immediately upon room creation.'
+                  : 'Registrations will start in paused/closed state.'}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setNewGameRegistrationOpen(!newGameRegistrationOpen)}
+              className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold border transition-all flex items-center gap-1.5 shrink-0 ${
+                newGameRegistrationOpen
+                  ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                  : 'bg-rose-500/20 text-rose-300 border-rose-500/40'
+              }`}
+            >
+              {newGameRegistrationOpen ? <Unlock size={13} /> : <Lock size={13} />}
+              <span>{newGameRegistrationOpen ? 'OPEN' : 'CLOSED'}</span>
+            </button>
           </div>
 
           <div className="flex gap-3 justify-end pt-2">

@@ -4,7 +4,7 @@ import {
   Play, SkipForward, Eye, Lock, AlertTriangle, Users,
   ChevronLeft, Timer, Zap, Shield, Trophy, CheckCircle2,
   ExternalLink, Copy, Trash2, Key, UserCheck, Crown,
-  Calendar, Edit3, Clock, ArrowRight, Rocket
+  Calendar, Edit3, Clock, Rocket
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { PageLayout } from '../../components/layout/PageLayout'
@@ -20,30 +20,35 @@ import { PHASE_LABELS } from '../../data/mockData'
 import type { GamePhase, Problem } from '../../types'
 import { api } from '../../lib/api'
 import { getPhaseDuration, setPhaseDuration, TIMER_CHANGE_EVENT } from '../../lib/phaseTimers'
-
 import { useRealtimeGame } from '../../hooks/useRealtimeGame'
 
 const stagesForRound = (round: number, buildMin: number, pitchSec: number) => {
   const buildLabel = buildMin >= 60 ? `${buildMin / 60}h` : `${buildMin}m`
   const pitchLabel = pitchSec >= 60 ? `${pitchSec / 60}m` : `${pitchSec}s`
   if (round === 1) return [
-    { phase: 'LOBBY' as GamePhase, title: 'Lobby', desc: 'Waiting for teams to join', icon: '🚪' },
+    { phase: 'LOBBY' as GamePhase, title: 'Lobby', desc: 'Squad check-in & readiness', icon: '🚪' },
     { phase: 'PROBLEM_REVEAL' as GamePhase, title: 'Problem Reveal', desc: 'Teams select 1 of 8 challenges', icon: '💡' },
-    { phase: 'CARD_REVEAL' as GamePhase, title: 'Card Reveal', desc: 'Teams draft 3 random tech cards', icon: '🎴' },
-    { phase: 'BUILDING' as GamePhase, title: 'Build Phase', desc: `${buildLabel} Solution Formulation`, icon: '⚡' },
-    { phase: 'PITCHING' as GamePhase, title: 'Pitching', desc: `${pitchLabel} live pitches & defense`, icon: '🎤' },
-    { phase: 'JUDGING' as GamePhase, title: 'Judging', desc: 'Deliberation & rubric scoring', icon: '⚖️' },
-    { phase: 'LEADERBOARD' as GamePhase, title: 'Leaderboard', desc: 'Rank reveal & podium honors', icon: '🏆' },
+    { phase: 'CARD_REVEAL' as GamePhase, title: 'Card Reveal', desc: 'Teams draft 3 surprise tech cards', icon: '🎴' },
+    { phase: 'BUILDING' as GamePhase, title: 'Build Phase', desc: `${buildLabel} Problem & Existing Landscape (100 M)`, icon: '⚡' },
+    { phase: 'PITCHING' as GamePhase, title: 'Pitching', desc: `${pitchLabel} Problem Understanding & Landscape`, icon: '🎤' },
+    { phase: 'JUDGING' as GamePhase, title: 'Judging', desc: '100-mark problem evaluation', icon: '⚖️' },
+    { phase: 'LEADERBOARD' as GamePhase, title: 'Leaderboard', desc: 'Zero elimination · All advance to R2', icon: '🏆' },
+  ]
+  if (round === 2) return [
+    { phase: 'LOBBY' as GamePhase, title: 'Round 2 Lobby', desc: 'Briefing for Solution Enhancement', icon: '🚪' },
+    { phase: 'BUILDING' as GamePhase, title: 'Build Phase', desc: `${buildLabel} Solution Enhancement & Tech (100 M)`, icon: '⚡' },
+    { phase: 'PITCHING' as GamePhase, title: 'Pitching', desc: `${pitchLabel} Enhanced Architecture & Ideation`, icon: '🎤' },
+    { phase: 'JUDGING' as GamePhase, title: 'Judging', desc: '100-mark solution evaluation', icon: '⚖️' },
+    { phase: 'LEADERBOARD' as GamePhase, title: 'Leaderboard', desc: 'Top 8 squads qualify for Finals', icon: '🏆' },
   ]
   return [
-    { phase: 'LOBBY' as GamePhase, title: 'Round Lobby', desc: 'Announce the round and confirm eligible teams', icon: '🚪' },
-    { phase: 'BUILDING' as GamePhase, title: 'Build Phase', desc: `${buildLabel} solution formulation`, icon: '⚡' },
-    { phase: 'PITCHING' as GamePhase, title: 'Pitching', desc: `${pitchLabel} live pitches & defense`, icon: '🎤' },
-    { phase: 'JUDGING' as GamePhase, title: 'Judging', desc: 'Deliberation and rubric scoring', icon: '⚖️' },
-    { phase: 'LEADERBOARD' as GamePhase, title: 'Leaderboard', desc: 'Round standings and advancement', icon: '🏆' },
+    { phase: 'LOBBY' as GamePhase, title: 'Finals Lobby', desc: 'Top 8 Finalists Stage Prep', icon: '🚪' },
+    { phase: 'BUILDING' as GamePhase, title: 'Master Polish', desc: `${buildLabel} Master Architecture Refinement`, icon: '⚡' },
+    { phase: 'PITCHING' as GamePhase, title: 'Grand Pitch', desc: `${pitchLabel} Master Pitch & Live Q&A Defense`, icon: '🎤' },
+    { phase: 'JUDGING' as GamePhase, title: 'Final Judging', desc: 'Podium rank evaluation', icon: '⚖️' },
+    { phase: 'LEADERBOARD' as GamePhase, title: 'Prize Podium', desc: 'Top 4 winners crowned on podium', icon: '🏆' },
   ]
 }
-
 
 export default function HostGameControlPage() {
   const { gameId } = useParams()
@@ -168,6 +173,7 @@ export default function HostGameControlPage() {
     }
   }
 
+
   const assignCards = async () => {
     if (!game.id) return
     try {
@@ -265,25 +271,24 @@ export default function HostGameControlPage() {
 
   return (
     <PageLayout fullWidth className="host-mobile-view">
-      <div className="max-w-7xl mx-auto px-3 sm:px-6 py-4 sm:py-6">
+      <PageTransition className="max-w-7xl mx-auto px-3 sm:px-6 py-4 sm:py-6 pb-28 sm:pb-12">
         {/* Top Breadcrumb & Quick Action Buttons */}
-        <PageTransition>
-          <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5 sm:mb-6">
             <Link
               to="/host/dashboard"
-              className="inline-flex items-center gap-1.5 text-xs text-bwb-muted hover:text-bwb-accent transition-colors font-medium"
+              className="inline-flex items-center gap-1.5 text-xs text-bwb-muted hover:text-bwb-accent transition-colors font-medium py-1"
             >
               <ChevronLeft size={16} /> Back to Host Dashboard
             </Link>
 
-            <div className="flex items-center gap-2">
-              <Link to="/projector" target="_blank" rel="noreferrer">
-                <Button variant="secondary" size="sm" className="glass border border-bwb-accent/30">
+            <div className="grid grid-cols-2 sm:flex items-center gap-2 w-full sm:w-auto">
+              <Link to="/projector" target="_blank" rel="noreferrer" className="w-full sm:w-auto">
+                <Button variant="secondary" size="sm" className="w-full sm:w-auto glass border border-bwb-accent/30 text-xs justify-center">
                   <ExternalLink size={14} className="mr-1 text-bwb-accent" /> Open Projector Screen
                 </Button>
               </Link>
-              <Link to="/host/round">
-                <Button variant="ghost" size="sm">
+              <Link to="/host/round" className="w-full sm:w-auto">
+                <Button variant="ghost" size="sm" className="w-full sm:w-auto text-xs justify-center border border-white/5">
                   <Eye size={14} className="mr-1" /> Participants
                 </Button>
               </Link>
@@ -291,37 +296,37 @@ export default function HostGameControlPage() {
           </div>
 
           {/* Hero Header HUD */}
-          <div className="stereo-card rounded-3xl p-6 sm:p-8 mb-8 relative overflow-hidden border border-bwb-border">
-            <div className="flex flex-wrap items-start justify-between gap-6">
-              <div>
-                <div className="flex items-center gap-3 mb-2 flex-wrap">
-                  <h1 className="font-display text-3xl sm:text-4xl font-black tracking-tight text-bwb-text">
+          <div className="stereo-card rounded-3xl p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8 relative overflow-hidden border border-bwb-border">
+            <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 sm:gap-6">
+              <div className="space-y-3">
+                <div className="flex items-center gap-2.5 flex-wrap">
+                  <h1 className="font-display text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-bwb-text break-words">
                     {game.name}
                   </h1>
                   <PhaseIndicator phase={game.phase} />
                 </div>
 
-                <div className="flex items-center gap-3 text-sm text-bwb-muted">
-                  <span>Room PIN:</span>
+                <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs sm:text-sm text-bwb-muted">
+                  <span className="font-medium">Room PIN:</span>
                   <button
                     type="button"
                     onClick={copyCode}
-                    className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-bwb-surface-2 border border-bwb-accent/40 font-mono text-bwb-accent font-bold hover:bg-bwb-accent/10 transition-all"
+                    className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-bwb-surface-2 border border-bwb-accent/40 font-mono text-bwb-accent font-bold hover:bg-bwb-accent/10 transition-all text-xs"
                   >
                     <span>{game.code}</span>
                     <Copy size={13} className={copied ? 'text-bwb-success' : 'text-bwb-muted'} />
                   </button>
-                  <span>·</span>
-                  <span><strong>{game.teams.length}</strong> Teams ({totalParticipants} Players)</span>
+                  <span className="text-white/20">·</span>
+                  <span><strong className="text-bwb-text">{game.teams.length}</strong> Teams ({totalParticipants} Players)</span>
                 </div>
               </div>
 
-              {/* Countdown timer is tied to the active timed phase. */}
-              <div className="flex items-center gap-4 bg-bwb-surface-2/80 p-3.5 rounded-2xl border border-white/5 shadow-inner">
+              {/* Countdown timer HUD */}
+              <div className="flex items-center justify-between sm:justify-start gap-4 bg-bwb-surface-2/90 p-3 sm:p-3.5 rounded-2xl border border-white/5 shadow-inner">
                 <div className={`p-2.5 rounded-xl border ${phaseTimer ? 'bg-bwb-accent/10 border-bwb-accent/30 text-bwb-accent' : 'bg-bwb-surface border-bwb-border text-bwb-muted'}`}>
                   <Timer size={20} />
                 </div>
-                <div>
+                <div className="text-right sm:text-left">
                   <p className="text-[10px] uppercase font-bold tracking-widest text-bwb-muted">{phaseTimer?.label ?? 'Stage Timer'}</p>
                   {phaseTimer ? (
                     <CountdownTimer
@@ -343,9 +348,9 @@ export default function HostGameControlPage() {
             </div>
 
             {/* Scheduled Event Date & Time Widget */}
-            <div className="mt-6 pt-5 border-t border-white/5 flex flex-wrap items-center justify-between gap-4">
+            <div className="mt-5 pt-4 sm:mt-6 sm:pt-5 border-t border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-xl bg-amber-400/10 border border-amber-400/20 text-amber-400">
+                <div className="p-2.5 rounded-xl bg-amber-400/10 border border-amber-400/20 text-amber-400 shrink-0">
                   <Calendar size={18} />
                 </div>
                 <div>
@@ -370,12 +375,12 @@ export default function HostGameControlPage() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 w-full sm:w-auto">
                 <Button
                   size="sm"
                   variant="secondary"
                   onClick={() => setIsEditingSchedule(!isEditingSchedule)}
-                  className="text-xs border-white/10"
+                  className="w-full sm:w-auto text-xs border-white/10 justify-center"
                 >
                   <Edit3 size={13} className="mr-1.5 text-amber-400" />
                   {isEditingSchedule ? 'Close Editor' : game.scheduledStartTime ? 'Edit Schedule' : 'Schedule Event Date & Time'}
@@ -390,10 +395,10 @@ export default function HostGameControlPage() {
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
                   exit={{ opacity: 0, height: 0 }}
-                  className="mt-4 p-5 rounded-2xl bg-bwb-bg border border-amber-400/40 overflow-hidden shadow-2xl"
+                  className="mt-4 p-4 sm:p-5 rounded-2xl bg-bwb-bg border border-amber-400/40 overflow-hidden shadow-2xl"
                 >
-                  <div className="flex flex-wrap items-end gap-3 mb-4">
-                    <div className="flex-1 min-w-0 sm:min-w-[280px]">
+                  <div className="flex flex-col sm:flex-row sm:items-end gap-3 mb-4">
+                    <div className="flex-1 min-w-0">
                       <label className="text-xs font-mono uppercase text-amber-400 font-bold block mb-1.5 flex items-center gap-1.5">
                         <Calendar size={13} /> Select Tournament Date & Time
                       </label>
@@ -404,12 +409,12 @@ export default function HostGameControlPage() {
                           value={scheduledDateTime}
                           onChange={(e) => setScheduledDateTime(e.target.value)}
                           style={{ colorScheme: 'dark' }}
-                          className="w-full px-4 py-2.5 rounded-xl bg-bwb-surface border border-bwb-border text-bwb-text text-sm font-mono focus:border-amber-400 outline-none cursor-pointer"
+                          className="w-full px-3.5 py-2.5 rounded-xl bg-bwb-surface border border-bwb-border text-bwb-text text-xs sm:text-sm font-mono focus:border-amber-400 outline-none cursor-pointer"
                         />
                         <button
                           type="button"
                           onClick={() => dateInputRef.current?.showPicker?.()}
-                          className="absolute right-2 px-3 py-1 rounded-lg bg-amber-400/15 text-amber-300 hover:bg-amber-400/25 text-xs font-mono font-bold flex items-center gap-1 transition-colors border border-amber-400/30"
+                          className="hidden sm:flex absolute right-2 px-3 py-1 rounded-lg bg-amber-400/15 text-amber-300 hover:bg-amber-400/25 text-xs font-mono font-bold items-center gap-1 transition-colors border border-amber-400/30"
                         >
                           <Calendar size={13} />
                           <span>Open Calendar</span>
@@ -422,7 +427,7 @@ export default function HostGameControlPage() {
                         size="md"
                         disabled={!scheduledDateTime}
                         onClick={() => handleSaveSchedule(scheduledDateTime)}
-                        className="text-xs font-bold bg-amber-400 text-bwb-bg hover:bg-amber-300 shadow-md"
+                        className="flex-1 sm:flex-initial text-xs font-bold bg-amber-400 text-bwb-bg hover:bg-amber-300 shadow-md justify-center"
                       >
                         <CheckCircle2 size={14} className="mr-1" />
                         Save Schedule
@@ -445,7 +450,7 @@ export default function HostGameControlPage() {
                     <p className="text-[10px] font-mono uppercase text-bwb-muted font-bold mb-2">
                       1-Click Quick Presets:
                     </p>
-                    <div className="flex flex-wrap items-center gap-2">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                       <button
                         type="button"
                         onClick={() => {
@@ -453,7 +458,7 @@ export default function HostGameControlPage() {
                           const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16)
                           setScheduledDateTime(local)
                         }}
-                        className="px-3 py-1.5 rounded-xl text-xs font-mono bg-bwb-surface border border-white/10 text-bwb-text hover:text-amber-400 hover:border-amber-400/40 transition-all flex items-center gap-1"
+                        className="px-2.5 py-1.5 rounded-xl text-[11px] sm:text-xs font-mono bg-bwb-surface border border-white/10 text-bwb-text hover:text-amber-400 hover:border-amber-400/40 transition-all flex items-center justify-center gap-1"
                       >
                         <Clock size={11} className="text-amber-400" /> +15 Mins
                       </button>
@@ -464,7 +469,7 @@ export default function HostGameControlPage() {
                           const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16)
                           setScheduledDateTime(local)
                         }}
-                        className="px-3 py-1.5 rounded-xl text-xs font-mono bg-bwb-surface border border-white/10 text-bwb-text hover:text-amber-400 hover:border-amber-400/40 transition-all flex items-center gap-1"
+                        className="px-2.5 py-1.5 rounded-xl text-[11px] sm:text-xs font-mono bg-bwb-surface border border-white/10 text-bwb-text hover:text-amber-400 hover:border-amber-400/40 transition-all flex items-center justify-center gap-1"
                       >
                         <Clock size={11} className="text-amber-400" /> +1 Hour
                       </button>
@@ -477,9 +482,9 @@ export default function HostGameControlPage() {
                           const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16)
                           setScheduledDateTime(local)
                         }}
-                        className="px-3 py-1.5 rounded-xl text-xs font-mono bg-bwb-surface border border-white/10 text-bwb-text hover:text-amber-400 hover:border-amber-400/40 transition-all flex items-center gap-1"
+                        className="px-2.5 py-1.5 rounded-xl text-[11px] sm:text-xs font-mono bg-bwb-surface border border-white/10 text-bwb-text hover:text-amber-400 hover:border-amber-400/40 transition-all flex items-center justify-center gap-1 truncate"
                       >
-                        <Calendar size={11} className="text-amber-400" /> Today Evening (6 PM)
+                        <Calendar size={11} className="text-amber-400 shrink-0" /> <span className="truncate">Today 6 PM</span>
                       </button>
                       <button
                         type="button"
@@ -490,9 +495,9 @@ export default function HostGameControlPage() {
                           const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16)
                           setScheduledDateTime(local)
                         }}
-                        className="px-3 py-1.5 rounded-xl text-xs font-mono bg-bwb-surface border border-white/10 text-bwb-text hover:text-amber-400 hover:border-amber-400/40 transition-all flex items-center gap-1"
+                        className="px-2.5 py-1.5 rounded-xl text-[11px] sm:text-xs font-mono bg-bwb-surface border border-white/10 text-bwb-text hover:text-amber-400 hover:border-amber-400/40 transition-all flex items-center justify-center gap-1 truncate"
                       >
-                        <Calendar size={11} className="text-amber-400" /> Tomorrow 10:00 AM
+                        <Calendar size={11} className="text-amber-400 shrink-0" /> <span className="truncate">Tomorrow 10 AM</span>
                       </button>
                     </div>
                   </div>
@@ -501,10 +506,9 @@ export default function HostGameControlPage() {
             </AnimatePresence>
 
             {/* Max Team Registration Capacity Limit Widget */}
-            <div className="mt-4 pt-4 border-t border-white/5 flex flex-wrap items-center justify-between gap-4">
-
+            <div className="mt-4 pt-4 border-t border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-xl bg-cyan-400/10 border border-cyan-400/20 text-cyan-400">
+                <div className="p-2.5 rounded-xl bg-cyan-400/10 border border-cyan-400/20 text-cyan-400 shrink-0">
                   <Users size={18} />
                 </div>
                 <div>
@@ -531,12 +535,12 @@ export default function HostGameControlPage() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 w-full sm:w-auto">
                 <Button
                   size="sm"
                   variant="secondary"
                   onClick={() => setIsEditingMaxTeams(!isEditingMaxTeams)}
-                  className="text-xs border-white/10"
+                  className="w-full sm:w-auto text-xs border-white/10 justify-center"
                 >
                   <Edit3 size={13} className="mr-1.5 text-cyan-400" />
                   {isEditingMaxTeams ? 'Close Quota Editor' : 'Adjust Max Team Limit'}
@@ -551,7 +555,7 @@ export default function HostGameControlPage() {
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
                   exit={{ opacity: 0, height: 0 }}
-                  className="mt-4 p-5 rounded-2xl bg-bwb-bg border border-cyan-400/40 overflow-hidden shadow-2xl"
+                  className="mt-4 p-4 sm:p-5 rounded-2xl bg-bwb-bg border border-cyan-400/40 overflow-hidden shadow-2xl"
                 >
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
@@ -581,7 +585,7 @@ export default function HostGameControlPage() {
                       ))}
                     </div>
 
-                    <div className="flex items-center gap-3 pt-1">
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 pt-1">
                       <input
                         type="number"
                         min={2}
@@ -595,7 +599,7 @@ export default function HostGameControlPage() {
                       <Button
                         size="md"
                         onClick={() => handleSaveMaxTeams(maxTeamsInput)}
-                        className="text-xs font-bold bg-cyan-400 text-bwb-bg hover:bg-cyan-300 shadow-md shrink-0"
+                        className="text-xs font-bold bg-cyan-400 text-bwb-bg hover:bg-cyan-300 shadow-md shrink-0 justify-center"
                       >
                         <CheckCircle2 size={14} className="mr-1" />
                         Save Team Limit
@@ -608,24 +612,17 @@ export default function HostGameControlPage() {
                   </div>
                 </motion.div>
               )}
-              </AnimatePresence>
-            </div>
-        </PageTransition>
+            </AnimatePresence>
+          </div>
 
-
-
-
-
-        <PageTransition delay={0.1}>
           {/* 3-ROUND TOURNAMENT CONTROLLER BAR */}
-          <div className="stereo-card rounded-3xl p-5 sm:p-6 mb-8 border border-purple-500/30 bg-gradient-to-r from-purple-950/30 via-bwb-surface to-bwb-surface">
-
+          <div className="stereo-card rounded-3xl p-4 sm:p-6 mb-6 sm:mb-8 border border-purple-500/30 bg-gradient-to-r from-purple-950/30 via-bwb-surface to-bwb-surface">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4 pb-3 border-b border-white/5">
               <div>
                 <span className="text-[10px] font-mono uppercase tracking-widest text-purple-300 font-bold">
                   TOURNAMENT FLOW CONTROLLER
                 </span>
-                <h2 className="font-display font-black text-xl text-bwb-text flex items-center gap-2">
+                <h2 className="font-display font-black text-lg sm:text-xl text-bwb-text flex items-center gap-2 flex-wrap mt-0.5">
                   <span>Current: Round {currentRound}</span>
                   <Badge variant="accent">
                     {currentRound === 1 ? 'Open Qualifier' : currentRound === 2 ? 'Problem Showdown (8x2)' : 'Grand Finals (Top 8)'}
@@ -634,48 +631,50 @@ export default function HostGameControlPage() {
               </div>
 
               {/* Round Navigation Buttons */}
-              <div className="flex items-center gap-2 flex-wrap">
-                <button
-                  type="button"
-                  onClick={() => handleSetRound(1)}
-                  className={`px-3.5 py-2 rounded-xl text-xs font-mono font-bold border transition-all ${
-                    currentRound === 1
-                      ? 'bg-purple-600 text-white border-purple-400 shadow-lg shadow-purple-600/30'
-                      : 'bg-bwb-surface-2 text-bwb-muted hover:text-bwb-text border-white/5'
-                  }`}
-                >
-                  Round 1 (Open)
-                </button>
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full md:w-auto">
+                <div className="grid grid-cols-3 gap-2 w-full md:w-auto">
+                  <button
+                    type="button"
+                    onClick={() => handleSetRound(1)}
+                    className={`py-2 px-2.5 rounded-xl text-xs font-mono font-bold border transition-all text-center ${
+                      currentRound === 1
+                        ? 'bg-purple-600 text-white border-purple-400 shadow-lg shadow-purple-600/30'
+                        : 'bg-bwb-surface-2 text-bwb-muted hover:text-bwb-text border-white/5'
+                    }`}
+                  >
+                    Round 1 (Open)
+                  </button>
 
-                <button
-                  type="button"
-                  onClick={() => handleSetRound(2)}
-                  className={`px-3.5 py-2 rounded-xl text-xs font-mono font-bold border transition-all ${
-                    currentRound === 2
-                      ? 'bg-purple-600 text-white border-purple-400 shadow-lg shadow-purple-600/30'
-                      : 'bg-bwb-surface-2 text-bwb-muted hover:text-bwb-text border-white/5'
-                  }`}
-                >
-                  Round 2 (8×2 Showdown)
-                </button>
+                  <button
+                    type="button"
+                    onClick={() => handleSetRound(2)}
+                    className={`py-2 px-2 rounded-xl text-xs font-mono font-bold border transition-all text-center ${
+                      currentRound === 2
+                        ? 'bg-purple-600 text-white border-purple-400 shadow-lg shadow-purple-600/30'
+                        : 'bg-bwb-surface-2 text-bwb-muted hover:text-bwb-text border-white/5'
+                    }`}
+                  >
+                    Round 2 (8×2)
+                  </button>
 
-                <button
-                  type="button"
-                  onClick={() => handleSetRound(3)}
-                  className={`px-3.5 py-2 rounded-xl text-xs font-mono font-bold border transition-all ${
-                    currentRound === 3
-                      ? 'bg-purple-600 text-white border-purple-400 shadow-lg shadow-purple-600/30'
-                      : 'bg-bwb-surface-2 text-bwb-muted hover:text-bwb-text border-white/5'
-                  }`}
-                >
-                  Round 3 (Grand Finals)
-                </button>
+                  <button
+                    type="button"
+                    onClick={() => handleSetRound(3)}
+                    className={`py-2 px-2.5 rounded-xl text-xs font-mono font-bold border transition-all text-center ${
+                      currentRound === 3
+                        ? 'bg-purple-600 text-white border-purple-400 shadow-lg shadow-purple-600/30'
+                        : 'bg-bwb-surface-2 text-bwb-muted hover:text-bwb-text border-white/5'
+                    }`}
+                  >
+                    Round 3 (Finals)
+                  </button>
+                </div>
 
                 {currentRound === 2 && (
                   <Button
                     size="sm"
                     onClick={handleAdvanceTop8ToFinals}
-                    className="bg-amber-400 hover:bg-amber-300 text-bwb-bg font-black text-xs shadow-md ml-2"
+                    className="w-full md:w-auto bg-amber-400 hover:bg-amber-300 text-bwb-bg font-black text-xs shadow-md justify-center"
                   >
                     <Trophy size={13} className="mr-1" />
                     Lock Top 8 & Start Finals
@@ -685,9 +684,9 @@ export default function HostGameControlPage() {
             </div>
 
             {/* Phase Timer Duration Controls */}
-            <div className="mt-4 pt-4 border-t border-white/5 flex flex-wrap items-center justify-between gap-4">
+            <div className="mt-4 pt-4 border-t border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-xl bg-bwb-accent/10 border border-bwb-accent/20 text-bwb-accent">
+                <div className="p-2.5 rounded-xl bg-bwb-accent/10 border border-bwb-accent/20 text-bwb-accent shrink-0">
                   <Timer size={18} />
                 </div>
                 <div>
@@ -705,7 +704,7 @@ export default function HostGameControlPage() {
                 size="sm"
                 variant="secondary"
                 onClick={() => setIsEditingTimer(!isEditingTimer)}
-                className="text-xs border-white/10"
+                className="w-full sm:w-auto text-xs border-white/10 justify-center"
               >
                 <Edit3 size={13} className="mr-1.5 text-bwb-accent" />
                 {isEditingTimer ? 'Close Timer Editor' : 'Edit Phase Timers'}
@@ -719,7 +718,7 @@ export default function HostGameControlPage() {
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
                   exit={{ opacity: 0, height: 0 }}
-                  className="mt-4 p-5 rounded-2xl bg-bwb-bg border border-bwb-accent/40 overflow-hidden shadow-2xl"
+                  className="mt-4 p-4 sm:p-5 rounded-2xl bg-bwb-bg border border-bwb-accent/40 overflow-hidden shadow-2xl"
                 >
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                     <div>
@@ -788,16 +787,16 @@ export default function HostGameControlPage() {
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 pt-2 border-t border-white/5">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-2 pt-2 border-t border-white/5">
                     <Button
                       size="md"
                       onClick={handleSavePhaseTimers}
-                      className="text-xs font-bold bg-bwb-accent text-bwb-bg hover:bg-bwb-accent/90 shadow-md"
+                      className="w-full sm:w-auto text-xs font-bold bg-bwb-accent text-bwb-bg hover:bg-bwb-accent/90 shadow-md justify-center"
                     >
                       <CheckCircle2 size={14} className="mr-1" />
                       Save Timer Settings for Round {currentRound}
                     </Button>
-                    <p className="text-[11px] text-bwb-muted ml-2">
+                    <p className="text-[11px] text-bwb-muted sm:ml-2">
                       Settings apply per-round and take effect on next phase start.
                     </p>
                   </div>
@@ -813,30 +812,29 @@ export default function HostGameControlPage() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
                 transition={{ duration: 0.25 }}
-                className="mt-4 p-4 sm:p-5 rounded-2xl bg-bwb-bg/90 border border-purple-500/40 shadow-xl space-y-3"
+                className="mt-4 p-3.5 sm:p-5 rounded-2xl bg-bwb-bg/90 border border-purple-500/40 shadow-xl space-y-2.5"
               >
                 {/* Round 1 Mission Briefing */}
                 {currentRound === 1 && (
                   <div>
                     <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-wrap items-center gap-2">
                         <span className="px-2.5 py-0.5 rounded-lg bg-purple-500/20 text-purple-300 font-mono text-xs font-bold border border-purple-500/30 flex items-center gap-1.5">
                           <Rocket size={13} className="text-purple-400" />
-                          <span>ROUND 1: OPEN QUALIFIER ACTIVATED</span>
+                          <span>ROUND 1: PROBLEM UNDERSTANDING & LANDSCAPE (100 MARKS)</span>
                         </span>
                         <span className="text-[11px] font-mono text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">
-                          🛡️ Zero Elimination
+                          🛡️ Zero Elimination · All Advance
                         </span>
                       </div>
-                      <span className="text-xs font-mono text-bwb-muted">
-                        All {game.teams.length} Squads Active
+                      <span className="text-xs font-mono text-bwb-muted font-bold">
+                        100 Marks Evaluation
                       </span>
                     </div>
 
                     <p className="text-xs text-bwb-text/90 leading-relaxed">
-                      All squads participate in Round 1 with zero elimination. Use this round to calibrate team pitching dynamics, draft surprise tech cards, and formulate a 15-minute system architecture pitch. All teams advance into Round 2.
+                      Teams select 1 of 8 problem statements and draft 3 surprise frontier tech cards. In the build and pitch stages, squads must present <strong>how clearly they understand the problem root causes, market pain points, and existing solution limitations</strong>. Judges evaluate this for <strong>100 marks</strong>. All squads advance directly into Round 2.
                     </p>
-
                   </div>
                 )}
 
@@ -844,24 +842,23 @@ export default function HostGameControlPage() {
                 {currentRound === 2 && (
                   <div>
                     <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-wrap items-center gap-2">
                         <span className="px-2.5 py-0.5 rounded-lg bg-cyan-500/20 text-cyan-300 font-mono text-xs font-bold border border-cyan-500/30 flex items-center gap-1.5">
                           <Zap size={13} className="text-cyan-400" />
-                          <span>ROUND 2: 8×2 PROBLEM SHOWDOWN ACTIVATED</span>
+                          <span>ROUND 2: SOLUTION ENHANCEMENT & ARCHITECTURE (100 MARKS)</span>
                         </span>
                         <span className="text-[11px] font-mono text-amber-300 font-bold bg-amber-500/10 px-2 py-0.5 rounded-md border border-amber-500/20">
                           ⚡ Top 8 Advance to Finals
                         </span>
                       </div>
-                      <span className="text-xs font-mono text-bwb-muted">
-                        Max 16 Teams (2 per Challenge)
+                      <span className="text-xs font-mono text-bwb-muted font-bold">
+                        100 Marks Evaluation
                       </span>
                     </div>
 
                     <p className="text-xs text-bwb-text/90 leading-relaxed">
-                      8 real-world challenge domains with strict maximum 2 teams per statement. Teams draft surprise tech cards and pitch live architecture defense. After judging, the <strong>Top 8 highest-scoring squads</strong> qualify for the Grand Finals!
+                      Squads present <strong>how they are going to enhance their solution, integrate their 3 surprise frontier tech cards, and deliver novel system architecture and ideation</strong>. Judges evaluate the enhanced architecture for <strong>100 marks</strong>. The <strong>Top 8 highest-scoring squads</strong> qualify for the Grand Finals (Round 3)!
                     </p>
-
                   </div>
                 )}
 
@@ -869,24 +866,23 @@ export default function HostGameControlPage() {
                 {currentRound === 3 && (
                   <div>
                     <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-wrap items-center gap-2">
                         <span className="px-2.5 py-0.5 rounded-lg bg-amber-500/20 text-amber-300 font-mono text-xs font-bold border border-amber-500/30 flex items-center gap-1.5">
                           <Crown size={13} className="text-amber-400" />
-                          <span>ROUND 3: GRAND FINALS & PRIZE PODIUM ACTIVATED</span>
+                          <span>ROUND 3: GRAND FINALS & MASTER PITCH DEFENSE</span>
                         </span>
                         <span className="text-[11px] font-mono text-amber-300 font-bold bg-amber-500/10 px-2 py-0.5 rounded-md border border-amber-500/20">
-                          🏆 Top 4 Prized on Podium
+                          🏆 Top 4 Crowned on Podium
                         </span>
                       </div>
-                      <span className="text-xs font-mono text-bwb-muted">
-                        Top 8 Finalist Squads
+                      <span className="text-xs font-mono text-bwb-muted font-bold">
+                        Top 8 Finalists
                       </span>
                     </div>
 
                     <p className="text-xs text-bwb-text/90 leading-relaxed">
-                      The Top 8 Finalist squads pitch their master systems live on stage in front of the judges! The Top 4 squads are awarded championship honors: <strong>1st Place Champion, 2nd Place Runner-Up, and Dual 3rd Place Bronze Winners</strong>!
+                      The Top 8 Finalist squads deliver their <strong>final refined master system pitch</strong> live on stage and defend their architecture against judge cross-examination. The <strong>Top 4 winning squads are crowned on the championship podium</strong>: 🥇 1st Place Champion, 🥈 2nd Place Runner-Up, and 🥉 Dual 3rd Place Bronze Winners (2 teams)!
                     </p>
-
                   </div>
                 )}
               </motion.div>
@@ -923,177 +919,100 @@ export default function HostGameControlPage() {
                 </div>
               </div>
             )}
+
             {/* Stage Progression Pipeline / Interactive Stepper */}
             <div className="mt-6 pt-5 border-t border-white/10">
-            <div className="flex flex-wrap items-center justify-between gap-4 mb-5 pb-3 border-b border-white/5">
-              <div>
-                <h2 className="font-display font-bold text-lg text-bwb-text flex items-center gap-2">
-                  <Zap size={18} className="text-bwb-accent" /> Round {currentRound} Stage Flow
-                </h2>
-                <p className="text-xs text-bwb-muted mt-0.5">
-                  Click any stage to transition the entire room (player screens & projector auto-update)
-                </p>
-              </div>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 pb-3 border-b border-white/5">
+                <div>
+                  <h2 className="font-display font-bold text-base sm:text-lg text-bwb-text flex items-center gap-2">
+                    <Zap size={18} className="text-bwb-accent" /> Round {currentRound} Stage Flow
+                  </h2>
+                  <p className="text-xs text-bwb-muted mt-0.5">
+                    Click any stage to transition the room (player screens & projector auto-update)
+                  </p>
+                </div>
 
-              {/* Advance CTA */}
-              {(nextStage || game.phase === 'LEADERBOARD') && (
-                <Button
-                  size="md"
-                  onClick={advanceStage}
-                  disabled={game.phase === 'JUDGING' && !allTeamsScored}
-                  className={`glow-accent shadow-lg shadow-bwb-accent/20 ${game.phase === 'JUDGING' && !allTeamsScored ? 'opacity-50 cursor-not-allowed' : ''}`}
-                >
-                  <Play size={15} className="mr-1.5" />
-                  {game.phase === 'JUDGING' && !allTeamsScored
-                    ? `Waiting for Scores (${scoredCount}/${game.teams.length})`
-                    : nextStage ? `Advance to: ${nextStage.title}` : currentRound === 1 ? 'Start Round 2 Lobby' : currentRound === 2 ? 'Lock Top 8 & Start Round 3 Lobby' : 'Reveal Final Results'
-                  }
-                </Button>
-              )}
-            </div>
-
-            {/* Stepper Pipeline Grid */}
-            {(() => {
-              const visibleStages = stages
-              const colCount = visibleStages.length
-              const gridClass = colCount <= 4
-                ? 'grid-cols-2 sm:grid-cols-4'
-                : colCount === 5
-                ? 'grid-cols-3 sm:grid-cols-5'
-                : 'grid-cols-3 sm:grid-cols-5 lg:grid-cols-7'
-              return (
-                <div className={`grid gap-2.5 ${gridClass}`}>
-                  {visibleStages.map((stg, idx) => {
-                const isActive = game.phase === stg.phase
-                return (
-                  <motion.button
-                    key={stg.phase}
-                    type="button"
-                    onClick={() => changePhase(stg.phase)}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className={`p-2.5 sm:p-3.5 rounded-2xl border text-left transition-all relative flex flex-col justify-between min-h-[80px] sm:min-h-[105px] ${
-                      isActive
-                        ? 'bg-bwb-accent text-bwb-bg font-bold shadow-xl shadow-bwb-accent/25 border-bwb-accent ring-2 ring-bwb-accent/40'
-                        : 'bg-bwb-surface-2/80 text-bwb-muted hover:text-bwb-text border-bwb-border hover:border-bwb-accent/40'
+                {/* Advance CTA */}
+                {(nextStage || game.phase === 'LEADERBOARD') && (
+                  <Button
+                    size="md"
+                    onClick={advanceStage}
+                    disabled={game.phase === 'JUDGING' && !allTeamsScored}
+                    className={`w-full sm:w-auto glow-accent shadow-lg shadow-bwb-accent/20 justify-center font-bold ${
+                      game.phase === 'JUDGING' && !allTeamsScored ? 'opacity-50 cursor-not-allowed' : ''
                     }`}
                   >
-                    <div>
-                      <div className="flex items-center justify-between text-xs mb-1">
-                        <span className="text-base">{stg.icon}</span>
-                        <span className={`text-[10px] font-mono font-bold px-1.5 py-0.2 rounded-md ${
-                          isActive ? 'bg-bwb-bg text-bwb-accent' : 'bg-bwb-surface text-bwb-muted'
-                        }`}>
-                          Step {idx + 1}
-                        </span>
-                      </div>
-                      <p className={`font-display font-bold text-sm leading-snug ${isActive ? 'text-bwb-bg' : 'text-bwb-text'}`}>
-                        {stg.title}
-                      </p>
-                    </div>
-
-                    <p className={`text-[11px] leading-tight line-clamp-2 mt-1 ${isActive ? 'text-bwb-bg/80 font-medium' : 'text-bwb-muted'}`}>
-                      {stg.desc}
-                    </p>
-                  </motion.button>
-                )
-              })}
+                    <Play size={15} className="mr-1.5" />
+                    {game.phase === 'JUDGING' && !allTeamsScored
+                      ? `Waiting for Scores (${scoredCount}/${game.teams.length})`
+                      : nextStage ? `Advance to: ${nextStage.title}` : currentRound === 1 ? 'Start Round 2 Lobby' : currentRound === 2 ? 'Lock Top 8 & Start Round 3 Lobby' : 'Reveal Final Results'
+                    }
+                  </Button>
+                )}
               </div>
-              )
-            })()}
 
-            {/* Stage status is intentionally omitted: the highlighted stage card is the live status. */}
-            {false && (
-            <div className="mt-5 pt-4 border-t border-white/5">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={`stage-info-${game.phase}`}
-                  initial={{ opacity: 0, y: 6 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -6 }}
-                  transition={{ duration: 0.2 }}
-                  className="p-4 rounded-2xl bg-bwb-bg/70 border border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-4"
-                >
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-display font-black text-bwb-accent flex items-center gap-1.5">
-                        <Zap size={14} /> Stage Status: {PHASE_LABELS[game.phase]} (Round {currentRound})
-                      </span>
-                      <span className="text-[10px] font-mono uppercase bg-white/5 px-2 py-0.5 rounded-md text-bwb-muted">
-                        Live on Stage & Screens
-                      </span>
-                    </div>
+              {/* Stepper Pipeline Grid */}
+              {(() => {
+                const visibleStages = stages
+                const totalCount = visibleStages.length
+                const gridClass =
+                  totalCount === 5
+                    ? 'grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-5'
+                    : totalCount === 7
+                    ? 'grid-cols-2 sm:grid-cols-4 lg:grid-cols-7'
+                    : 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-6'
 
-                    {game.phase === 'LOBBY' && (
-                      <p className="text-xs text-bwb-muted">
-                        🚪 <strong>Round {currentRound} Standby & Setup</strong>: Previous round leaderboard is cleared and Round {currentRound} is ready! Click <strong>Problem Reveal</strong>, <strong>Card Reveal</strong>, or <strong>Build Phase</strong> when you want to begin Round {currentRound}.
-                      </p>
-                    )}
-                    {game.phase === 'PROBLEM_REVEAL' && (
-                      <p className="text-xs text-bwb-muted">
-                        💡 <strong>Problem Selection (Round {currentRound})</strong>: 8 Problem statements are active on projector and player devices. Teams are choosing their challenge track.
-                      </p>
-                    )}
-                    {game.phase === 'CARD_REVEAL' && (
-                      <p className="text-xs text-bwb-muted">
-                        🎴 <strong>Surprise Tech Card Draft (Round {currentRound})</strong>: Squads have received 3 surprise frontier tech cards. Teams are reviewing their cards before the build sprint.
-                      </p>
-                    )}
-                    {game.phase === 'BUILDING' && (
-                      <p className="text-xs text-bwb-muted">
-                        ⚡ <strong>15-Minute Rapid Architecture Sprint Active (Round {currentRound})</strong>: Squads are building system architectures. Submissions received: <strong className="text-bwb-accent">{submittedCount}</strong> / {game.teams.length}.
-                      </p>
-                    )}
-                    {game.phase === 'PITCHING' && (
-                      <p className="text-xs text-bwb-muted">
-                        🎤 <strong>Live Stage Pitching Active (Round {currentRound})</strong>: Teams have 3 minutes to present their system flow, tech card integration, and answer judge defenses.
-                      </p>
-                    )}
-                    {game.phase === 'JUDGING' && (
-                      <p className="text-xs text-bwb-muted">
-                        ⚖ <strong>Judge Scoring Active (Round {currentRound})</strong>: Judges enter ratings across 4 Rubric dimensions: Tech Integration (20), Feasibility (20), Problem Relevance (20), and Presentation (20).
-                      </p>
-                    )}
-                    {game.phase === 'LEADERBOARD' && (
-                      <p className="text-xs text-bwb-muted">
-                        🏆 <strong>Live Leaderboard & Standings (Round {currentRound})</strong>: {currentRound === 2 ? 'Review Top 8 squads. Click "Lock Top 8 & Start Finals" when ready.' : 'Review final scores before podium reveal.'}
-                      </p>
-                    )}
-                    {game.phase === 'RESULTS' && (
-                      <p className="text-xs text-bwb-muted">
-                        🎉 <strong>Championship Prize Podium (Round {currentRound})</strong>: 1st Champion, 2nd Runner-Up, and Dual 3rd Bronze Winners are presented with celebration confetti!
-                      </p>
-                    )}
+                return (
+                  <div className={`grid ${gridClass} gap-2 sm:gap-2.5`}>
+                    {visibleStages.map((stg, idx) => {
+                      const isActive = game.phase === stg.phase
+                      const isLastOdd = totalCount % 2 !== 0 && idx === totalCount - 1
+                      return (
+                        <button
+                          key={stg.phase}
+                          type="button"
+                          onClick={() => changePhase(stg.phase)}
+                          className={`p-2.5 sm:p-3.5 rounded-2xl border text-left transition-all duration-150 active:scale-[0.98] hover:scale-[1.01] relative flex flex-col justify-between min-h-[86px] sm:min-h-[105px] ${
+                            isLastOdd ? 'col-span-2 sm:col-span-1 md:col-span-1 lg:col-span-1' : ''
+                          } ${
+                            isActive
+                              ? 'bg-bwb-accent text-bwb-bg font-bold shadow-xl shadow-bwb-accent/25 border-bwb-accent ring-2 ring-bwb-accent/40'
+                              : 'bg-bwb-surface-2/80 text-bwb-muted hover:text-bwb-text border-bwb-border hover:border-bwb-accent/40'
+                          }`}
+                        >
+                          <div>
+                            <div className="flex items-center justify-between text-xs mb-1">
+                              <span className="text-base sm:text-lg">{stg.icon}</span>
+                              <span className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-md ${
+                                isActive ? 'bg-bwb-bg text-bwb-accent' : 'bg-bwb-surface text-bwb-muted'
+                              }`}>
+                                Step {idx + 1}
+                              </span>
+                            </div>
+                            <p className={`font-display font-bold text-xs sm:text-sm leading-snug ${isActive ? 'text-bwb-bg' : 'text-bwb-text'}`}>
+                              {stg.title}
+                            </p>
+                          </div>
+
+                          <p className={`text-[10px] sm:text-[11px] leading-tight line-clamp-2 mt-1 ${isActive ? 'text-bwb-bg/85 font-medium' : 'text-bwb-muted'}`}>
+                            {stg.desc}
+                          </p>
+                        </button>
+                      )
+                    })}
                   </div>
-
-                  {(nextStage || game.phase === 'LEADERBOARD') && (
-                    <Button
-                      size="sm"
-                      onClick={advanceStage}
-                      className="shrink-0 bg-bwb-accent text-bwb-bg font-bold text-xs shadow-md hover:bg-bwb-accent/90"
-                    >
-                      <span>{nextStage ? `Advance to ${nextStage?.title}` : currentRound === 1 ? 'Start Round 2 Lobby' : currentRound === 2 ? 'Lock Top 8 & Start Round 3 Lobby' : 'Reveal Final Results'}</span>
-                      <ArrowRight size={14} className="ml-1" />
-                    </Button>
-                  )}
-                </motion.div>
-              </AnimatePresence>
+                )
+              })()}
             </div>
-            )}
           </div>
-          </div>
-        </PageTransition>
-
-
 
         {/* Live Teams, Selection & Submission Status Grid */}
-        <div className="grid lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 space-y-6">
-            <PageTransition delay={0.2}>
-              <Card padding="lg">
-                <div className="flex items-center justify-between mb-5">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 sm:gap-6">
+          <div className="lg:col-span-2 space-y-5 sm:space-y-6">
+            <Card padding="md" className="sm:p-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
                   <div>
-                    <h2 className="font-display font-bold text-lg text-bwb-text flex items-center gap-2">
+                    <h2 className="font-display font-bold text-base sm:text-lg text-bwb-text flex items-center gap-2">
                       <Users size={18} className="text-bwb-accent" />
                       Live Teams & Strategy Status
                       <Badge variant="default" className="ml-1 text-xs">{game.teams.length}</Badge>
@@ -1103,20 +1022,20 @@ export default function HostGameControlPage() {
                     </p>
                   </div>
 
-                  <div className="flex flex-wrap items-center gap-2">
-                    <div className="text-xs font-mono text-bwb-muted bg-bwb-surface-2 px-3 py-1.5 rounded-xl border border-white/5 flex items-center gap-1.5">
+                  <div className="grid grid-cols-2 sm:flex items-center gap-2">
+                    <div className="text-xs font-mono text-bwb-muted bg-bwb-surface-2 px-3 py-1.5 rounded-xl border border-white/5 flex items-center justify-center gap-1.5">
                       <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                       <span>Live:</span> <strong className="text-emerald-400">{game.teams.filter((t) => t.isOnline).length}</strong> / {game.teams.length}
                     </div>
-                    <div className="text-xs font-mono text-bwb-muted bg-bwb-surface-2 px-3 py-1.5 rounded-xl border border-white/5">
-                      Submissions: <strong className="text-bwb-accent">{submittedCount}</strong> / {game.teams.length}
+                    <div className="text-xs font-mono text-bwb-muted bg-bwb-surface-2 px-3 py-1.5 rounded-xl border border-white/5 flex items-center justify-center gap-1.5 text-center">
+                      <span>Submissions:</span> <strong className="text-bwb-accent">{submittedCount}</strong> / {game.teams.length}
                     </div>
                   </div>
                 </div>
 
                 {game.teams.length === 0 ? (
-                  <div className="py-14 text-center border border-dashed border-bwb-border rounded-2xl">
-                    <Users size={40} className="mx-auto text-bwb-muted/50 mb-3" />
+                  <div className="py-12 sm:py-14 text-center border border-dashed border-bwb-border rounded-2xl">
+                    <Users size={36} className="mx-auto text-bwb-muted/50 mb-3" />
                     <p className="text-bwb-text font-semibold text-sm">No teams joined yet</p>
                     <p className="text-bwb-muted text-xs mt-1">
                       Participants can join at <span className="text-bwb-accent font-mono">/join</span> with PIN <span className="text-bwb-accent font-mono font-bold">{game.code}</span>
@@ -1131,25 +1050,21 @@ export default function HostGameControlPage() {
                       const teamPasscode = team.passcode || (team.name.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 4) || 'TEAM') + '-' + Math.floor(100 + Math.random() * 900)
 
                       return (
-                        <motion.div
+                        <div
                           key={team.id}
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: idx * 0.04 }}
-                          className="p-4 rounded-2xl stereo-card border border-bwb-border/80 flex flex-col gap-3.5"
+                          className="p-3.5 sm:p-4 rounded-2xl stereo-card border border-bwb-border/80 flex flex-col gap-3 transition-colors"
                         >
-                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                            <div className="flex items-start gap-3">
-                              <div className="w-9 h-9 rounded-xl bg-bwb-surface-2 border border-white/5 flex items-center justify-center font-mono font-bold text-xs text-bwb-accent shrink-0">
+                          {/* Row 1: Team Index, Name, Online Status & Delete Action */}
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex items-center gap-2.5 min-w-0">
+                              <div className="w-8 h-8 rounded-xl bg-bwb-surface-2 border border-white/5 flex items-center justify-center font-mono font-bold text-xs text-bwb-accent shrink-0">
                                 #{idx + 1}
                               </div>
-                              <div>
-                                <div className="flex flex-wrap items-center gap-2">
-                                  <h4 className="font-display font-black text-base text-bwb-text">
+                              <div className="min-w-0">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <h4 className="font-display font-black text-base text-bwb-text break-words">
                                     {team.name}
                                   </h4>
-
-                                  {/* Live vs Offline Status Badge */}
                                   {team.isOnline ? (
                                     <span className="px-2 py-0.5 rounded-lg text-[10px] font-mono font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5 shadow-sm">
                                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
@@ -1158,91 +1073,87 @@ export default function HostGameControlPage() {
                                   ) : (
                                     <span className="px-2 py-0.5 rounded-lg text-[10px] font-mono font-semibold bg-white/5 text-bwb-muted border border-white/10 flex items-center gap-1.5">
                                       <span className="w-1.5 h-1.5 rounded-full bg-gray-500" />
-                                      <span>PRE-REGISTERED (OFFLINE)</span>
-                                    </span>
-                                  )}
-
-                                  {/* Entry Passcode Badge with Copy */}
-                                  <button
-                                    type="button"
-                                    onClick={() => handleCopyTeamPasscode(teamPasscode, team.name)}
-                                    title="Click to copy team entry passcode"
-                                    className="px-2.5 py-1 rounded-xl text-xs font-mono font-bold bg-amber-400/10 text-amber-300 border border-amber-400/30 flex items-center gap-1.5 hover:bg-amber-400/20 transition-colors shadow-sm"
-                                  >
-                                    <Key size={12} className="text-amber-400" />
-                                    <span>{teamPasscode}</span>
-                                    <Copy size={11} className="text-amber-400/70" />
-                                  </button>
-                                </div>
-
-                                {/* Selected Problem Pill & Academic Info */}
-                                <div className="mt-1.5 flex flex-wrap items-center gap-2">
-                                  <span className="text-[11px] text-bwb-muted font-mono">Challenge:</span>
-                                  {selectedProblem && team.selectedProblemId ? (
-                                    <span className="px-2.5 py-0.5 rounded-lg text-[11px] font-bold bg-bwb-accent/15 text-bwb-accent border border-bwb-accent/30 flex items-center gap-1">
-                                      <CheckCircle2 size={11} />
-                                      <span>{selectedProblem.category}</span>
-                                    </span>
-                                  ) : (
-                                    <span className="px-2.5 py-0.5 rounded-lg text-[11px] font-medium bg-bwb-surface-2 text-bwb-muted border border-white/5 flex items-center gap-1.5">
-                                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400/60 animate-pulse" />
-                                      <span>Pending Problem Selection...</span>
-                                    </span>
-                                  )}
-
-                                  {(team.department || team.year || team.section) && (
-                                    <span className="px-2.5 py-0.5 rounded-lg text-[10px] font-mono font-semibold bg-purple-500/15 text-purple-300 border border-purple-500/30">
-                                      {[team.department, team.year, team.section].filter(Boolean).join(' · ')}
-                                    </span>
-                                  )}
-
-                                  {(team.email || team.phone) && (
-                                    <span className="text-[10px] text-bwb-muted font-mono">
-                                      {[team.email, team.phone].filter(Boolean).join(' | ')}
+                                      <span>OFFLINE</span>
                                     </span>
                                   )}
                                 </div>
                               </div>
                             </div>
 
-                            {/* Status Badges & Delete Button */}
-                            <div className="flex flex-wrap items-center gap-2 self-end sm:self-center">
-                              {/* Cards status */}
-                              <span className="px-2.5 py-1 rounded-xl text-xs font-mono bg-bwb-surface-2 text-bwb-text border border-white/5">
-                                🎴 {revealedCardsCount}/3 Cards
-                              </span>
-
-                              {/* Submission status */}
-                              <span className={`px-2.5 py-1 rounded-xl text-xs font-semibold border flex items-center gap-1 ${
-                                isSubmitted
-                                  ? 'bg-bwb-success/15 text-bwb-success border-bwb-success/30'
-                                  : 'bg-bwb-surface-2 text-bwb-muted border-bwb-border'
-                              }`}>
-                                {isSubmitted ? (
-                                  <>
-                                    <CheckCircle2 size={12} />
-                                    <span>Submitted</span>
-                                  </>
-                                ) : (
-                                  <span>Building...</span>
-                                )}
-                              </span>
-
-                              {/* Delete Team Button */}
-                              <button
-                                type="button"
-                                onClick={() => handleDeleteTeam(team.id, team.name)}
-                                title="Remove team from room"
-                                className="p-2 rounded-xl text-bwb-muted hover:text-bwb-danger hover:bg-bwb-danger/10 border border-transparent hover:border-bwb-danger/20 transition-colors shrink-0"
-                              >
-                                <Trash2 size={15} />
-                              </button>
-                            </div>
+                            {/* Delete Team Button */}
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteTeam(team.id, team.name)}
+                              title="Remove team from room"
+                              className="p-2 rounded-xl text-bwb-muted hover:text-bwb-danger hover:bg-bwb-danger/10 border border-transparent hover:border-bwb-danger/20 transition-colors shrink-0"
+                            >
+                              <Trash2 size={15} />
+                            </button>
                           </div>
 
-                          {/* Member Roster List */}
+                          {/* Row 2: Passcode & Challenge Track */}
+                          <div className="flex flex-wrap items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => handleCopyTeamPasscode(teamPasscode, team.name)}
+                              title="Click to copy team entry passcode"
+                              className="px-2.5 py-1 rounded-xl text-xs font-mono font-bold bg-amber-400/10 text-amber-300 border border-amber-400/30 flex items-center gap-1.5 hover:bg-amber-400/20 transition-colors shadow-sm"
+                            >
+                              <Key size={12} className="text-amber-400" />
+                              <span>{teamPasscode}</span>
+                              <Copy size={11} className="text-amber-400/70" />
+                            </button>
+
+                            {selectedProblem && team.selectedProblemId ? (
+                              <span className="px-2.5 py-1 rounded-xl text-xs font-bold bg-bwb-accent/15 text-bwb-accent border border-bwb-accent/30 flex items-center gap-1">
+                                <CheckCircle2 size={12} />
+                                <span>{selectedProblem.category}</span>
+                              </span>
+                            ) : (
+                              <span className="px-2.5 py-1 rounded-xl text-xs font-medium bg-bwb-surface-2 text-bwb-muted border border-white/5 flex items-center gap-1.5">
+                                <span className="w-1.5 h-1.5 rounded-full bg-amber-400/60 animate-pulse" />
+                                <span>Pending Problem Selection...</span>
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Row 3: Cards Drafted & Submission Status & Academic info */}
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="px-2.5 py-1 rounded-xl text-xs font-mono bg-bwb-surface-2 text-bwb-text border border-white/5">
+                              🎴 {revealedCardsCount}/3 Cards
+                            </span>
+
+                            <span className={`px-2.5 py-1 rounded-xl text-xs font-semibold border flex items-center gap-1 ${
+                              isSubmitted
+                                ? 'bg-bwb-success/15 text-bwb-success border-bwb-success/30'
+                                : 'bg-bwb-surface-2 text-bwb-muted border-bwb-border'
+                            }`}>
+                              {isSubmitted ? (
+                                <>
+                                  <CheckCircle2 size={12} />
+                                  <span>Submitted</span>
+                                </>
+                              ) : (
+                                <span>Building...</span>
+                              )}
+                            </span>
+
+                            {(team.department || team.year || team.section) && (
+                              <span className="px-2.5 py-1 rounded-xl text-[10px] font-mono font-semibold bg-purple-500/15 text-purple-300 border border-purple-500/30">
+                                {[team.department, team.year, team.section].filter(Boolean).join(' · ')}
+                              </span>
+                            )}
+
+                            {(team.email || team.phone) && (
+                              <span className="text-[10px] text-bwb-muted font-mono">
+                                {[team.email, team.phone].filter(Boolean).join(' | ')}
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Row 4: Member Roster List */}
                           {team.members && team.members.length > 0 && (
-                            <div className="pt-2.5 border-t border-white/5 flex flex-wrap items-center gap-1.5">
+                            <div className="pt-2 border-t border-white/5 flex flex-wrap items-center gap-1.5">
                               <span className="text-[10px] font-mono uppercase text-bwb-muted font-bold mr-1">
                                 Roster ({team.members.length}):
                               </span>
@@ -1257,67 +1168,60 @@ export default function HostGameControlPage() {
                               ))}
                             </div>
                           )}
-                        </motion.div>
+                        </div>
                       )
                     })}
                   </div>
                 )}
-              </Card>
-            </PageTransition>
+            </Card>
           </div>
 
           {/* Right Sidebar: Quick Actions & Operations */}
-          <div className="space-y-6">
-            <PageTransition delay={0.3}>
-              <Card padding="lg">
-                <h2 className="font-display font-semibold mb-4 flex items-center gap-2">
+          <div className="space-y-5 sm:space-y-6">
+            <Card padding="md" className="sm:p-6">
+                <h2 className="font-display font-semibold mb-3.5 flex items-center gap-2 text-base">
                   <Zap size={18} className="text-bwb-accent" /> Round Operations
                 </h2>
                 <div className="space-y-2.5">
-                  <Button variant="secondary" fullWidth size="sm" onClick={() => changePhase('BUILDING')}>
-                    <Play size={14} className="text-bwb-accent" /> Start Build Timer (15 min)
+                  <Button variant="secondary" fullWidth size="sm" onClick={() => changePhase('BUILDING')} className="justify-center">
+                    <Play size={14} className="text-bwb-accent mr-1" /> Start Build Timer (15 min)
                   </Button>
-                  <Button variant="secondary" fullWidth size="sm" onClick={() => changePhase('SUBMISSION_LOCKED')}>
-                    <Lock size={14} className="text-bwb-warn" /> Lock All Submissions
+                  <Button variant="secondary" fullWidth size="sm" onClick={() => changePhase('SUBMISSION_LOCKED')} className="justify-center">
+                    <Lock size={14} className="text-bwb-warn mr-1" /> Lock All Submissions
                   </Button>
-                  <Button variant="secondary" fullWidth size="sm" onClick={() => changePhase('PITCHING')}>
-                    <SkipForward size={14} /> Start Pitch Phase
+                  <Button variant="secondary" fullWidth size="sm" onClick={() => changePhase('PITCHING')} className="justify-center">
+                    <SkipForward size={14} className="mr-1" /> Start Pitch Phase
                   </Button>
                   <Link to="/host/leaderboard" className="block">
-                    <Button variant="secondary" fullWidth size="sm">
-                      <Trophy size={14} className="text-bwb-gold" /> Leaderboard & Results
+                    <Button variant="secondary" fullWidth size="sm" className="justify-center">
+                      <Trophy size={14} className="text-bwb-gold mr-1" /> Leaderboard & Results
                     </Button>
                   </Link>
                 </div>
-              </Card>
-            </PageTransition>
+            </Card>
 
-            <PageTransition delay={0.4}>
-              <Card padding="lg" className="border-bwb-danger/20">
-                <h2 className="font-display font-semibold mb-3 flex items-center gap-2 text-bwb-danger">
+            <Card padding="md" className="sm:p-6 border-bwb-danger/20">
+                <h2 className="font-display font-semibold mb-2.5 flex items-center gap-2 text-bwb-danger text-base">
                   <AlertTriangle size={16} /> Deck Management
                 </h2>
-                <p className="text-xs text-bwb-muted mb-4">
+                <p className="text-xs text-bwb-muted mb-3.5">
                   Re-roll 3 random tech cards for all connected teams if you want to reset drafting.
                 </p>
-                <Button variant="danger" fullWidth size="sm" onClick={assignCards}>
-                  <Shield size={14} /> Reassign Tech Cards to All
+                <Button variant="danger" fullWidth size="sm" onClick={assignCards} className="justify-center">
+                  <Shield size={14} className="mr-1" /> Reassign Tech Cards to All
                 </Button>
-              </Card>
-            </PageTransition>
+            </Card>
           </div>
         </div>
 
         {error && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
+          <div
             className="mt-4 px-4 py-3 rounded-xl bg-bwb-danger/10 border border-bwb-danger/30 text-sm text-bwb-danger"
           >
             {error}
-          </motion.div>
+          </div>
         )}
-      </div>
+      </PageTransition>
     </PageLayout>
   )
 }

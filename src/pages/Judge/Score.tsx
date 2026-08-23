@@ -208,6 +208,7 @@ export default function JudgeScorePage() {
           <ScoreForm
             teamName={team.name}
             onSubmit={handleScoreSubmit}
+            round={game.currentRound || 1}
           />
         </Card>
       </div>

@@ -849,13 +849,13 @@ export function CactusWaitingCard({
                 </span>
                 <div>
                   <div className="flex items-center gap-1.5 flex-wrap">
-                    <p className="text-xs font-bold text-bwb-text">Round 1: Open Qualifier</p>
+                    <p className="text-xs font-bold text-bwb-text">Round 1: Problem & Existing Landscape (100 Marks)</p>
                     <span className="text-[10px] font-mono font-bold px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                      No Elimination
+                      Zero Elimination
                     </span>
                   </div>
                   <p className="text-[11px] text-bwb-muted mt-0.5 leading-relaxed">
-                    Choose from 8 problem statements, draft 3 surprise tech cards, and formulate a 15-minute system architecture. All registered squads advance to Round 2!
+                    Select 1 of 8 problems, draft 3 frontier tech cards, and pitch your deep problem understanding, root causes, and critique of existing solutions. Evaluated for 100 marks.
                   </p>
                 </div>
               </div>
@@ -867,13 +867,13 @@ export function CactusWaitingCard({
                 </span>
                 <div>
                   <div className="flex items-center gap-1.5 flex-wrap">
-                    <p className="text-xs font-bold text-bwb-text">Round 2: Problem Showdown</p>
+                    <p className="text-xs font-bold text-bwb-text">Round 2: Solution & Tech Architecture (100 Marks)</p>
                     <span className="text-[10px] font-mono font-bold px-1.5 py-0.2 rounded bg-bwb-accent/20 text-bwb-accent border border-bwb-accent/30">
-                      Top 8 Qualify
+                      Top 8 Advance
                     </span>
                   </div>
                   <p className="text-[11px] text-bwb-muted mt-0.5 leading-relaxed">
-                    8 distinct challenge tracks with strictly max 2 teams per problem statement. The Top 8 squads advance to the Grand Finals.
+                    Present your enhanced solution, novelty, and deep 3-card frontier tech integration. Evaluated for 100 marks. Top 8 squads advance to Grand Finals!
                   </p>
                 </div>
               </div>
@@ -885,13 +885,13 @@ export function CactusWaitingCard({
                 </span>
                 <div>
                   <div className="flex items-center gap-1.5 flex-wrap">
-                    <p className="text-xs font-bold text-bwb-text">Round 3: Grand Finals & Prize Podium</p>
+                    <p className="text-xs font-bold text-bwb-text">Round 3: Grand Finals & Championship Defense</p>
                     <span className="text-[10px] font-mono font-bold px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                      Top 4 Prized
+                      Top 4 Podium
                     </span>
                   </div>
                   <p className="text-[11px] text-bwb-muted mt-0.5 leading-relaxed">
-                    Top 8 Finalists defend live on stage. Top 4 teams receive championship prizes: 🥇 1st Place (Champion), 🥈 2nd Place (Runner-Up), and 🥉 3rd Place (Dual Bronze Winners).
+                    Top 8 Finalists defend refined master architectures live on stage against judge Q&A. Top 4 teams win honors: 🥇 1st Place Champion, 🥈 2nd Place Runner-Up, and 🥉 Dual 3rd Place Bronze Winners.
                   </p>
                 </div>
               </div>

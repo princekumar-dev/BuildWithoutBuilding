@@ -1,10 +1,11 @@
 import { Link, useNavigate } from 'react-router-dom'
-import { Trophy, ArrowRight, Sparkles } from 'lucide-react'
+import { Trophy, ArrowRight, Sparkles, ChevronLeft, ExternalLink, Globe } from 'lucide-react'
 import { PageLayout } from '../../components/layout/PageLayout'
 import { Card } from '../../components/ui/Card'
 import { Button } from '../../components/ui/Button'
 import { Badge } from '../../components/ui/Badge'
 import { LeaderboardTable } from '../../components/leaderboard/LeaderboardTable'
+import { PageTransition } from '../../components/ui/PageTransition'
 import { useGameStore } from '../../store/gameStore'
 import { useRealtimeGame } from '../../hooks/useRealtimeGame'
 import { api } from '../../lib/api'
@@ -26,9 +27,9 @@ export default function HostLeaderboardPage() {
         const top8Ids = top8.map((t) => t.id)
         await api.setFinalists(game.id, top8Ids)
       }
-      const updated = await api.setRound(game.id, roundNum, 'PROBLEM_REVEAL')
+      const updated = await api.setRound(game.id, roundNum, 'LOBBY')
       setGame(updated)
-      toast.success(`Advanced to Round ${roundNum}!`)
+      toast.success(`Advanced to Round ${roundNum} Lobby!`)
       navigate(`/host/game/${game.id}`)
     } catch (err: any) {
       toast.error(err.message || 'Unable to advance round.')
@@ -36,29 +37,42 @@ export default function HostLeaderboardPage() {
   }
 
   return (
-    <PageLayout>
-      <div className="max-w-4xl mx-auto pb-12">
-        <Link to={`/host/game/${game.id}`} className="text-xs text-bwb-muted hover:text-bwb-accent">
-          ← Back to Game Control
-        </Link>
-        <div className="flex flex-wrap items-center justify-between gap-4 mt-2 mb-8">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <Badge variant="accent">Host Panel</Badge>
-              <span className="text-xs font-mono font-bold text-purple-300">
-                Round {currentRound} Leaderboard
-              </span>
-            </div>
-            <h1 className="font-display text-3xl font-bold">Leaderboard & Tournament Operations</h1>
-          </div>
-          <div className="flex gap-2">
-            <Link to="/projector" target="_blank">
-              <Button variant="secondary" size="sm">Projector Screen</Button>
+    <PageLayout fullWidth className="host-mobile-view">
+      <PageTransition className="max-w-4xl mx-auto px-3 sm:px-6 py-4 sm:py-6 pb-28 sm:pb-12">
+        {/* Top Breadcrumb & Quick Action Buttons */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 sm:mb-6">
+          <Link
+            to={`/host/game/${game.id}`}
+            className="inline-flex items-center gap-1.5 text-xs text-bwb-muted hover:text-bwb-accent transition-colors font-medium py-1"
+          >
+            <ChevronLeft size={16} /> Back to Game Control
+          </Link>
+
+          <div className="grid grid-cols-2 sm:flex items-center gap-2 w-full sm:w-auto">
+            <Link to="/projector" target="_blank" rel="noreferrer" className="w-full sm:w-auto">
+              <Button variant="secondary" size="sm" className="w-full sm:w-auto text-xs justify-center border border-white/10">
+                <ExternalLink size={14} className="mr-1 text-bwb-accent" /> Projector Screen
+              </Button>
             </Link>
-            <Link to="/leaderboard" target="_blank">
-              <Button size="sm">Public View</Button>
+            <Link to="/leaderboard" target="_blank" rel="noreferrer" className="w-full sm:w-auto">
+              <Button size="sm" className="w-full sm:w-auto text-xs justify-center bg-bwb-accent text-bwb-bg font-bold">
+                <Globe size={14} className="mr-1" /> Public View
+              </Button>
             </Link>
           </div>
+        </div>
+
+        {/* Header HUD */}
+        <div className="mb-5 sm:mb-6">
+          <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+            <Badge variant="accent">Host Panel</Badge>
+            <span className="text-xs font-mono font-bold text-purple-300 bg-purple-500/10 px-2 py-0.5 rounded-md border border-purple-500/20">
+              Round {currentRound} Leaderboard
+            </span>
+          </div>
+          <h1 className="font-display text-2xl sm:text-3xl font-black text-bwb-text tracking-tight">
+            Leaderboard & Tournament Operations
+          </h1>
         </div>
 
         <LeaderboardTable
@@ -70,68 +84,74 @@ export default function HostLeaderboardPage() {
 
         {/* Round Progression Actions */}
         {currentRound === 1 && (
-          <Card padding="lg" className="mt-6 border-bwb-accent/30 bg-gradient-to-br from-bwb-surface-2 to-bwb-surface">
-            <h3 className="font-display font-bold text-base text-bwb-text mb-2 flex items-center gap-2">
+          <Card padding="md" className="mt-5 sm:mt-6 sm:p-6 border-bwb-accent/30 bg-gradient-to-br from-bwb-surface-2 to-bwb-surface shadow-xl">
+            <h3 className="font-display font-bold text-base sm:text-lg text-bwb-text mb-2 flex items-center gap-2">
               <Sparkles className="text-bwb-accent" size={18} />
               <span>Round 1 Complete (No Elimination)</span>
             </h3>
-            <p className="text-xs sm:text-sm text-bwb-muted mb-4">
-              All {game.teams.length} registered squads advance to Round 2 to select from the 8 Problem Statements (max 2 squads per problem).
+            <p className="text-xs sm:text-sm text-bwb-muted mb-4 leading-relaxed">
+              All {game.teams.length} registered squads advance to Round 2 to select from the 8 Problem Statements (max 2 squads per problem). The room will transition directly to the Round 2 Lobby.
             </p>
-            <Button onClick={() => handleAdvanceToRound(2)} className="bg-bwb-accent text-bwb-bg font-bold">
-              <span>Advance All Teams to Round 2</span>
+            <Button
+              onClick={() => handleAdvanceToRound(2)}
+              className="w-full sm:w-auto bg-bwb-accent text-bwb-bg font-bold shadow-lg shadow-bwb-accent/20 justify-center"
+            >
+              <span>Advance All Teams to Round 2 (Lobby)</span>
               <ArrowRight size={15} className="ml-1.5" />
             </Button>
           </Card>
         )}
 
         {currentRound === 2 && (
-          <Card padding="lg" className="mt-6 border-purple-500/30 bg-gradient-to-br from-purple-950/30 via-bwb-surface-2 to-bwb-surface">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="font-display font-bold text-base text-bwb-text flex items-center gap-2">
+          <Card padding="md" className="mt-5 sm:mt-6 sm:p-6 border-purple-500/30 bg-gradient-to-br from-purple-950/30 via-bwb-surface-2 to-bwb-surface shadow-xl">
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+              <h3 className="font-display font-bold text-base sm:text-lg text-bwb-text flex items-center gap-2">
                 <Trophy className="text-amber-400" size={18} />
                 <span>Round 2 Complete · Advance Top 8 Finalists</span>
               </h3>
-              <span className="text-xs font-mono text-emerald-400 font-bold">
+              <span className="text-xs font-mono text-emerald-400 font-bold bg-emerald-500/10 px-2.5 py-0.5 rounded-lg border border-emerald-500/20">
                 {top8.length} Finalists Qualified
               </span>
             </div>
-            <p className="text-xs sm:text-sm text-bwb-muted mb-4">
-              The Top 8 teams below qualify for the Grand Finals (Round 3). In Round 3, the top 4 are awarded: 1st Place (1), 2nd Place (1), 3rd Place (2).
+            <p className="text-xs sm:text-sm text-bwb-muted mb-4 leading-relaxed">
+              The Top 8 squads below qualify for the Grand Finals (Round 3). In Round 3, the top 4 are awarded podium trophies: 1st Place (1), 2nd Place (1), and Dual 3rd Place (2).
             </p>
-            <div className="flex flex-wrap gap-2 mb-4">
+            <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-4">
               {top8.map((t, idx) => (
-                <Badge key={t.id} variant={idx < 4 ? 'accent' : 'default'} className="text-xs font-mono">
+                <Badge key={t.id} variant={idx < 4 ? 'accent' : 'default'} className="text-[11px] font-mono py-1 px-2.5">
                   #{idx + 1} {t.name} ({t.score ?? 0} pts)
                 </Badge>
               ))}
             </div>
-            <Button onClick={() => handleAdvanceToRound(3)} className="bg-amber-400 text-bwb-bg font-black hover:bg-amber-300">
+            <Button
+              onClick={() => handleAdvanceToRound(3)}
+              className="w-full sm:w-auto bg-amber-400 text-bwb-bg font-black hover:bg-amber-300 shadow-lg shadow-amber-400/20 justify-center"
+            >
               <Trophy size={14} className="mr-1.5" />
-              <span>Launch Grand Finals (Round 3) with Top 8</span>
+              <span>Launch Grand Finals (Round 3 Lobby) with Top 8</span>
             </Button>
           </Card>
         )}
 
         {currentRound === 3 && (
-          <Card padding="lg" className="mt-6 border-bwb-gold/40 bg-gradient-to-br from-amber-950/20 via-bwb-surface-2 to-bwb-surface">
-            <h3 className="font-display font-bold text-lg text-bwb-text mb-2 flex items-center gap-2">
+          <Card padding="md" className="mt-5 sm:mt-6 sm:p-6 border-bwb-gold/40 bg-gradient-to-br from-amber-950/20 via-bwb-surface-2 to-bwb-surface shadow-xl">
+            <h3 className="font-display font-bold text-base sm:text-lg text-bwb-text mb-2 flex items-center gap-2">
               <Trophy className="text-bwb-gold" size={20} />
               <span>Grand Finals Prize Distribution (Top 4 Awarded)</span>
             </h3>
             <p className="text-xs text-bwb-muted mb-4">
               Tournament concluded! Top 4 positions received official honors.
             </p>
-            <div className="grid sm:grid-cols-3 gap-3 text-center text-xs font-mono">
-              <div className="p-3 rounded-xl bg-amber-500/15 border border-bwb-gold text-bwb-gold font-bold">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3 text-center text-xs font-mono">
+              <div className="p-3.5 rounded-2xl bg-amber-500/15 border border-bwb-gold text-bwb-gold font-bold">
                 🥇 1st Place (1 Team)
                 <p className="text-bwb-text font-sans font-bold text-sm mt-1">{top8[0]?.name || 'Pending'}</p>
               </div>
-              <div className="p-3 rounded-xl bg-slate-500/15 border border-slate-400 text-slate-200 font-bold">
+              <div className="p-3.5 rounded-2xl bg-slate-500/15 border border-slate-400 text-slate-200 font-bold">
                 🥈 2nd Place (1 Team)
                 <p className="text-bwb-text font-sans font-bold text-sm mt-1">{top8[1]?.name || 'Pending'}</p>
               </div>
-              <div className="p-3 rounded-xl bg-amber-800/20 border border-amber-600 text-amber-400 font-bold">
+              <div className="p-3.5 rounded-2xl bg-amber-800/20 border border-amber-600 text-amber-400 font-bold">
                 🥉 3rd Place (2 Teams)
                 <p className="text-bwb-text font-sans font-bold text-xs mt-1">
                   {[top8[2]?.name, top8[3]?.name].filter(Boolean).join(' & ') || 'Pending'}
@@ -140,7 +160,7 @@ export default function HostLeaderboardPage() {
             </div>
           </Card>
         )}
-      </div>
+      </PageTransition>
     </PageLayout>
   )
 }

@@ -215,42 +215,79 @@ export const MOCK_GAME: Game = {
 export const TOURNAMENT_ROUNDS = [
   {
     round: 1,
-    name: 'Round 1: Open Qualifier',
-    subtitle: 'Foundation & Ideation Round',
-    elimination: 'No Elimination — All registered teams advance to Round 2!',
-    rule: 'Every registered squad builds and presents their initial architecture.',
+    name: 'Round 1: Problem Understanding & Existing Landscape',
+    subtitle: '100 Marks Evaluation · Zero Elimination',
+    elimination: 'Zero Elimination — All registered squads advance to Round 2!',
+    rule: 'Teams select their problem statement, draft 3 surprise tech cards, and pitch how deeply they understand the root causes, existing market solutions, and core limitations.',
+    focus: 'Problem Root Causes, User Pain Points, Existing Solution Critique, Initial Tech Alignment',
+    marks: '100 Marks Total',
     capacity: 'Open Entry',
-    badge: 'Round 1 / No Elimination',
+    badge: 'Round 1 / Zero Elimination (100 Marks)',
   },
   {
     round: 2,
-    name: 'Round 2: Problem Showdown',
-    subtitle: '8 Challenges · Max 2 Teams per Problem',
-    elimination: 'Top 8 Teams advance to the Grand Finals (Round 3)',
-    rule: '8 distinct challenges available. Each problem can only be selected by at most 2 teams (16 teams max capacity).',
+    name: 'Round 2: Solution Architecture & Innovation Enhancement',
+    subtitle: '100 Marks Evaluation · Top 8 Qualify for Grand Finals',
+    elimination: 'Top 8 squads with highest cumulative scores advance to Round 3 Grand Finals.',
+    rule: 'Teams present how they enhance and build on their solution, integrating all 3 surprise frontier tech cards into a feasible, scalable architecture.',
+    focus: 'Enhanced Solution Architecture, 3-Card Tech Integration, Feasibility & Scalability, Novel Ideation',
+    marks: '100 Marks Total',
     capacity: '16 Teams (8 × 2)',
-    badge: 'Round 2 / Top 8 Qualify',
+    badge: 'Round 2 / Top 8 Qualify (100 Marks)',
   },
   {
     round: 3,
-    name: 'Round 3: Grand Finals',
-    subtitle: '8 Finalists · Top 4 Prized',
-    elimination: 'Top 4 Awarded: 1st Place (1), 2nd Place (1), 3rd Place (2)',
-    rule: '8 Finalist teams battle in high-intensity sprint for championship prizes.',
+    name: 'Round 3: Grand Finals & Championship Defense',
+    subtitle: 'Top 8 Finalists · Top 4 Crowned on Podium',
+    elimination: 'Top 4 Awarded: 🥇 1st Place (1), 🥈 2nd Place (1), 🥉 Dual 3rd Place (2)',
+    rule: 'The Top 8 finalist squads deliver their refined master pitch and defend their architecture live against rigorous judge Q&A.',
+    focus: 'Master System Pitch, Live Defense & Q&A, Business Viability & Impact',
+    marks: 'Championship Podium Ranking',
     capacity: '8 Finalists',
-    badge: 'Round 3 / Grand Finals',
+    badge: 'Round 3 / Grand Finals (Top 4 Prized)',
   },
 ] as const
 
 export const SCORING_CRITERIA = [
-  { key: 'problemUnderstanding', label: 'Problem Understanding', max: 15 },
-  { key: 'creativity', label: 'Creativity & Novelty', max: 20 },
-  { key: 'technologyUsage', label: 'Technology Integration', max: 20 },
-  { key: 'technicalFeasibility', label: 'Technical Feasibility', max: 20 },
-  { key: 'realWorldImpact', label: 'Real-World Impact', max: 10 },
-  { key: 'pitch', label: 'Pitch Clarity', max: 10 },
-  { key: 'defense', label: 'Q&A / Defense', max: 5 },
+  { key: 'problemUnderstanding', label: 'Problem Understanding & Landscape', max: 30, desc: 'Clarity on root causes, pain points & shortcomings of existing solutions' },
+  { key: 'creativity', label: 'Novelty & Architecture Ideation', max: 20, desc: 'Innovative approach and creative formulation' },
+  { key: 'technologyUsage', label: '3-Card Tech Integration', max: 20, desc: 'How effectively the 3 surprise frontier tech cards are embedded' },
+  { key: 'technicalFeasibility', label: 'Feasibility & Edge-to-Cloud Flow', max: 15, desc: 'Realistic components, scalability, and system flows' },
+  { key: 'pitch', label: 'Pitch Presentation Clarity', max: 10, desc: 'Concise, clear, and compelling delivery within time' },
+  { key: 'defense', label: 'Judge Q&A Defense', max: 5, desc: 'Resilience and clarity under judge technical questions' },
 ]
+
+export const ROUND_1_SCORING_CRITERIA = [
+  { key: 'problemUnderstanding', label: 'Problem & Root Cause Understanding', max: 35, desc: 'Depth of understanding, target audience needs, and ecosystem pain points' },
+  { key: 'technicalFeasibility', label: 'Critique of Existing Solutions & Gaps', max: 25, desc: 'Identification of why current methods fail and where the opportunity lies' },
+  { key: 'technologyUsage', label: 'Initial Tech Stack Formulation', max: 20, desc: 'Relevance of the 3 frontier technologies to the core challenge' },
+  { key: 'pitch', label: 'Clarity & Structure of Pitch', max: 15, desc: 'Structure, focus, and effectiveness of problem articulation' },
+  { key: 'defense', label: 'Judge Q&A Defense', max: 5, desc: 'Response to initial judge queries and problem nuances' },
+]
+
+export const ROUND_2_SCORING_CRITERIA = [
+  { key: 'technologyUsage', label: 'Enhanced 3-Card Tech Integration', max: 30, desc: 'Deep technical synthesis of all 3 surprise frontier tech cards' },
+  { key: 'creativity', label: 'Novelty & Enhanced Architecture', max: 25, desc: 'Originality, architectural enhancement, and differentiation' },
+  { key: 'technicalFeasibility', label: 'System Flow & Scaling Feasibility', max: 20, desc: 'Edge-to-cloud handshakes, failover resilience & BOM cost realism' },
+  { key: 'problemUnderstanding', label: 'Problem-Solution Alignment', max: 10, desc: 'How precisely the enhanced system solves the verified problem' },
+  { key: 'pitch', label: 'Elevator Pitch Delivery', max: 10, desc: 'Compelling 60-second architecture walkthrough' },
+  { key: 'defense', label: 'Judge Attack Defense', max: 5, desc: 'Handling rigorous edge-case technical attacks' },
+]
+
+export const ROUND_3_SCORING_CRITERIA = [
+  { key: 'creativity', label: 'Master System Architecture & Innovation', max: 30, desc: 'End-to-end master system blueprint and technological elegance' },
+  { key: 'technicalFeasibility', label: 'Production Viability & Resilience', max: 25, desc: 'Real-world deployment feasibility, security, and edge fallback' },
+  { key: 'technologyUsage', label: 'Seamless Tech Synthesis', max: 20, desc: 'Mastery over the frontier tech stack components' },
+  { key: 'defense', label: 'Live Stage Defense & Q&A Mastery', max: 15, desc: 'Composure and technical depth during live judge interrogation' },
+  { key: 'pitch', label: 'Championship Pitch Delivery', max: 10, desc: 'Stage presence, storytelling, and high-impact presentation' },
+]
+
+export function getScoringCriteriaForRound(round: number = 1) {
+  if (round === 1) return ROUND_1_SCORING_CRITERIA
+  if (round === 2) return ROUND_2_SCORING_CRITERIA
+  if (round === 3) return ROUND_3_SCORING_CRITERIA
+  return SCORING_CRITERIA
+}
 
 export const PHASE_LABELS: Record<string, string> = {
   LOBBY: 'Lobby',

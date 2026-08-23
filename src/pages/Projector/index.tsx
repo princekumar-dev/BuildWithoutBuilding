@@ -3,7 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   Users, Sparkles, Trophy, Play, Pause,
   ChevronLeft, ChevronRight, CheckCircle2, Radio, Activity,
-  Crown, Clock, Layers, Zap, Mic, Award
+  Crown, Clock, Layers, Zap, Mic, Award,
+  Flame
 } from 'lucide-react'
 import { CountdownTimer } from '../../components/timer/CountdownTimer'
 import { LeaderboardTable } from '../../components/leaderboard/LeaderboardTable'
@@ -17,12 +18,81 @@ import type { Game, GamePhase, Problem, Technology } from '../../types'
 
 const STADIUM_ANNOUNCEMENTS = [
   { icon: '🚀', tag: 'ARENA STAGE BROADCAST', text: 'Welcome squads! Connect your devices at /join and prepare your architecture strategy!' },
-  { icon: '⚡', tag: '3-ROUND TOURNAMENT', text: 'Round 1 (Open Qualifier) ➔ Round 2 (Problem Showdown) ➔ Round 3 (Grand Finals)!' },
-  { icon: '🎯', tag: '8 REAL-WORLD DOMAINS', text: 'Prepare for challenges across Disaster Response, Urban Mobility, Healthcare & more!' },
-  { icon: '🤖', tag: 'SURPRISE TECH CARDS', text: 'Draft 3 surprise frontier tech cards and integrate them into a 15-minute system pitch!' },
-  { icon: '🏆', tag: 'CHAMPIONSHIP PODIUM', text: 'Top 8 squads defend live on stage · Top 4 crowned on the prize podium with trophies!' },
+  { icon: '⚡', tag: 'ROUND 1 · 100 MARKS', text: 'Round 1: Pitch deep problem understanding, root causes & landscape (Zero elimination, all scores carry forward)!' },
+  { icon: '🎯', tag: 'ROUND 2 · 100 MARKS', text: 'Round 2: Pitch enhanced solution architecture & 3 frontier tech integrations (Top 8 squads advance to Grand Finals)!' },
+  { icon: '🏆', tag: 'ROUND 3 · GRAND FINALS', text: 'Round 3: Top 8 Finalists pitch master solutions and defend live on stage against judge Q&A!' },
+  { icon: '🥇', tag: 'CHAMPIONSHIP PODIUM', text: 'Top 4 winners crowned on podium: 1st Champion, 2nd Runner-Up, and Dual 3rd Place Bronze winners!' },
   { icon: '⏱️', tag: 'RAPID ARCHITECTURE', text: 'Formulate system flows, edge-to-cloud handshakes, and realistic BOM feasibility!' },
 ]
+
+const PITCH_ROUND_CONFIG: Record<number, {
+  roundLabel: string
+  badge: string
+  badgeClass: string
+  title: string
+  subtitle: string
+  focusHighlights: { label: string; pts: string; icon: string }[]
+  waitingHeadline: string
+  waitingSubtext: string
+  accentColor: string
+  borderColor: string
+  glowGradient: string
+}> = {
+  1: {
+    roundLabel: 'Round 1 · Open Qualifier',
+    badge: '100 Marks · Zero Elimination',
+    badgeClass: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
+    title: 'Problem Understanding & Existing Solutions Pitch',
+    subtitle: 'Squads pitch root causes, user pain points, and shortcomings of existing market solutions.',
+    focusHighlights: [
+      { label: 'Problem Understanding', pts: '35 Pts', icon: '🎯' },
+      { label: 'Existing Solutions Critique', pts: '25 Pts', icon: '🔍' },
+      { label: '3-Tech Formulation', pts: '20 Pts', icon: '⚡' },
+      { label: 'Pitch & Defense', pts: '20 Pts', icon: '🎙️' },
+    ],
+    waitingHeadline: 'Waiting For Next Squad',
+    waitingSubtext: 'Judges are evaluating problem root causes, market alternatives, and tech formulation.',
+    accentColor: 'text-purple-400',
+    borderColor: 'border-purple-500/30',
+    glowGradient: 'from-purple-950/30 via-bwb-surface-2 to-bwb-surface',
+  },
+  2: {
+    roundLabel: 'Round 2 · Problem Showdown',
+    badge: '100 Marks · Top 8 Advance',
+    badgeClass: 'bg-bwb-accent/20 text-bwb-accent border-bwb-accent/30',
+    title: 'Enhanced Solution & 3-Card Tech Integration',
+    subtitle: 'Squads pitch novel architecture enhancement, 3 frontier tech cards & data telemetry.',
+    focusHighlights: [
+      { label: '3-Card Tech Integration', pts: '30 Pts', icon: '⚡' },
+      { label: 'Novelty & Architecture', pts: '25 Pts', icon: '💡' },
+      { label: 'System Flow Feasibility', pts: '20 Pts', icon: '🔄' },
+      { label: 'Pitch & Defense', pts: '25 Pts', icon: '🛡️' },
+    ],
+    waitingHeadline: 'Waiting For Next Squad',
+    waitingSubtext: 'Top 8 squads with highest cumulative scores advance to the Grand Finals.',
+    accentColor: 'text-bwb-accent',
+    borderColor: 'border-bwb-accent/30',
+    glowGradient: 'from-cyan-950/30 via-bwb-surface-2 to-bwb-surface',
+  },
+  3: {
+    roundLabel: 'Round 3 · Grand Finals',
+    badge: 'Championship Live Defense · Top 4 Prized',
+    badgeClass: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
+    title: 'Grand Finals Master Pitch & Live Defense',
+    subtitle: 'Top 8 Finalists defend master architecture blueprints live on stage against judge attacks.',
+    focusHighlights: [
+      { label: 'Master Blueprint', pts: '30 Pts', icon: '👑' },
+      { label: 'Production Viability', pts: '25 Pts', icon: '🏗️' },
+      { label: 'Tech Synthesis', pts: '20 Pts', icon: '⚡' },
+      { label: 'Stage Defense & Q&A', pts: '25 Pts', icon: '🔥' },
+    ],
+    waitingHeadline: 'Waiting For Next Finalist',
+    waitingSubtext: 'Top 4 Championship positions awarded at the conclusion of this round.',
+    accentColor: 'text-amber-400',
+    borderColor: 'border-amber-400/40',
+    glowGradient: 'from-amber-950/30 via-bwb-surface-2 to-bwb-surface',
+  },
+}
 
 const categoryThemes: Record<string, { gradient: string; border: string; badge: string; accent: string; icon: string }> = {
   'Disaster Response': { gradient: 'from-red-950/60 via-red-900/30 to-bwb-surface/90', border: 'border-red-500/50', badge: 'bg-red-500/20 text-red-300 border-red-500/40', accent: '#ef4444', icon: '🚨' },
@@ -556,36 +626,36 @@ export default function ProjectorPage() {
                   {/* Round 1 */}
                   <div className="p-4 rounded-2xl bg-bwb-bg/80 border border-purple-500/30 space-y-1.5 shadow-sm">
                     <div className="flex items-center justify-between">
-                      <span className="px-2 py-0.5 rounded-md bg-purple-500/20 text-purple-300 font-mono text-[10px] font-bold">ROUND 1</span>
-                      <span className="text-[10px] font-mono text-emerald-400 font-bold">100% Qualify</span>
+                      <span className="px-2 py-0.5 rounded-md bg-purple-500/20 text-purple-300 font-mono text-[10px] font-bold">ROUND 1 · 100 MARKS</span>
+                      <span className="text-[10px] font-mono text-emerald-400 font-bold">Zero Elimination</span>
                     </div>
-                    <h4 className="font-display font-bold text-sm text-bwb-text">Open Qualifier</h4>
+                    <h4 className="font-display font-bold text-sm text-bwb-text">Problem & Existing Landscape</h4>
                     <p className="text-xs text-bwb-muted leading-relaxed">
-                      Choose from 8 problem domains, draft 3 surprise tech cards, and create a 15-minute system architecture.
+                      Select 1 of 8 problems, draft 3 surprise tech cards, and pitch your deep problem understanding, root causes, and critique of existing solutions.
                     </p>
                   </div>
 
                   {/* Round 2 */}
                   <div className="p-4 rounded-2xl bg-bwb-bg/80 border border-bwb-accent/30 space-y-1.5 shadow-sm">
                     <div className="flex items-center justify-between">
-                      <span className="px-2 py-0.5 rounded-md bg-bwb-accent/20 text-bwb-accent font-mono text-[10px] font-bold">ROUND 2</span>
+                      <span className="px-2 py-0.5 rounded-md bg-bwb-accent/20 text-bwb-accent font-mono text-[10px] font-bold">ROUND 2 · 100 MARKS</span>
                       <span className="text-[10px] font-mono text-bwb-accent font-bold">Top 8 Advance</span>
                     </div>
-                    <h4 className="font-display font-bold text-sm text-bwb-text">Problem Showdown</h4>
+                    <h4 className="font-display font-bold text-sm text-bwb-text">Solution & Tech Architecture</h4>
                     <p className="text-xs text-bwb-muted leading-relaxed">
-                      8 challenge tracks with max 2 teams per statement. The Top 8 squads advance to the Grand Finals.
+                      Present how you enhance your solution, integrate all 3 surprise tech cards, and deliver novel ideation. Top 8 squads qualify for Grand Finals!
                     </p>
                   </div>
 
                   {/* Round 3 */}
                   <div className="p-4 rounded-2xl bg-bwb-bg/80 border border-amber-500/30 space-y-1.5 shadow-sm">
                     <div className="flex items-center justify-between">
-                      <span className="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 font-mono text-[10px] font-bold">ROUND 3</span>
-                      <span className="text-[10px] font-mono text-amber-300 font-bold">Top 4 Prized</span>
+                      <span className="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 font-mono text-[10px] font-bold">ROUND 3 · GRAND FINALS</span>
+                      <span className="text-[10px] font-mono text-amber-300 font-bold">Top 4 Crowned</span>
                     </div>
-                    <h4 className="font-display font-bold text-sm text-bwb-text">Grand Finals & Podium</h4>
+                    <h4 className="font-display font-bold text-sm text-bwb-text">Master Pitch & Defense</h4>
                     <p className="text-xs text-bwb-muted leading-relaxed">
-                      Top 8 Finalists defend live on stage. Top 4 teams receive championship trophies and prize podium awards!
+                      Top 8 Finalists pitch refined master architectures and defend against live judge Q&A. Top 4 squads are crowned on the championship podium!
                     </p>
                   </div>
                 </div>
@@ -1180,178 +1250,192 @@ export default function ProjectorPage() {
         {/* ============================================================
             5. PITCHING PHASE: GRAND STAGE & TEAM ARCHITECTURE SPOTLIGHT
             ============================================================ */}
-        {(currentPhase === 'PITCHING' || currentPhase === 'JUDGE_ATTACK') && (
-          <div className="w-full max-w-6xl mx-auto my-auto flex flex-col items-center justify-center px-4">
-            {/* Round & Phase Badges + Title */}
-            <div className="w-full text-center mb-6 pb-3 border-b border-white/10">
-              <div className="flex items-center justify-center gap-2 mb-3">
-                <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30">
-                  {currentRound === 1
-                    ? 'Round 1 · Open Qualifier (No Elimination)'
-                    : currentRound === 2
-                    ? 'Round 2 · Problem Showdown (Top 8 Qualify)'
-                    : 'Round 3 · Grand Finals (Top 4 Prized)'}
-                </span>
-                <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30">
-                  {currentPhase === 'JUDGE_ATTACK' ? 'Defense & Q&A' : 'Pitch Presentations'}
-                </span>
-              </div>
-              <h1 className="font-display text-3xl sm:text-5xl font-black flex items-center justify-center gap-3 text-gradient">
-                <Mic className="text-purple-400" size={36} />
-                {currentPhase === 'JUDGE_ATTACK' ? 'Defense & Judge Q&A Arena' : 'Live Solution Presentations'}
-              </h1>
-              <p className="text-bwb-muted mt-2">{game.name || 'Build Without Building Tournament'}</p>
-            </div>
-
-            {/* Top Pitch Round Header */}
-            <div className="w-full flex flex-wrap items-center justify-between gap-4 mb-6 pb-3 border-b border-white/10">
-              <div>
-                <p className="text-xs uppercase font-mono tracking-widest text-bwb-accent font-bold mb-1 flex items-center gap-1.5">
-                  <Radio size={14} className="animate-pulse" />
-                  {currentPhase === 'JUDGE_ATTACK' ? 'DEFENSE & JUDGE Q&A ARENA' : 'OFFICIAL PITCH ROUND ARENA'}
-                </p>
-                <h2 className="font-display text-2xl sm:text-3xl font-black text-bwb-text">
-                  Live Solution Presentations
-                </h2>
-              </div>
-
-              {/* Overall Round Pitch Clock */}
-              <div className="flex items-center gap-3 p-2.5 px-4 rounded-2xl bg-bwb-surface-2 border border-bwb-accent/30 shadow-lg">
-                <span className="text-[11px] font-mono uppercase text-bwb-muted font-bold">Pitch Session:</span>
-                <CountdownTimer
-                  initialSeconds={60 * 60}
-                  size="sm"
-                  running
-                  showExpired={false}
-                />
-              </div>
-            </div>
-
-            {/* Active Pitching Stage Hero */}
-            {pitchTeam ? (
-              <motion.div
-                key={pitchTeam.id}
-                initial={{ opacity: 0, scale: 0.96 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="w-full stereo-card rounded-3xl p-6 sm:p-10 border-2 border-bwb-accent/40 shadow-2xl relative overflow-hidden mb-6 bg-gradient-to-br from-bwb-surface-2/95 to-bwb-surface"
-              >
-                <div className="flex flex-wrap items-start justify-between gap-6 mb-6">
-                  <div>
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="px-3 py-1 rounded-xl text-xs font-mono font-bold bg-bwb-accent text-bwb-bg shadow-md">
-                        ON STAGE NOW
+        {(currentPhase === 'PITCHING' || currentPhase === 'JUDGE_ATTACK') && (() => {
+          const roundConfig = PITCH_ROUND_CONFIG[currentRound] || PITCH_ROUND_CONFIG[1]
+          return (
+            <div className="w-full max-w-6xl mx-auto my-auto flex flex-col items-center justify-center px-4">
+              {/* MINIMAL TOP BROADCAST HUD */}
+              <div className="w-full flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-white/10">
+                <div>
+                  <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                    <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-white/10 text-white border border-white/15">
+                      {roundConfig.roundLabel}
+                    </span>
+                    <span className={`px-3 py-1 rounded-full text-xs font-mono font-bold border shadow-sm ${roundConfig.badgeClass}`}>
+                      {roundConfig.badge}
+                    </span>
+                    {currentPhase === 'JUDGE_ATTACK' && (
+                      <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center gap-1">
+                        <Flame size={12} className="animate-bounce text-amber-400" />
+                        <span>Judge Q&A Defense</span>
                       </span>
-                      <span className="text-xs text-bwb-muted font-mono">
-                        ({pitchTeam.members?.join(', ') || 'Team Members'})
-                      </span>
-                    </div>
-                    <h3 className="font-display font-black text-4xl sm:text-6xl text-bwb-text tracking-tight">
-                      {pitchTeam.name}
-                    </h3>
+                    )}
                   </div>
-
-                  {/* Individual 60s pitch / defense clock */}
-                  <div className="p-4 rounded-2xl stereo-card border border-purple-500/40 bg-purple-950/20 text-center min-w-[160px]">
-                    <p className="text-[10px] uppercase font-mono tracking-widest text-purple-300 font-bold mb-1">
-                      {currentPhase === 'JUDGE_ATTACK' ? 'Defense Clock' : 'Pitch Clock'}
-                    </p>
-                    <CountdownTimer
-                      initialSeconds={currentPhase === 'JUDGE_ATTACK' ? 30 : 90}
-                      size="lg"
-                    />
-                  </div>
+                  <h1 className="font-display text-2xl sm:text-3xl font-black text-bwb-text tracking-tight flex items-center gap-2">
+                    <Radio size={20} className="text-bwb-accent animate-pulse shrink-0" />
+                    <span>{currentPhase === 'JUDGE_ATTACK' ? 'Live Defense & Technical Attack' : roundConfig.title}</span>
+                  </h1>
                 </div>
 
-                {/* Team's Solution Formulation Details */}
-                <div className="grid md:grid-cols-2 gap-4 mb-6">
-                  {/* Problem being solved */}
-                  {(() => {
-                    const teamProblem = catalog.problems.find((p) => p.id === pitchTeam.selectedProblemId) ?? catalog.problems[0]
-                    const theme = teamProblem ? categoryThemes[teamProblem.category] : null
-                    return (
-                      <div className={`p-4 rounded-2xl bg-gradient-to-br ${theme?.gradient ?? 'from-bwb-surface to-bwb-surface-2'} border ${theme?.border ?? 'border-white/10'}`}>
-                        <span className={`px-2.5 py-0.5 rounded-lg text-[10px] font-bold border ${theme?.badge} inline-block mb-1.5`}>
-                          {theme?.icon} {teamProblem?.category}
+                {/* Session Clock */}
+                <div className="flex items-center gap-2.5 px-4 py-2 rounded-2xl bg-bwb-surface-2/90 border border-white/10 text-xs font-mono font-bold text-bwb-muted shrink-0 self-start sm:self-auto">
+                  <span>Session:</span>
+                  <CountdownTimer
+                    initialSeconds={60 * 60}
+                    size="sm"
+                    running
+                    showExpired={false}
+                  />
+                </div>
+              </div>
+
+              {/* Active Pitching Stage Hero */}
+              {pitchTeam ? (
+                <motion.div
+                  key={pitchTeam.id}
+                  initial={{ opacity: 0, scale: 0.96 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className={`w-full stereo-card rounded-3xl p-6 sm:p-8 border-2 shadow-2xl relative overflow-hidden mb-6 bg-gradient-to-br ${roundConfig.glowGradient} ${roundConfig.borderColor}`}
+                >
+                  <div className="flex flex-wrap items-start justify-between gap-6 mb-6">
+                    <div>
+                      <div className="flex items-center gap-2 mb-2 flex-wrap">
+                        <span className="px-3 py-1 rounded-xl text-xs font-mono font-bold bg-bwb-accent text-bwb-bg shadow-md">
+                          ON STAGE NOW
                         </span>
-                        <h4 className="font-display font-bold text-base text-bwb-text mb-1">
-                          {teamProblem?.title}
-                        </h4>
-                        {teamProblem?.twist && (
-                          <p className="text-xs text-bwb-warn font-semibold">
-                            ⚡ Constraint: {teamProblem.twist}
-                          </p>
-                        )}
+                        <span className="text-xs text-bwb-muted font-mono">
+                          {pitchTeam.members?.join(', ') || 'Team Members'}
+                        </span>
                       </div>
-                    )
-                  })()}
+                      <h3 className="font-display font-black text-3xl sm:text-5xl text-bwb-text tracking-tight">
+                        {pitchTeam.name}
+                      </h3>
+                    </div>
 
-                  {/* 3 Tech components integrated */}
-                  <div className="p-4 rounded-2xl bg-bwb-bg/70 border border-white/10 flex flex-col justify-between">
-                    <p className="text-[10px] uppercase tracking-wider text-bwb-muted font-bold mb-2">
-                      Drafted Tech Components (3):
-                    </p>
-                    <div className="grid grid-cols-3 gap-2">
-                      {((pitchTeam.technologies && pitchTeam.technologies.length >= 3) ? pitchTeam.technologies : catalog.technologies.slice(0, 3)).map((tech) => (
-                        <div key={tech.id} className="p-2 rounded-xl bg-bwb-surface-2 border border-white/5 text-center">
-                          <span className="text-2xl block mb-0.5">{tech.icon}</span>
-                          <span className="text-xs font-bold text-bwb-text truncate block">{tech.name}</span>
-                        </div>
-                      ))}
+                    {/* Pitch / Defense Clock */}
+                    <div className="p-3.5 sm:p-4 rounded-2xl stereo-card border border-white/15 bg-bwb-bg/80 text-center min-w-[160px] shadow-lg">
+                      <p className="text-[10px] uppercase font-mono tracking-widest text-bwb-accent font-bold mb-1 flex items-center justify-center gap-1">
+                        <Clock size={12} />
+                        <span>{currentPhase === 'JUDGE_ATTACK' ? 'Defense Clock' : 'Pitch Clock'}</span>
+                      </p>
+                      <CountdownTimer
+                        initialSeconds={currentPhase === 'JUDGE_ATTACK' ? 30 : 90}
+                        size="lg"
+                      />
                     </div>
                   </div>
-                </div>
 
-                {/* Solution Summary */}
-                {pitchTeam.submission && (
-                  <div className="p-4 rounded-2xl bg-bwb-bg/80 border border-bwb-accent/20">
-                    <p className="text-xs uppercase font-mono tracking-widest text-bwb-accent font-bold mb-1">
-                      Architecture Proposal: {pitchTeam.submission.solutionName || 'System Architecture'}
-                    </p>
-                    <p className="text-sm text-bwb-text/90 leading-relaxed font-medium">
-                      {pitchTeam.submission.whatItDoes || pitchTeam.submission.howItWorks}
-                    </p>
+                  {/* Team's Problem & Tech Details */}
+                  <div className="grid md:grid-cols-2 gap-4 mb-5">
+                    {/* Problem Domain */}
+                    {(() => {
+                      const teamProblem = catalog.problems.find((p) => p.id === pitchTeam.selectedProblemId) ?? catalog.problems[0]
+                      const theme = teamProblem ? categoryThemes[teamProblem.category] : null
+                      return (
+                        <div className={`p-4 rounded-2xl bg-gradient-to-br ${theme?.gradient ?? 'from-bwb-surface to-bwb-surface-2'} border ${theme?.border ?? 'border-white/10'} text-left space-y-1.5`}>
+                          <span className={`px-2.5 py-0.5 rounded-lg text-[10px] font-bold border ${theme?.badge} inline-block`}>
+                            {theme?.icon} {teamProblem?.category}
+                          </span>
+                          <h4 className="font-display font-bold text-base text-bwb-text leading-snug">
+                            {teamProblem?.title}
+                          </h4>
+                          {teamProblem?.twist && (
+                            <p className="text-xs text-bwb-warn font-semibold">
+                              ⚡ Constraint: {teamProblem.twist}
+                            </p>
+                          )}
+                        </div>
+                      )
+                    })()}
+
+                    {/* 3 Frontier Tech Cards */}
+                    <div className="p-4 rounded-2xl bg-bwb-bg/80 border border-white/10 flex flex-col justify-between text-left">
+                      <p className="text-[10px] uppercase tracking-wider text-bwb-muted font-bold mb-2 flex items-center gap-1.5">
+                        <Zap size={12} className="text-amber-400" />
+                        <span>Assigned Frontier Tech:</span>
+                      </p>
+                      <div className="grid grid-cols-3 gap-2">
+                        {((pitchTeam.technologies && pitchTeam.technologies.length >= 3) ? pitchTeam.technologies : catalog.technologies.slice(0, 3)).map((tech) => (
+                          <div key={tech.id} className="p-2 rounded-xl bg-bwb-surface-2 border border-white/5 text-center">
+                            <span className="text-2xl block mb-0.5">{tech.icon}</span>
+                            <span className="text-xs font-bold text-bwb-text truncate block">{tech.name}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   </div>
-                )}
-              </motion.div>
-            ) : (
-              <div className="w-full stereo-card rounded-3xl p-10 sm:p-16 border-2 border-bwb-accent/20 shadow-2xl text-center bg-gradient-to-br from-bwb-surface-2/95 to-bwb-surface mb-6">
-                <div className="w-20 h-20 rounded-2xl bg-bwb-accent/10 border border-bwb-accent/30 flex items-center justify-center mx-auto mb-5">
-                  <Mic size={36} className="text-bwb-accent animate-pulse" />
+
+                  {/* Architecture Summary */}
+                  {pitchTeam.submission && (
+                    <div className="p-4 sm:p-5 rounded-2xl bg-bwb-bg/90 border border-white/10 text-left space-y-1.5">
+                      <p className="text-xs uppercase font-mono tracking-widest text-bwb-accent font-bold">
+                        {pitchTeam.submission.solutionName || 'System Architecture Proposal'}
+                      </p>
+                      <p className="text-sm text-bwb-text/90 leading-relaxed font-medium">
+                        {pitchTeam.submission.whatItDoes || pitchTeam.submission.howItWorks}
+                      </p>
+                    </div>
+                  )}
+                </motion.div>
+              ) : (
+                /* MINIMAL SLEEK WAITING CARD */
+                <div className={`w-full stereo-card rounded-3xl p-8 sm:p-12 border-2 shadow-2xl text-center mb-6 bg-gradient-to-br ${roundConfig.glowGradient} ${roundConfig.borderColor}`}>
+                  <div className="w-18 h-18 sm:w-20 sm:h-20 rounded-3xl bg-bwb-bg/80 border border-white/15 flex items-center justify-center mx-auto mb-4 shadow-xl">
+                    <Mic size={38} className="text-bwb-accent animate-pulse" />
+                  </div>
+                  
+                  <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/10 text-xs font-mono font-bold text-bwb-text uppercase tracking-widest mb-3">
+                    <span className="w-2 h-2 rounded-full bg-bwb-accent animate-ping" />
+                    <span>Stage Standby</span>
+                  </div>
+
+                  <h2 className="font-display font-black text-2xl sm:text-4xl text-bwb-text mb-2">
+                    {roundConfig.waitingHeadline}
+                  </h2>
+                  
+                  <p className="text-xs sm:text-sm text-bwb-muted max-w-md mx-auto mb-6">
+                    {roundConfig.waitingSubtext}
+                  </p>
+
+                  {/* Minimal 4-Pill Evaluation Highlights */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-2xl mx-auto">
+                    {roundConfig.focusHighlights.map((f) => (
+                      <div key={f.label} className="p-3 rounded-2xl bg-bwb-bg/70 border border-white/10 text-center">
+                        <span className="text-lg block mb-0.5">{f.icon}</span>
+                        <span className="text-xs font-bold text-bwb-text block truncate">{f.label}</span>
+                        <span className={`text-[11px] font-mono font-bold ${roundConfig.accentColor}`}>{f.pts}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <h3 className="font-display font-black text-3xl sm:text-4xl text-bwb-text mb-2">
-                  WAITING FOR NEXT PITCH
-                </h3>
-                <p className="text-sm text-bwb-muted max-w-md mx-auto">
-                  The judge will call the next team to the stage. Please standby.
-                </p>
+              )}
+
+              {/* Team Presentation Queue Bar */}
+              <div className="w-full flex items-center justify-start gap-2 overflow-x-auto pb-2 scrollbar-none">
+                <span className="text-xs font-mono text-bwb-muted mr-1 shrink-0 font-bold">Stage Queue:</span>
+                {game.teams.map((team, idx) => {
+                  const isCurrent = team.id === (pitchTeam?.id ?? '')
+                  const isPitched = pitchedTeamIds.includes(team.id)
+                  return (
+                    <div
+                      key={team.id}
+                      className={`shrink-0 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 border ${
+                        isCurrent
+                          ? 'bg-bwb-accent text-bwb-bg border-bwb-accent shadow-md scale-105'
+                          : isPitched
+                          ? 'bg-bwb-success/15 text-bwb-success border-bwb-success/30'
+                          : 'bg-bwb-surface-2 text-bwb-muted border-bwb-border'
+                      }`}
+                    >
+                      <span>#{idx + 1}</span>
+                      <span>{team.name}</span>
+                    </div>
+                  )
+                })}
               </div>
-            )}
-
-            {/* Team Presentation Queue Bar */}
-            <div className="w-full flex items-center justify-start gap-2 overflow-x-auto pb-2 scrollbar-none">
-              <span className="text-xs font-mono text-bwb-muted mr-1 shrink-0">Stage Queue:</span>
-              {game.teams.map((team, idx) => {
-                const isCurrent = team.id === (pitchTeam?.id ?? '')
-                const isPitched = pitchedTeamIds.includes(team.id)
-                return (
-                  <div
-                    key={team.id}
-                    className={`shrink-0 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 border ${
-                      isCurrent
-                        ? 'bg-bwb-accent text-bwb-bg border-bwb-accent shadow-md'
-                        : isPitched
-                        ? 'bg-bwb-success/15 text-bwb-success border-bwb-success/30'
-                        : 'bg-bwb-surface-2 text-bwb-muted border-bwb-border'
-                    }`}
-                  >
-                    <span>#{idx + 1}</span>
-                    <span>{team.name}</span>
-                  </div>
-                )
-              })}
             </div>
-          </div>
-        )}
+          )
+        })()}
 
         {/* ============================================================
             6. JUDGING PHASE: GRAND STADIUM EVALUATION & DELIBERATION ARENA

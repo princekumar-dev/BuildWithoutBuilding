@@ -7,24 +7,24 @@ import { Button } from '../../components/ui/Button'
 
 const tournamentRounds = [
   {
-    num: 'ROUND 01',
-    title: 'Open Qualifier & Ideation',
-    badge: 'No Elimination',
-    desc: 'All registered squads participate. Teams receive tech cards, formulate initial architectures, and present on stage. No teams are eliminated in Round 1 — all advance to Round 2!',
+    num: 'ROUND 01 · 100 MARKS',
+    title: 'Problem & Existing Landscape',
+    badge: 'Zero Elimination',
+    desc: 'Select 1 of 8 problems, draft 3 frontier tech cards, and pitch how deeply your team understands the problem statement, root causes, and limitations of existing solutions. Evaluated for 100 marks. Zero elimination — all teams advance!',
     icon: '🚀',
   },
   {
-    num: 'ROUND 02',
-    title: '8 Challenges Showdown (Max 2 Teams / Problem)',
+    num: 'ROUND 02 · 100 MARKS',
+    title: 'Solution & Tech Architecture',
     badge: 'Top 8 Qualify for Finals',
-    desc: 'There are exactly 8 distinct problem statements. Each challenge can only be chosen by a maximum of 2 teams (16 teams total capacity). After rigorous pitch and judge attack evaluations, only the Top 8 teams advance to the Grand Finals.',
+    desc: 'Teams present how they enhance their solution, integrate all 3 surprise frontier tech cards, and deliver novel ideation and system architecture. Evaluated for 100 marks. The Top 8 squads advance to the Grand Finals.',
     icon: '⚡',
   },
   {
-    num: 'ROUND 03',
-    title: 'Grand Finals & Prize Ceremony',
-    badge: 'Top 4 Awarded Prizes',
-    desc: 'The 8 Finalist squads face high-intensity evaluation. The top 4 positions receive Championship Honors: 1st Place (1 Champion), 2nd Place (1 Runner-Up), and 3rd Place (2 Joint Bronze Winners).',
+    num: 'ROUND 03 · GRAND FINALS',
+    title: 'Master Pitch & Stage Defense',
+    badge: 'Top 4 Crowned on Podium',
+    desc: 'The Top 8 Finalists defend their master architectures live on stage against rigorous judge Q&A. The top 4 positions receive Championship Honors: 🥇 1st Place (1 Champion), 🥈 2nd Place (1 Runner-Up), and 🥉 3rd Place (2 Joint Bronze Winners).',
     icon: '🏆',
   },
 ]
@@ -32,21 +32,20 @@ const tournamentRounds = [
 const steps = [
   { num: '01', title: 'Join & Roster Entry', desc: 'Enter the Room PIN provided by your host. Register your squad of 2–3 members and receive your unique Team Passcode.' },
   { num: '02', title: 'Pick Your Challenge', desc: 'Select 1 of 8 Problem Statements (strictly max 2 teams per problem statement capacity).' },
-  { num: '03', title: 'Draft 3 Tech Cards', desc: 'Each team receives 3 randomized core technology cards that must be incorporated into the solution architecture.' },
-  { num: '04', title: '15m Build Architecture Sprint', desc: 'You have 15 minutes to architect a full system solution explaining data flow, edge telemetry, and component integration.' },
+  { num: '03', title: 'Draft 3 Tech Cards', desc: 'Each team drafts 3 surprise frontier tech cards that must be incorporated into the architecture.' },
+  { num: '04', title: '15m Build Architecture Sprint', desc: 'Round 1 focuses on problem understanding and existing solution landscape; Round 2 focuses on enhanced solution architecture and 3-card tech integration.' },
   { num: '05', title: '60s Live Pitch & 20s Defense', desc: 'Present your solution verbally on stage. When the timer ends, defend against targeted technical judge attacks.' },
-  { num: '06', title: 'Judging Deliberation', desc: 'The jury panel scores teams across 7 rubric dimensions (100 points total) during live deliberation.' },
-  { num: '07', title: 'Rankings & Championship Podium', desc: 'Standings revealed! Round 1 (No elimination), Round 2 (Top 8 qualify), Round 3 (Top 4 awarded 1st, 2nd, and dual 3rd prizes).' },
+  { num: '06', title: 'Judging Deliberation (100 Marks)', desc: 'The jury panel scores teams across the official 100-mark rubric during live deliberation.' },
+  { num: '07', title: 'Rankings & Championship Podium', desc: 'Standings revealed! Round 1 (Zero elimination), Round 2 (Top 8 qualify), Round 3 (Top 4 awarded 1st, 2nd, and dual 3rd prizes).' },
 ]
 
 const rubric = [
-  { label: 'Problem Understanding', pts: 15 },
-  { label: 'Creativity & Novelty', pts: 20 },
-  { label: 'Technology Integration', pts: 20 },
-  { label: 'Technical Feasibility', pts: 20 },
-  { label: 'Real-World Impact', pts: 10 },
-  { label: 'Pitch Clarity', pts: 10 },
-  { label: 'Defense / Q&A', pts: 5 },
+  { label: 'Problem Understanding & Landscape (Round 1 Focus)', pts: 30 },
+  { label: 'Novelty & Architecture Ideation (Round 2 Focus)', pts: 20 },
+  { label: '3-Card Frontier Tech Integration', pts: 20 },
+  { label: 'Technical Feasibility & Edge Flow', pts: 15 },
+  { label: 'Pitch Presentation Clarity', pts: 10 },
+  { label: 'Judge Q&A Defense', pts: 5 },
 ]
 
 export default function HowToPlayPage() {

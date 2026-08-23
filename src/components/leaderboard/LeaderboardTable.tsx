@@ -1,5 +1,4 @@
 import React from 'react'
-import { motion } from 'framer-motion'
 import type { Team } from '../../types'
 
 interface LeaderboardTableProps {
@@ -50,17 +49,14 @@ export function LeaderboardTable({
 
             return (
               <React.Fragment key={team.id}>
-                <motion.tr
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.04 }}
-                  className={`border-t border-bwb-border ${
+                <tr
+                  className={`border-t border-bwb-border transition-colors duration-150 ${
                     isHighlighted
                       ? 'bg-bwb-accent/10 ring-1 ring-bwb-accent/30'
                       : isFirst && (round === 3 || isFinalResults)
                       ? 'bg-amber-500/10'
                       : 'bg-bwb-surface hover:bg-bwb-surface-2/50'
-                  } transition-colors`}
+                  }`}
                 >
                   {/* Rank Column */}
                   <td className="px-2 sm:px-3 py-3">
@@ -112,10 +108,10 @@ export function LeaderboardTable({
                         <span className="px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-[9px] sm:text-[10px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40 whitespace-nowrap">
                           🥉 3RD PLACE ({rank === 3 ? 'A' : 'B'})
                         </span>
-                    ) : (
-                      <span className="px-1.5 sm:px-2 py-0.5 rounded-lg text-[9px] sm:text-[10px] font-mono text-bwb-muted bg-white/5 border border-white/10">
-                        🎖️ Finalist #{rank}
-                      </span>
+                      ) : (
+                        <span className="px-1.5 sm:px-2 py-0.5 rounded-lg text-[9px] sm:text-[10px] font-mono text-bwb-muted bg-white/5 border border-white/10">
+                          🎖️ Finalist #{rank}
+                        </span>
                       )
                     ) : round === 2 ? (
                       isTop8 ? (
@@ -139,7 +135,7 @@ export function LeaderboardTable({
                     {team.score ?? 0}
                     <span className="text-[9px] text-bwb-muted font-mono font-normal"> pts</span>
                   </td>
-                </motion.tr>
+                </tr>
 
                 {/* Round 2 Qualification Cut-Off Divider */}
                 {showRound2Cutoff && (
@@ -159,4 +155,3 @@ export function LeaderboardTable({
     </div>
   )
 }
-

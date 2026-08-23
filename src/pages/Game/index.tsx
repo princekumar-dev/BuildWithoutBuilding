@@ -247,6 +247,7 @@ export default function GamePage() {
                 disabled={isFormLocked || saving}
                 initial={currentSubmission}
                 submitLabel={isEditing ? (saving ? 'Saving Changes…' : 'Update & Save Solution') : (saving ? 'Submitting…' : 'Submit Solution')}
+                currentRound={game.currentRound || 1}
               />
             </Card>
           </div>

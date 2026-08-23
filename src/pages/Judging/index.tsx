@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { Sparkles, Award, CheckCircle2, Shield, Brain, Cpu, Lightbulb, Compass } from 'lucide-react'
+import { Sparkles, Award, CheckCircle2, Shield, Brain, Cpu, Lightbulb, Compass, Zap, Target } from 'lucide-react'
 import { PageLayout } from '../../components/layout/PageLayout'
 import { Card } from '../../components/ui/Card'
 import { Badge } from '../../components/ui/Badge'
@@ -7,14 +7,17 @@ import { PhaseIndicator } from '../../components/ui/PhaseIndicator'
 import { useGameStore } from '../../store/gameStore'
 import { usePhaseNavigation } from '../../hooks/usePhaseNavigation'
 import { useRealtimeGame } from '../../hooks/useRealtimeGame'
+import { getScoringCriteriaForRound } from '../../data/mockData'
 
-const RUBRIC_CRITERIA = [
-  { label: 'Problem Understanding', maxPts: 15, icon: Brain, color: 'text-blue-400 bg-blue-500/10 border-blue-500/30' },
-  { label: 'Technical Feasibility', maxPts: 20, icon: Cpu, color: 'text-purple-400 bg-purple-500/10 border-purple-500/30' },
-  { label: 'Creativity & Novelty', maxPts: 20, icon: Lightbulb, color: 'text-amber-400 bg-amber-500/10 border-amber-500/30' },
-  { label: 'Technology Integration', maxPts: 20, icon: Compass, color: 'text-cyan-400 bg-cyan-500/10 border-cyan-500/30' },
-  { label: 'Pitch & Defense Q&A', maxPts: 25, icon: Shield, color: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30' },
-]
+const ICON_MAP: Record<string, typeof Brain> = {
+  problemUnderstanding: Brain,
+  technicalFeasibility: Cpu,
+  creativity: Lightbulb,
+  technologyUsage: Zap,
+  pitch: Compass,
+  defense: Shield,
+  realWorldImpact: Target,
+}
 
 export default function JudgingPage() {
   usePhaseNavigation()
@@ -26,6 +29,7 @@ export default function JudgingPage() {
   const scoredCount = game.teams.filter((t) => (t.score ?? 0) > 0).length
   const totalTeams = game.teams.length || 1
   const progressPercent = Math.round((scoredCount / totalTeams) * 100)
+  const currentCriteria = getScoringCriteriaForRound(currentRound)
 
   return (
     <PageLayout>
@@ -108,25 +112,30 @@ export default function JudgingPage() {
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
-            {RUBRIC_CRITERIA.map((criterion, idx) => {
-              const IconComp = criterion.icon
+            {currentCriteria.map((criterion, idx) => {
+              const IconComp = ICON_MAP[criterion.key] || Award
               return (
                 <motion.div
-                  key={criterion.label}
+                  key={criterion.key}
                   initial={{ opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: idx * 0.06 }}
-                  className={`p-4 rounded-2xl border ${criterion.color} flex items-start gap-3 backdrop-blur-md`}
+                  className="p-4 rounded-2xl border border-purple-500/30 bg-purple-500/5 flex items-start gap-3 backdrop-blur-md"
                 >
-                  <div className="p-2.5 rounded-xl bg-bwb-surface border border-white/10 shrink-0">
+                  <div className="p-2.5 rounded-xl bg-purple-500/20 text-purple-300 border border-purple-500/30 shrink-0">
                     <IconComp size={20} />
                   </div>
                   <div>
                     <h4 className="font-display font-bold text-sm text-bwb-text leading-snug">
                       {criterion.label}
                     </h4>
-                    <span className="text-xs font-mono font-bold text-bwb-muted mt-1 block">
-                      Up to {criterion.maxPts} Pts
+                    {criterion.desc && (
+                      <p className="text-[11px] text-bwb-muted mt-0.5 leading-relaxed">
+                        {criterion.desc}
+                      </p>
+                    )}
+                    <span className="text-xs font-mono font-bold text-purple-300 mt-1 block">
+                      Up to {criterion.max} Pts
                     </span>
                   </div>
                 </motion.div>

@@ -61,6 +61,11 @@ button {
     min-height: 44px;
   }
 
+  .host-mobile-view .stereo-card {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+
   .host-mobile-view [class*="overflow-x-auto"],
   .projector-mobile-view [class*="overflow-x-auto"] {
     -webkit-overflow-scrolling: touch;
@@ -276,6 +281,12 @@ h1, h2, h3, h4, h5, h6 {
   .glass, .glass-card, .holo-card {
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
+  }
+
+  .stereo-card {
+    box-shadow:
+      0 10px 25px rgba(0, 0, 0, 0.5),
+      0 2px 6px rgba(0, 229, 199, 0.03);
   }
 }
 

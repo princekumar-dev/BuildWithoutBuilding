@@ -56,8 +56,8 @@ export default function LandingPage() {
       {/* HERO SECTION WITH DEPARTMENT & MICROSOFT AI CLUB BRANDING */}
       <section className="relative pt-6 sm:pt-14 pb-8 sm:pb-14 px-4 sm:px-6 overflow-hidden">
         {/* Background Atmospheric Glows */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[700px] h-[500px] bg-gradient-to-tr from-bwb-accent/15 via-purple-600/10 to-transparent blur-[120px] pointer-events-none" />
-        <div className="absolute top-10 right-10 w-96 h-96 bg-cyan-500/10 blur-[100px] pointer-events-none" />
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[700px] h-[500px] bg-gradient-to-tr from-bwb-accent/15 via-purple-600/10 to-transparent blur-[40px] sm:blur-[120px] pointer-events-none" />
+        <div className="absolute top-10 right-10 w-96 h-96 bg-cyan-500/10 blur-[40px] sm:blur-[100px] pointer-events-none" />
 
         <div className="max-w-6xl mx-auto text-center relative z-10">
           <motion.div
@@ -206,8 +206,9 @@ export default function LandingPage() {
             <motion.div
               key={title}
               initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 * idx + 0.2 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.15 }}
+              transition={{ duration: 0.5, delay: 0.1 * idx }}
             >
               <div className={`h-full rounded-3xl p-6 border ${border} bg-gradient-to-b ${color} stereo-card flex flex-col justify-between shadow-xl relative overflow-hidden group hover:scale-[1.02] transition-transform`}>
                 <div>

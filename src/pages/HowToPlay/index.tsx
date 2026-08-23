@@ -1,9 +1,11 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Trophy, Award, Sparkles } from 'lucide-react'
 import { PageLayout } from '../../components/layout/PageLayout'
 import { Card } from '../../components/ui/Card'
 import { Badge } from '../../components/ui/Badge'
 import { Button } from '../../components/ui/Button'
+import { getScoringCriteriaForRound } from '../../data/mockData'
 
 const tournamentRounds = [
   {
@@ -77,16 +79,15 @@ const buildStrategies = [
   },
 ]
 
-const rubric = [
-  { label: 'Problem Understanding & Root Causes (R1: 35 Pts · R2: 10 Pts · R3: 10 Pts)', pts: '35 / 100' },
-  { label: 'Critique of Existing Solutions & Novelty (R1: 25 Pts · R2: 25 Pts · R3: 30 Pts)', pts: '25 / 100' },
-  { label: '3-Card Frontier Tech Integration (R1: 20 Pts · R2: 30 Pts · R3: 20 Pts)', pts: '30 / 100' },
-  { label: 'Technical Feasibility & System Flow (R1: 15 Pts · R2: 20 Pts · R3: 25 Pts)', pts: '25 / 100' },
-  { label: 'Pitch Presentation Clarity & Delivery', pts: '10 / 100' },
-  { label: 'Judge Attack Defense & Q&A Response', pts: '15 / 100' },
+const rubricRounds = [
+  { id: 1 as const, name: 'Round 1', subtitle: 'Problem Understanding', icon: '🚀', badge: '100 Pts' },
+  { id: 2 as const, name: 'Round 2', subtitle: 'Solution Architecture', icon: '⚡', badge: '100 Pts' },
+  { id: 3 as const, name: 'Round 3', subtitle: 'Grand Finals Defense', icon: '🏆', badge: '100 Pts' },
 ]
 
 export default function HowToPlayPage() {
+  const [activeRubricRound, setActiveRubricRound] = useState<1 | 2 | 3>(1)
+
   return (
     <PageLayout>
       <div className="max-w-4xl mx-auto px-1 sm:px-4 pb-12">
@@ -148,20 +149,20 @@ export default function HowToPlayPage() {
             {eventTimeline.map((item, idx) => (
               <div
                 key={idx}
-                className="p-3.5 rounded-2xl bg-bwb-bg/70 border border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                className="p-3.5 rounded-2xl bg-bwb-bg/70 border border-white/5 flex items-start gap-3"
               >
-                <div className="flex items-start gap-3">
-                  <span className="w-6 h-6 rounded-lg bg-cyan-500/20 text-cyan-300 font-mono text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
-                    {idx + 1}
-                  </span>
-                  <div>
-                    <h4 className="font-display font-bold text-sm text-bwb-text">{item.phase}</h4>
-                    <p className="text-xs text-bwb-muted mt-0.5">{item.desc}</p>
-                  </div>
-                </div>
-                <span className="px-2.5 py-1 rounded-xl text-xs font-mono font-bold bg-bwb-surface-2 text-cyan-300 border border-cyan-500/20 shrink-0 self-start sm:self-auto">
-                  {item.estTime}
+                <span className="w-6 h-6 rounded-lg bg-cyan-500/20 text-cyan-300 font-mono text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
+                  {idx + 1}
                 </span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between gap-2 flex-wrap sm:flex-nowrap">
+                    <h4 className="font-display font-bold text-sm text-bwb-text">{item.phase}</h4>
+                    <span className="px-2.5 py-0.5 rounded-xl text-xs font-mono font-bold bg-bwb-surface-2 text-cyan-300 border border-cyan-500/20 shrink-0">
+                      {item.estTime}
+                    </span>
+                  </div>
+                  <p className="text-xs text-bwb-muted mt-1 leading-relaxed">{item.desc}</p>
+                </div>
               </div>
             ))}
           </div>
@@ -235,15 +236,92 @@ export default function HowToPlayPage() {
         </div>
 
         {/* Rubric */}
-        <Card padding="lg" className="mb-10">
-          <h2 className="font-display text-xl font-bold mb-4">Official Scoring Rubric (100 Points Total)</h2>
-          <div className="space-y-2">
-            {rubric.map((r) => (
-              <div key={r.label} className="flex justify-between text-xs sm:text-sm py-1.5 border-b border-bwb-border last:border-0">
-                <span className="text-bwb-muted font-medium">{r.label}</span>
-                <span className="font-display font-bold text-bwb-accent">{r.pts}</span>
+        <Card padding="lg" className="mb-10 border-bwb-accent/30 bg-gradient-to-b from-bwb-surface-2/80 to-bwb-surface">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-5 pb-3 border-b border-white/10">
+            <div>
+              <span className="text-[10px] font-mono uppercase tracking-widest text-bwb-accent font-bold">
+                EVALUATION CRITERIA
+              </span>
+              <h2 className="font-display text-xl font-bold text-bwb-text">
+                Official Scoring Rubric (100 Points Total)
+              </h2>
+            </div>
+            <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-bwb-accent/20 text-bwb-accent border border-bwb-accent/30 w-fit">
+              100 Pts per Round
+            </span>
+          </div>
+
+          {/* Round Selection Tabs */}
+          <div className="grid grid-cols-3 gap-2 mb-5">
+            {rubricRounds.map((r) => {
+              const active = activeRubricRound === r.id
+              return (
+                <button
+                  key={r.id}
+                  type="button"
+                  onClick={() => setActiveRubricRound(r.id)}
+                  className={`p-2 sm:p-3 rounded-xl border text-left transition-all flex flex-col justify-between ${
+                    active
+                      ? 'bg-bwb-accent/20 border-bwb-accent text-white shadow-lg shadow-bwb-accent/10'
+                      : 'bg-bwb-bg/50 border-white/5 text-bwb-muted hover:border-white/20 hover:text-bwb-text'
+                  }`}
+                >
+                  <div className="flex items-center justify-between w-full mb-1">
+                    <span className="text-base sm:text-lg">{r.icon}</span>
+                    <span className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded ${
+                      active ? 'bg-bwb-accent/30 text-white' : 'bg-white/5 text-bwb-muted'
+                    }`}>
+                      {r.badge}
+                    </span>
+                  </div>
+                  <div>
+                    <p className={`font-display font-bold text-xs sm:text-sm leading-tight ${active ? 'text-white' : 'text-bwb-text'}`}>
+                      {r.name}
+                    </p>
+                    <p className="text-[10px] sm:text-xs text-bwb-muted truncate hidden sm:block mt-0.5">
+                      {r.subtitle}
+                    </p>
+                  </div>
+                </button>
+              )
+            })}
+          </div>
+
+          {/* Criteria Cards */}
+          <div className="space-y-2.5">
+            {getScoringCriteriaForRound(activeRubricRound).map((item) => (
+              <div
+                key={item.key}
+                className="p-3 sm:p-3.5 rounded-xl bg-bwb-bg/70 border border-white/5 hover:border-white/10 transition-colors"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-display font-bold text-xs sm:text-sm text-bwb-text">
+                      {item.label}
+                    </h4>
+                    {item.desc && (
+                      <p className="text-[11px] sm:text-xs text-bwb-muted mt-0.5 leading-relaxed">
+                        {item.desc}
+                      </p>
+                    )}
+                  </div>
+                  <span className="px-2.5 py-1 rounded-lg bg-bwb-accent/15 text-bwb-accent border border-bwb-accent/30 font-mono text-xs font-bold shrink-0 whitespace-nowrap">
+                    {item.max} Pts
+                  </span>
+                </div>
+                <div className="w-full bg-white/5 rounded-full h-1 mt-2 overflow-hidden">
+                  <div
+                    className="bg-gradient-to-r from-bwb-accent to-purple-400 h-full rounded-full"
+                    style={{ width: `${item.max}%` }}
+                  />
+                </div>
               </div>
             ))}
+          </div>
+
+          <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-xs font-mono">
+            <span className="text-bwb-muted">Total Evaluation Weight</span>
+            <span className="font-bold text-bwb-accent text-sm">100 / 100 Points</span>
           </div>
         </Card>
 

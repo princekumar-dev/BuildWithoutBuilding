@@ -56,7 +56,7 @@ export function SolutionForm({ technologies, onSubmit, disabled, initial, submit
           <div className="flex items-center justify-between">
             <span className="text-xs font-mono font-bold text-purple-300 uppercase flex items-center gap-1.5">
               <Target size={14} className="text-purple-400" />
-              Round 1 Evaluation Focus · 100 Marks
+              Round 1 Evaluation Focus · 100 Pts
             </span>
             <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300">
               Zero Elimination
@@ -73,7 +73,7 @@ export function SolutionForm({ technologies, onSubmit, disabled, initial, submit
           <div className="flex items-center justify-between">
             <span className="text-xs font-mono font-bold text-bwb-accent uppercase flex items-center gap-1.5">
               <Sparkles size={14} className="text-bwb-accent" />
-              Round 2 Evaluation Focus · 100 Marks
+              Round 2 Evaluation Focus · 100 Pts
             </span>
             <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-bwb-accent/20 text-bwb-accent">
               Top 8 Qualify

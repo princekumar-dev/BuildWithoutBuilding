@@ -18,6 +18,7 @@ import { useRealtimeGame } from '../../hooks/useRealtimeGame'
 import { drawProblemCards } from '../../data/mockData'
 import type { Submission } from '../../types'
 import { api } from '../../lib/api'
+import { getPhaseDuration } from '../../lib/phaseTimers'
 
 export default function GamePage() {
   const navigate = useNavigate()
@@ -83,7 +84,13 @@ export default function GamePage() {
             <Badge>{myTeam?.name ?? 'Loading squad…'}</Badge>
           </div>
 
-          <CountdownTimer initialSeconds={15 * 60} running={!hasSubmitted} size="md" label="Build Time" />
+          <CountdownTimer
+            key={`build-timer-r${game.currentRound || 1}`}
+            initialSeconds={getPhaseDuration(game.id, game.currentRound || 1, 'BUILDING', game.buildDurationMinutes)}
+            running={!hasSubmitted}
+            size="md"
+            label="Build Time"
+          />
 
           {hasSubmitted && (
             <div className="flex items-center gap-2 text-bwb-success text-sm font-semibold">

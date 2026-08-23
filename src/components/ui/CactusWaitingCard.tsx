@@ -842,6 +842,16 @@ export function CactusWaitingCard({
               className="w-full p-3.5 sm:p-4 rounded-2xl bg-bwb-bg border border-white/10 text-left space-y-3 will-change-transform gpu-layer"
             >
 
+              {/* Approximate Event Duration Banner */}
+              <div className="p-2.5 rounded-xl bg-cyan-950/40 border border-cyan-500/30 flex items-center justify-between gap-2 text-[11px] font-mono">
+                <span className="text-cyan-300 font-bold flex items-center gap-1.5">
+                  ⏱️ Estimated Event Runtime:
+                </span>
+                <span className="px-2 py-0.5 rounded-md bg-cyan-500/20 text-cyan-300 font-bold border border-cyan-500/30">
+                  ~4.5 to 5.0 Hours Total
+                </span>
+              </div>
+
               {/* Round 1 */}
               <div className="p-3 rounded-xl bg-bwb-surface border border-purple-500/20 flex items-start gap-3">
                 <span className="w-7 h-7 rounded-lg bg-purple-500/20 text-purple-300 border border-purple-500/40 flex items-center justify-center text-xs font-mono font-bold shrink-0">
@@ -849,13 +859,13 @@ export function CactusWaitingCard({
                 </span>
                 <div>
                   <div className="flex items-center gap-1.5 flex-wrap">
-                    <p className="text-xs font-bold text-bwb-text">Round 1: Problem & Existing Landscape (100 Marks)</p>
+                    <p className="text-xs font-bold text-bwb-text">Round 1: Problem & Existing Landscape (100 Pts)</p>
                     <span className="text-[10px] font-mono font-bold px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                      Zero Elimination
+                      Zero Elimination · 45m Build
                     </span>
                   </div>
                   <p className="text-[11px] text-bwb-muted mt-0.5 leading-relaxed">
-                    Select 1 of 8 problems, draft 3 frontier tech cards, and pitch your deep problem understanding, root causes, and critique of existing solutions. Evaluated for 100 marks.
+                    Select 1 of 8 problems, draft 3 frontier tech cards, and pitch your deep problem root causes and critique of existing solutions. 45-minute build sprint. Evaluated for 100 pts.
                   </p>
                 </div>
               </div>
@@ -867,13 +877,13 @@ export function CactusWaitingCard({
                 </span>
                 <div>
                   <div className="flex items-center gap-1.5 flex-wrap">
-                    <p className="text-xs font-bold text-bwb-text">Round 2: Solution & Tech Architecture (100 Marks)</p>
+                    <p className="text-xs font-bold text-bwb-text">Round 2: Solution & Tech Architecture (100 Pts)</p>
                     <span className="text-[10px] font-mono font-bold px-1.5 py-0.2 rounded bg-bwb-accent/20 text-bwb-accent border border-bwb-accent/30">
-                      Top 8 Advance
+                      Top 8 Advance · 30m Build
                     </span>
                   </div>
                   <p className="text-[11px] text-bwb-muted mt-0.5 leading-relaxed">
-                    Present your enhanced solution, novelty, and deep 3-card frontier tech integration. Evaluated for 100 marks. Top 8 squads advance to Grand Finals!
+                    Present your enhanced architecture and deep 3-card frontier tech synergy. 30-minute build sprint. Evaluated for 100 pts. Top 8 squads advance to Grand Finals!
                   </p>
                 </div>
               </div>
@@ -887,13 +897,18 @@ export function CactusWaitingCard({
                   <div className="flex items-center gap-1.5 flex-wrap">
                     <p className="text-xs font-bold text-bwb-text">Round 3: Grand Finals & Championship Defense</p>
                     <span className="text-[10px] font-mono font-bold px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                      Top 4 Podium
+                      Top 4 Podium · 30m Polish
                     </span>
                   </div>
                   <p className="text-[11px] text-bwb-muted mt-0.5 leading-relaxed">
-                    Top 8 Finalists defend refined master architectures live on stage against judge Q&A. Top 4 teams win honors: 🥇 1st Place Champion, 🥈 2nd Place Runner-Up, and 🥉 Dual 3rd Place Bronze Winners.
+                    Top 8 Finalists polish master blueprints (30m) and defend live on stage against judge Q&A. Top 4 teams win honors: 🥇 1st Champion, 🥈 2nd Runner-Up, 🥉 Dual 3rd Bronze Winners.
                   </p>
                 </div>
+              </div>
+
+              {/* How to Build Without Building Note */}
+              <div className="p-2.5 rounded-xl bg-purple-950/30 border border-purple-500/20 text-[11px] text-purple-200 text-left">
+                <strong className="text-purple-300">💡 How to &quot;Build Without Building&quot;:</strong> You don&apos;t code! Formulate system diagrams, telemetry pipelines, hardware BOM constraints, and 3-card tech integration.
               </div>
 
               {/* 7-Stage Flow */}

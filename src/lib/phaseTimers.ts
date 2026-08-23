@@ -8,14 +8,22 @@ function storageKey(gameId: string, round: number) {
   return `bwb-phase-timers:${gameId}:round:${round}`
 }
 
-export function getPhaseDuration(gameId: string, round: number, phase: TimedPhase, buildMinutes: number) {
+export function getDefaultBuildMinutes(round: number, fallbackBuildMinutes?: number): number {
+  if (round === 1) return 45
+  if (round === 2) return 30
+  if (round === 3) return 30
+  return fallbackBuildMinutes || 45
+}
+
+export function getPhaseDuration(gameId: string, round: number, phase: TimedPhase, buildMinutes?: number) {
   if (typeof window !== 'undefined') {
     try {
       const saved = JSON.parse(window.localStorage.getItem(storageKey(gameId, round)) || '{}') as Partial<Record<TimedPhase, number>>
       if (typeof saved[phase] === 'number' && saved[phase] > 0) return saved[phase]
     } catch { /* Use the event defaults when saved settings are invalid. */ }
   }
-  return phase === 'BUILDING' ? buildMinutes * 60 : 3 * 60
+  const defaultMinutes = getDefaultBuildMinutes(round, buildMinutes)
+  return phase === 'BUILDING' ? defaultMinutes * 60 : 3 * 60
 }
 
 export function setPhaseDuration(gameId: string, round: number, phase: TimedPhase, seconds: number) {

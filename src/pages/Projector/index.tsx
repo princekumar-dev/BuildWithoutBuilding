@@ -14,12 +14,13 @@ import { SoundFX } from '../../lib/soundEffects'
 import { useGameStore } from '../../store/gameStore'
 import { useRealtimeGame } from '../../hooks/useRealtimeGame'
 import { api } from '../../lib/api'
+import { getPhaseDuration } from '../../lib/phaseTimers'
 import type { Game, GamePhase, Problem, Technology } from '../../types'
 
 const STADIUM_ANNOUNCEMENTS = [
   { icon: '🚀', tag: 'ARENA STAGE BROADCAST', text: 'Welcome squads! Connect your devices at /join and prepare your architecture strategy!' },
-  { icon: '⚡', tag: 'ROUND 1 · 100 MARKS', text: 'Round 1: Pitch deep problem understanding, root causes & landscape (Zero elimination, all scores carry forward)!' },
-  { icon: '🎯', tag: 'ROUND 2 · 100 MARKS', text: 'Round 2: Pitch enhanced solution architecture & 3 frontier tech integrations (Top 8 squads advance to Grand Finals)!' },
+  { icon: '⚡', tag: 'ROUND 1 · 100 PTS', text: 'Round 1: Pitch deep problem understanding, root causes & landscape (Zero elimination, all scores carry forward)!' },
+  { icon: '🎯', tag: 'ROUND 2 · 100 PTS', text: 'Round 2: Pitch enhanced solution architecture & 3 frontier tech integrations (Top 8 squads advance to Grand Finals)!' },
   { icon: '🏆', tag: 'ROUND 3 · GRAND FINALS', text: 'Round 3: Top 8 Finalists pitch master solutions and defend live on stage against judge Q&A!' },
   { icon: '🥇', tag: 'CHAMPIONSHIP PODIUM', text: 'Top 4 winners crowned on podium: 1st Champion, 2nd Runner-Up, and Dual 3rd Place Bronze winners!' },
   { icon: '⏱️', tag: 'RAPID ARCHITECTURE', text: 'Formulate system flows, edge-to-cloud handshakes, and realistic BOM feasibility!' },
@@ -40,7 +41,7 @@ const PITCH_ROUND_CONFIG: Record<number, {
 }> = {
   1: {
     roundLabel: 'Round 1 · Open Qualifier',
-    badge: '100 Marks · Zero Elimination',
+    badge: '100 Pts · Zero Elimination',
     badgeClass: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
     title: 'Problem Understanding & Existing Solutions Pitch',
     subtitle: 'Squads pitch root causes, user pain points, and shortcomings of existing market solutions.',
@@ -58,7 +59,7 @@ const PITCH_ROUND_CONFIG: Record<number, {
   },
   2: {
     roundLabel: 'Round 2 · Problem Showdown',
-    badge: '100 Marks · Top 8 Advance',
+    badge: '100 Pts · Top 8 Advance',
     badgeClass: 'bg-bwb-accent/20 text-bwb-accent border-bwb-accent/30',
     title: 'Enhanced Solution & 3-Card Tech Integration',
     subtitle: 'Squads pitch novel architecture enhancement, 3 frontier tech cards & data telemetry.',
@@ -625,13 +626,13 @@ export default function ProjectorPage() {
 
               {/* STAGE FOOTER: 3-ROUND CHAMPIONSHIP ROADMAP & 7-STAGE PIPELINE */}
               <div className="space-y-4 text-left">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                   <p className="text-xs font-mono uppercase text-bwb-muted font-bold tracking-wider flex items-center gap-2">
                     <Layers size={14} className="text-bwb-accent" />
                     <span>Tournament Format & Championship Rules</span>
                   </p>
-                  <span className="text-[11px] font-mono text-bwb-muted">
-                    No Elimination in Round 1
+                  <span className="text-[11px] font-mono text-cyan-300 font-bold bg-cyan-500/10 px-2.5 py-0.5 rounded-md border border-cyan-500/20">
+                    ⏱️ Total Event Runtime: ~4.5 to 5.0 Hours
                   </span>
                 </div>
 
@@ -640,8 +641,8 @@ export default function ProjectorPage() {
                   {/* Round 1 */}
                   <div className="p-4 rounded-2xl bg-bwb-bg/80 border border-purple-500/30 space-y-1.5 shadow-sm">
                     <div className="flex items-center justify-between">
-                      <span className="px-2 py-0.5 rounded-md bg-purple-500/20 text-purple-300 font-mono text-[10px] font-bold">ROUND 1 · 100 MARKS</span>
-                      <span className="text-[10px] font-mono text-emerald-400 font-bold">Zero Elimination</span>
+                      <span className="px-2 py-0.5 rounded-md bg-purple-500/20 text-purple-300 font-mono text-[10px] font-bold">ROUND 1 · 100 PTS</span>
+                      <span className="text-[10px] font-mono text-emerald-400 font-bold">45m Build · Zero Elim</span>
                     </div>
                     <h4 className="font-display font-bold text-sm text-bwb-text">Problem & Existing Landscape</h4>
                     <p className="text-xs text-bwb-muted leading-relaxed">
@@ -652,8 +653,8 @@ export default function ProjectorPage() {
                   {/* Round 2 */}
                   <div className="p-4 rounded-2xl bg-bwb-bg/80 border border-bwb-accent/30 space-y-1.5 shadow-sm">
                     <div className="flex items-center justify-between">
-                      <span className="px-2 py-0.5 rounded-md bg-bwb-accent/20 text-bwb-accent font-mono text-[10px] font-bold">ROUND 2 · 100 MARKS</span>
-                      <span className="text-[10px] font-mono text-bwb-accent font-bold">Top 8 Advance</span>
+                      <span className="px-2 py-0.5 rounded-md bg-bwb-accent/20 text-bwb-accent font-mono text-[10px] font-bold">ROUND 2 · 100 PTS</span>
+                      <span className="text-[10px] font-mono text-bwb-accent font-bold">30m Build · Top 8</span>
                     </div>
                     <h4 className="font-display font-bold text-sm text-bwb-text">Solution & Tech Architecture</h4>
                     <p className="text-xs text-bwb-muted leading-relaxed">
@@ -665,7 +666,7 @@ export default function ProjectorPage() {
                   <div className="p-4 rounded-2xl bg-bwb-bg/80 border border-amber-500/30 space-y-1.5 shadow-sm">
                     <div className="flex items-center justify-between">
                       <span className="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 font-mono text-[10px] font-bold">ROUND 3 · GRAND FINALS</span>
-                      <span className="text-[10px] font-mono text-amber-300 font-bold">Top 4 Crowned</span>
+                      <span className="text-[10px] font-mono text-amber-300 font-bold">30m Polish · Top 4</span>
                     </div>
                     <h4 className="font-display font-bold text-sm text-bwb-text">Master Pitch & Defense</h4>
                     <p className="text-xs text-bwb-muted leading-relaxed">
@@ -1138,7 +1139,8 @@ export default function ProjectorPage() {
               <div className="stereo-card rounded-3xl p-6 sm:p-8 max-w-2xl mx-auto border-2 border-bwb-accent/40 shadow-2xl mb-6 relative overflow-hidden">
                 <div className="absolute -top-20 -right-20 w-48 h-48 rounded-full bg-bwb-accent/10 blur-3xl pointer-events-none" />
                 <CountdownTimer
-                  initialSeconds={game.buildDurationMinutes * 60}
+                  key={`proj-build-r${currentRound}`}
+                  initialSeconds={getPhaseDuration(game.id, currentRound, 'BUILDING', game.buildDurationMinutes)}
                   size="xl"
                   label="BUILD PHASE TIME REMAINING"
                 />

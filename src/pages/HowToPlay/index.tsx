@@ -7,45 +7,83 @@ import { Button } from '../../components/ui/Button'
 
 const tournamentRounds = [
   {
-    num: 'ROUND 01 · 100 MARKS',
+    num: 'ROUND 01 · 100 PTS',
     title: 'Problem & Existing Landscape',
-    badge: 'Zero Elimination',
-    desc: 'Select 1 of 8 problems, draft 3 frontier tech cards, and pitch how deeply your team understands the problem statement, root causes, and limitations of existing solutions. Evaluated for 100 marks. Zero elimination — all teams advance!',
+    badge: 'Zero Elimination · 45m Build',
+    desc: 'Select 1 of 8 problems, draft 3 frontier tech cards, and pitch how deeply your team understands the problem root causes and limitations of existing alternatives. 45-minute build sprint. Evaluated for 100 pts. All squads advance to Round 2!',
     icon: '🚀',
   },
   {
-    num: 'ROUND 02 · 100 MARKS',
+    num: 'ROUND 02 · 100 PTS',
     title: 'Solution & Tech Architecture',
-    badge: 'Top 8 Qualify for Finals',
-    desc: 'Teams present how they enhance their solution, integrate all 3 surprise frontier tech cards, and deliver novel ideation and system architecture. Evaluated for 100 marks. The Top 8 squads advance to the Grand Finals.',
+    badge: 'Top 8 Qualify · 30m Build',
+    desc: 'Teams present how they enhance their solution, integrate all 3 surprise frontier tech cards, and deliver novel ideation and system flow. 30-minute build sprint. Evaluated for 100 pts. The Top 8 squads advance to the Grand Finals.',
     icon: '⚡',
   },
   {
     num: 'ROUND 03 · GRAND FINALS',
     title: 'Master Pitch & Stage Defense',
-    badge: 'Top 4 Crowned on Podium',
-    desc: 'The Top 8 Finalists defend their master architectures live on stage against rigorous judge Q&A. The top 4 positions receive Championship Honors: 🥇 1st Place (1 Champion), 🥈 2nd Place (1 Runner-Up), and 🥉 3rd Place (2 Joint Bronze Winners).',
+    badge: 'Top 4 Crowned · 30m Polish',
+    desc: 'The Top 8 Finalists polish their master blueprints (30m) and defend live on stage against rigorous judge cross-examination. Top 4 positions receive Championship Honors: 🥇 1st Champion, 🥈 2nd Runner-Up, 🥉 Dual 3rd Bronze Winners.',
     icon: '🏆',
   },
 ]
 
+const eventTimeline = [
+  { phase: 'Registration & Kickoff', estTime: '20 Mins', desc: 'Squad roster check-in, room PIN entry, and opening tournament briefing.' },
+  { phase: 'Round 1: Open Qualifier', estTime: '~1h 45m', desc: 'Problem & Card Reveal (10m) ➔ 45m Build Sprint ➔ Live Pitches (16 teams × ~2.5m) ➔ 100-Pt Deliberation & Leaderboard.' },
+  { phase: 'Round 2: Solution Showdown', estTime: '~1h 30m', desc: 'Round 2 Briefing (10m) ➔ 30m Build Sprint ➔ Live Enhancement Pitches (16 teams) ➔ Top 8 Finalist Announcement.' },
+  { phase: 'Finals Intermission', estTime: '15 Mins', desc: 'Stage transition, Top 8 Finalist briefing, and strategy prep.' },
+  { phase: 'Round 3: Grand Finals', estTime: '~1h 15m', desc: '30m Master Blueprint Polish ➔ Live Stage Defense (8 Finalists) ➔ Final Deliberation & Championship Podium Ceremony.' },
+]
+
 const steps = [
-  { num: '01', title: 'Join & Roster Entry', desc: 'Enter the Room PIN provided by your host. Register your squad of 2–3 members and receive your unique Team Passcode.' },
-  { num: '02', title: 'Pick Your Challenge', desc: 'Select 1 of 8 Problem Statements (strictly max 2 teams per problem statement capacity).' },
-  { num: '03', title: 'Draft 3 Tech Cards', desc: 'Each team drafts 3 surprise frontier tech cards that must be incorporated into the architecture.' },
-  { num: '04', title: '15m Build Architecture Sprint', desc: 'Round 1 focuses on problem understanding and existing solution landscape; Round 2 focuses on enhanced solution architecture and 3-card tech integration.' },
-  { num: '05', title: '60s Live Pitch & 20s Defense', desc: 'Present your solution verbally on stage. When the timer ends, defend against targeted technical judge attacks.' },
-  { num: '06', title: 'Judging Deliberation (100 Marks)', desc: 'The jury panel scores teams across the official 100-mark rubric during live deliberation.' },
-  { num: '07', title: 'Rankings & Championship Podium', desc: 'Standings revealed! Round 1 (Zero elimination), Round 2 (Top 8 qualify), Round 3 (Top 4 awarded 1st, 2nd, and dual 3rd prizes).' },
+  { num: '01', title: 'Join & Roster Entry (Manual Host Start)', desc: 'Enter the Room PIN provided by your host. Register your squad of 2–3 members and receive your unique Team Passcode.' },
+  { num: '02', title: 'Problem Selection (8 Challenge Tracks)', desc: 'Select 1 of 8 Problem Statements (strictly max 2 teams per problem statement capacity in Round 2).' },
+  { num: '03', title: 'Draft 3 Frontier Tech Cards', desc: 'Each team drafts 3 surprise frontier tech cards that must be incorporated into the architecture.' },
+  { num: '04', title: 'Architecture Sprint (45m in R1 · 30m in R2/R3)', desc: 'Design your telemetry pipeline, system architecture, and solution proposal. Timer auto-advances to pitch when time expires.' },
+  { num: '05', title: 'Live Pitch & Stage Defense', desc: 'Present your solution verbally on stage. Judges cross-examine your technical feasibility and system constraints.' },
+  { num: '06', title: 'Jury Deliberation (100 Pts Rubric)', desc: 'The jury panel scores teams across the official 100-point rubric during live deliberation.' },
+  { num: '07', title: 'Official Host Leaderboard Reveal', desc: 'Standings revealed on projector and player screens only when the Host triggers the official reveal!' },
+]
+
+const buildStrategies = [
+  {
+    round: 'How to Build in Round 1 (Problem Understanding)',
+    focus: 'Problem Depth & Existing Landscape Critique',
+    points: [
+      'Deconstruct the root causes and specific user pain points rather than jumping straight to generic solutions.',
+      'Critique existing market solutions and explain clearly why current alternatives fail or cannot scale.',
+      'State your initial technical direction incorporating your 3 drafted frontier tech cards.',
+    ],
+  },
+  {
+    round: 'How to Build in Round 2 (Solution Enhancement)',
+    focus: 'Architecture Novelty & 3-Card Tech Integration',
+    points: [
+      'Detail your enhanced solution architecture, system block diagram, and data telemetry flow.',
+      'Demonstrate deep, seamless synergy of all 3 surprise frontier tech cards (not just surface-level buzzwords).',
+      'Address scale, cost efficiency, and edge failover reliability to secure a spot in the Top 8 cut-off.',
+    ],
+  },
+  {
+    round: 'How to Build in Round 3 (Grand Finals)',
+    focus: 'Master Blueprint & Live Defense Resilience',
+    points: [
+      'Refine your master end-to-end blueprint incorporating all feedback from Round 1 and Round 2.',
+      'Prepare for adversarial judge questions on hardware BOM cost, offline sync, security, and edge latency.',
+      'Deliver a concise, punchy championship pitch worthy of 1st, 2nd, or 3rd place podium honors.',
+    ],
+  },
 ]
 
 const rubric = [
-  { label: 'Problem Understanding & Landscape (Round 1 Focus)', pts: 30 },
-  { label: 'Novelty & Architecture Ideation (Round 2 Focus)', pts: 20 },
-  { label: '3-Card Frontier Tech Integration', pts: 20 },
-  { label: 'Technical Feasibility & Edge Flow', pts: 15 },
-  { label: 'Pitch Presentation Clarity', pts: 10 },
-  { label: 'Judge Q&A Defense', pts: 5 },
+  { label: 'Problem Understanding & Root Causes (R1: 35 Pts · R2: 10 Pts · R3: 10 Pts)', pts: '35 / 100' },
+  { label: 'Critique of Existing Solutions & Novelty (R1: 25 Pts · R2: 25 Pts · R3: 30 Pts)', pts: '25 / 100' },
+  { label: '3-Card Frontier Tech Integration (R1: 20 Pts · R2: 30 Pts · R3: 20 Pts)', pts: '30 / 100' },
+  { label: 'Technical Feasibility & System Flow (R1: 15 Pts · R2: 20 Pts · R3: 25 Pts)', pts: '25 / 100' },
+  { label: 'Pitch Presentation Clarity & Delivery', pts: '10 / 100' },
+  { label: 'Judge Attack Defense & Q&A Response', pts: '15 / 100' },
 ]
 
 export default function HowToPlayPage() {
@@ -89,6 +127,73 @@ export default function HowToPlayPage() {
           ))}
         </div>
 
+
+        {/* Tournament Schedule & Estimated Runtime */}
+        <Card padding="lg" className="mb-12 border-cyan-500/30 bg-gradient-to-r from-cyan-950/20 via-bwb-surface-2 to-bwb-surface">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 pb-3 border-b border-white/10">
+            <div>
+              <span className="text-[10px] font-mono uppercase tracking-widest text-cyan-300 font-bold">
+                ESTIMATED EVENT SCHEDULE
+              </span>
+              <h2 className="font-display text-xl font-black text-bwb-text flex items-center gap-2">
+                ⏱️ Full Tournament Timeline (~4.5 to 5 Hours Total)
+              </h2>
+            </div>
+            <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 w-fit">
+              16 Teams · 3 Rounds
+            </span>
+          </div>
+
+          <div className="space-y-3">
+            {eventTimeline.map((item, idx) => (
+              <div
+                key={idx}
+                className="p-3.5 rounded-2xl bg-bwb-bg/70 border border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+              >
+                <div className="flex items-start gap-3">
+                  <span className="w-6 h-6 rounded-lg bg-cyan-500/20 text-cyan-300 font-mono text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
+                    {idx + 1}
+                  </span>
+                  <div>
+                    <h4 className="font-display font-bold text-sm text-bwb-text">{item.phase}</h4>
+                    <p className="text-xs text-bwb-muted mt-0.5">{item.desc}</p>
+                  </div>
+                </div>
+                <span className="px-2.5 py-1 rounded-xl text-xs font-mono font-bold bg-bwb-surface-2 text-cyan-300 border border-cyan-500/20 shrink-0 self-start sm:self-auto">
+                  {item.estTime}
+                </span>
+              </div>
+            ))}
+          </div>
+        </Card>
+
+        {/* How to Build Without Building Strategy Guide */}
+        <h2 className="font-display text-xl sm:text-2xl font-bold mb-4 flex items-center gap-2">
+          <Sparkles className="text-amber-400" size={22} />
+          How to &quot;Build Without Building&quot; Across Rounds
+        </h2>
+        <div className="space-y-4 mb-12">
+          {buildStrategies.map((strat, sIdx) => (
+            <Card key={sIdx} padding="md" className="border-purple-500/20 bg-bwb-surface">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3 pb-2 border-b border-white/5">
+                <h3 className="font-display font-bold text-sm sm:text-base text-bwb-text">
+                  {strat.round}
+                </h3>
+                <span className="px-2.5 py-0.5 rounded-lg text-[11px] font-mono font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30 w-fit">
+                  Focus: {strat.focus}
+                </span>
+              </div>
+              <ul className="space-y-1.5 text-xs text-bwb-muted">
+                {strat.points.map((pt, pIdx) => (
+                  <li key={pIdx} className="flex items-start gap-2">
+                    <span className="text-bwb-accent font-bold mt-0.5">▸</span>
+                    <span>{pt}</span>
+                  </li>
+                ))}
+              </ul>
+            </Card>
+          ))}
+        </div>
 
         {/* Prize Distribution Card */}
         <Card padding="lg" className="mb-12 border-bwb-gold/30 bg-gradient-to-r from-amber-950/20 via-bwb-surface-2 to-bwb-surface">
@@ -136,7 +241,7 @@ export default function HowToPlayPage() {
             {rubric.map((r) => (
               <div key={r.label} className="flex justify-between text-xs sm:text-sm py-1.5 border-b border-bwb-border last:border-0">
                 <span className="text-bwb-muted font-medium">{r.label}</span>
-                <span className="font-display font-bold text-bwb-accent">{r.pts} pts</span>
+                <span className="font-display font-bold text-bwb-accent">{r.pts}</span>
               </div>
             ))}
           </div>

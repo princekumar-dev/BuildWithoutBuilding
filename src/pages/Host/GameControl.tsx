@@ -29,16 +29,16 @@ const stagesForRound = (round: number, buildMin: number, pitchSec: number) => {
     { phase: 'LOBBY' as GamePhase, title: 'Lobby', desc: 'Squad check-in & readiness', icon: '🚪' },
     { phase: 'PROBLEM_REVEAL' as GamePhase, title: 'Problem Reveal', desc: 'Teams select 1 of 8 challenges', icon: '💡' },
     { phase: 'CARD_REVEAL' as GamePhase, title: 'Card Reveal', desc: 'Teams draft 3 surprise tech cards', icon: '🎴' },
-    { phase: 'BUILDING' as GamePhase, title: 'Build Phase', desc: `${buildLabel} Problem & Existing Landscape (100 M)`, icon: '⚡' },
+    { phase: 'BUILDING' as GamePhase, title: 'Build Phase', desc: `${buildLabel} Problem & Existing Landscape (100 Pts)`, icon: '⚡' },
     { phase: 'PITCHING' as GamePhase, title: 'Pitching', desc: `${pitchLabel} Problem Understanding & Landscape`, icon: '🎤' },
-    { phase: 'JUDGING' as GamePhase, title: 'Judging', desc: '100-mark problem evaluation', icon: '⚖️' },
+    { phase: 'JUDGING' as GamePhase, title: 'Judging', desc: '100-pt problem evaluation', icon: '⚖️' },
     { phase: 'LEADERBOARD' as GamePhase, title: 'Leaderboard', desc: 'Zero elimination · All advance to R2', icon: '🏆' },
   ]
   if (round === 2) return [
     { phase: 'LOBBY' as GamePhase, title: 'Round 2 Lobby', desc: 'Briefing for Solution Enhancement', icon: '🚪' },
-    { phase: 'BUILDING' as GamePhase, title: 'Build Phase', desc: `${buildLabel} Solution Enhancement & Tech (100 M)`, icon: '⚡' },
+    { phase: 'BUILDING' as GamePhase, title: 'Build Phase', desc: `${buildLabel} Solution Enhancement & Tech (100 Pts)`, icon: '⚡' },
     { phase: 'PITCHING' as GamePhase, title: 'Pitching', desc: `${pitchLabel} Enhanced Architecture & Ideation`, icon: '🎤' },
-    { phase: 'JUDGING' as GamePhase, title: 'Judging', desc: '100-mark solution evaluation', icon: '⚖️' },
+    { phase: 'JUDGING' as GamePhase, title: 'Judging', desc: '100-pt solution evaluation', icon: '⚖️' },
     { phase: 'LEADERBOARD' as GamePhase, title: 'Leaderboard', desc: 'Top 8 squads qualify for Finals', icon: '🏆' },
   ]
   return [
@@ -255,19 +255,19 @@ export default function HostGameControlPage() {
     }
   }, [game.id, currentRound, game.buildDurationMinutes, game.phase])
 
+  const totalParticipants = game.teams.reduce((acc, t) => acc + (t.members?.length ?? 0), 0)
+  const submittedCount = game.teams.filter((t) => !!t.submission).length
+  const scoredCount = game.teams.filter((t) => (t.score ?? 0) > 0).length
+  const allTeamsScored = game.teams.length > 0 && scoredCount === game.teams.length
+  const pitchedCount = (game.pitchedTeamIds || []).length
+  const allTeamsPitched = game.teams.length > 0 && pitchedCount >= game.teams.length
+
   const advanceStage = async () => {
-    if (game.phase === 'JUDGING' && !allTeamsScored) return
     if (nextStage) return changePhase(nextStage.phase)
     if (currentRound === 1) return handleSetRound(2, 'LOBBY')
     if (currentRound === 2) return handleAdvanceTop8ToFinals()
     return changePhase('RESULTS')
   }
-
-  const totalParticipants = game.teams.reduce((acc, t) => acc + (t.members?.length ?? 0), 0)
-  const submittedCount = game.teams.filter((t) => !!t.submission).length
-  const scoredCount = game.teams.filter((t) => (t.score ?? 0) > 0).length
-  const allTeamsScored = game.teams.length > 0 && scoredCount === game.teams.length
-
 
   return (
     <PageLayout fullWidth className="host-mobile-view">
@@ -821,19 +821,19 @@ export default function HostGameControlPage() {
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="px-2.5 py-0.5 rounded-lg bg-purple-500/20 text-purple-300 font-mono text-xs font-bold border border-purple-500/30 flex items-center gap-1.5">
                           <Rocket size={13} className="text-purple-400" />
-                          <span>ROUND 1: PROBLEM UNDERSTANDING & LANDSCAPE (100 MARKS)</span>
+                          <span>ROUND 1: PROBLEM UNDERSTANDING & LANDSCAPE (100 PTS)</span>
                         </span>
                         <span className="text-[11px] font-mono text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">
                           🛡️ Zero Elimination · All Advance
                         </span>
                       </div>
                       <span className="text-xs font-mono text-bwb-muted font-bold">
-                        100 Marks Evaluation
+                        100 Pts Evaluation
                       </span>
                     </div>
 
                     <p className="text-xs text-bwb-text/90 leading-relaxed">
-                      Teams select 1 of 8 problem statements and draft 3 surprise frontier tech cards. In the build and pitch stages, squads must present <strong>how clearly they understand the problem root causes, market pain points, and existing solution limitations</strong>. Judges evaluate this for <strong>100 marks</strong>. All squads advance directly into Round 2.
+                      Teams select 1 of 8 problem statements and draft 3 surprise frontier tech cards. In the build and pitch stages, squads must present <strong>how clearly they understand the problem root causes, market pain points, and existing solution limitations</strong>. Judges evaluate this for <strong>100 pts</strong>. All squads advance directly into Round 2.
                     </p>
                   </div>
                 )}
@@ -845,19 +845,19 @@ export default function HostGameControlPage() {
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="px-2.5 py-0.5 rounded-lg bg-cyan-500/20 text-cyan-300 font-mono text-xs font-bold border border-cyan-500/30 flex items-center gap-1.5">
                           <Zap size={13} className="text-cyan-400" />
-                          <span>ROUND 2: SOLUTION ENHANCEMENT & ARCHITECTURE (100 MARKS)</span>
+                          <span>ROUND 2: SOLUTION ENHANCEMENT & ARCHITECTURE (100 PTS)</span>
                         </span>
                         <span className="text-[11px] font-mono text-amber-300 font-bold bg-amber-500/10 px-2 py-0.5 rounded-md border border-amber-500/20">
                           ⚡ Top 8 Advance to Finals
                         </span>
                       </div>
                       <span className="text-xs font-mono text-bwb-muted font-bold">
-                        100 Marks Evaluation
+                        100 Pts Evaluation
                       </span>
                     </div>
 
                     <p className="text-xs text-bwb-text/90 leading-relaxed">
-                      Squads present <strong>how they are going to enhance their solution, integrate their 3 surprise frontier tech cards, and deliver novel system architecture and ideation</strong>. Judges evaluate the enhanced architecture for <strong>100 marks</strong>. The <strong>Top 8 highest-scoring squads</strong> qualify for the Grand Finals (Round 3)!
+                      Squads present <strong>how they are going to enhance their solution, integrate their 3 surprise frontier tech cards, and deliver novel system architecture and ideation</strong>. Judges evaluate the enhanced architecture for <strong>100 pts</strong>. The <strong>Top 8 highest-scoring squads</strong> qualify for the Grand Finals (Round 3)!
                     </p>
                   </div>
                 )}
@@ -937,15 +937,23 @@ export default function HostGameControlPage() {
                   <Button
                     size="md"
                     onClick={advanceStage}
-                    disabled={game.phase === 'JUDGING' && !allTeamsScored}
-                    className={`w-full sm:w-auto glow-accent shadow-lg shadow-bwb-accent/20 justify-center font-bold ${
-                      game.phase === 'JUDGING' && !allTeamsScored ? 'opacity-50 cursor-not-allowed' : ''
-                    }`}
+                    disabled={game.phase === 'JUDGING' && !allTeamsScored && scoredCount === 0}
+                    className="w-full sm:w-auto glow-accent shadow-lg shadow-bwb-accent/20 justify-center font-bold"
                   >
                     <Play size={15} className="mr-1.5" />
-                    {game.phase === 'JUDGING' && !allTeamsScored
-                      ? `Waiting for Scores (${scoredCount}/${game.teams.length})`
-                      : nextStage ? `Advance to: ${nextStage.title}` : currentRound === 1 ? 'Start Round 2 Lobby' : currentRound === 2 ? 'Lock Top 8 & Start Round 3 Lobby' : 'Reveal Final Results'
+                    {game.phase === 'BUILDING'
+                      ? 'Advance to: Pitching Phase'
+                      : game.phase === 'PITCHING'
+                      ? (allTeamsPitched ? 'Advance to: Judging Phase' : `Advance to: Judging (${pitchedCount}/${game.teams.length} Pitched)`)
+                      : game.phase === 'JUDGING'
+                      ? (allTeamsScored ? '🎉 Reveal Official Leaderboard' : `Reveal Leaderboard (${scoredCount}/${game.teams.length} Graded)`)
+                      : nextStage
+                      ? `Advance to: ${nextStage.title}`
+                      : currentRound === 1
+                      ? 'Start Round 2 Lobby'
+                      : currentRound === 2
+                      ? 'Lock Top 8 & Start Round 3 Lobby'
+                      : 'Reveal Final Championship Results'
                     }
                   </Button>
                 )}

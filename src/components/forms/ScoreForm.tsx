@@ -41,7 +41,7 @@ export function ScoreForm({ teamName, onSubmit, round = 1 }: ScoreFormProps) {
         <div>
           <h3 className="font-display font-semibold">Score: {teamName}</h3>
           <span className="text-xs text-purple-400 font-mono">
-            {round === 1 ? 'Round 1: Problem Understanding & Landscape (100 Marks)' : round === 2 ? 'Round 2: Enhanced Architecture (100 Marks)' : 'Round 3: Master Pitch (Grand Finals)'}
+            {round === 1 ? 'Round 1: Problem Understanding & Landscape (100 Pts Rubric)' : round === 2 ? 'Round 2: Enhanced Architecture (100 Pts Rubric)' : 'Round 3: Master Pitch (Grand Finals)'}
           </span>
         </div>
         <span className={`font-display text-2xl font-bold ${total >= 70 ? 'text-bwb-success' : 'text-bwb-accent'}`}>

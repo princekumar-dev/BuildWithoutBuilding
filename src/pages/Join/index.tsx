@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   UserPlus, Key, ArrowRight, CheckCircle2,
   Copy, Sparkles, UserCheck, Plus, Trash2, Crown, Radio,
-  Mail, Phone, GraduationCap, Users, AlertTriangle, ShieldAlert
+  Mail, Phone, GraduationCap, Users, AlertTriangle, ShieldAlert, ChevronDown
 } from 'lucide-react'
 import { PageLayout } from '../../components/layout/PageLayout'
 import { Card } from '../../components/ui/Card'
@@ -293,48 +293,58 @@ export default function JoinPage() {
         {/* REGISTRATION & JOIN CARD */}
         {!registeredSession && (
           <Card glow padding="md" className="border-bwb-border/80 shadow-2xl bg-gradient-to-b from-bwb-surface-2 to-bwb-surface">
-            {/* Active Event Room Header with Clean Capacity & Room Code Badges */}
-            <div className="mb-6 p-4 rounded-2xl bg-bwb-bg/90 border border-white/10 shadow-lg relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-48 h-full bg-gradient-to-l from-bwb-accent/5 to-transparent pointer-events-none" />
+            {/* Active Event Room Header with Mobile-Optimized Layout */}
+            <div className="mb-6 p-4 sm:p-5 rounded-2xl bg-bwb-bg/95 border border-white/10 shadow-xl relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-48 h-full bg-gradient-to-l from-bwb-accent/10 to-transparent pointer-events-none" />
 
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 relative z-10">
-                <div className="space-y-0.5 truncate">
-                  <div className="flex items-center gap-2">
-                    <span className={`inline-block w-2 h-2 rounded-full ${isRoomFull ? 'bg-rose-400' : 'bg-bwb-success'} animate-pulse shrink-0`} />
+              <div className="relative z-10 space-y-2.5">
+                {/* Top Mini Bar: Status Tag & PIN Badge */}
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-1.5">
+                    <span className={`inline-block w-2 h-2 rounded-full ${isRoomFull ? 'bg-rose-400' : 'bg-emerald-400'} animate-pulse shrink-0`} />
                     <span className="text-[10px] font-mono uppercase text-bwb-muted font-bold tracking-widest">
-                      Active Event Room
+                      {isRoomFull ? 'Room At Capacity' : 'Active Event Arena'}
                     </span>
                   </div>
-                  <h3 className="font-display text-sm sm:text-base font-bold text-bwb-text tracking-tight truncate">
-                    {currentTargetGame?.name || 'Live Competition Room'}
+
+                  {/* Room Code Badge */}
+                  <div className="px-2.5 py-1 rounded-xl bg-bwb-surface-2 border border-bwb-accent/40 font-mono text-xs tracking-wider font-black text-bwb-accent shadow-sm flex items-center gap-1.5 select-all shrink-0">
+                    <Radio size={12} className="text-bwb-accent animate-pulse shrink-0" />
+                    <span>{code || currentTargetGame?.code || 'BWB-LIVE'}</span>
+                  </div>
+                </div>
+
+                {/* Main Event Title */}
+                <div>
+                  <h3 className="font-display text-base sm:text-lg font-black text-bwb-text tracking-tight truncate">
+                    {currentTargetGame?.name || 'Build Without Building Championship'}
                   </h3>
                 </div>
 
-                {/* Right side: Capacity Quota Pill & Game Code */}
-                <div className="flex items-center gap-2 shrink-0 self-start sm:self-center">
-                  <div className={`px-2.5 py-1.5 rounded-xl border font-mono text-xs font-bold flex items-center gap-1.5 shadow-sm ${
+                {/* Bottom Meta Row: Capacity Quota & Round Tag */}
+                <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-white/5 text-xs font-mono">
+                  <div className={`px-2.5 py-1 rounded-xl border flex items-center gap-1.5 text-xs ${
                     isRoomFull
-                      ? 'bg-rose-500/15 text-rose-300 border-rose-500/30'
-                      : 'bg-bwb-surface-2 border-white/10 text-bwb-muted'
+                      ? 'bg-rose-500/15 text-rose-300 border-rose-500/30 font-bold'
+                      : 'bg-bwb-surface-2/80 border-white/10 text-bwb-muted'
                   }`}>
                     {isRoomFull ? (
                       <>
                         <AlertTriangle size={12} className="text-rose-400 shrink-0" />
-                        <span className="text-rose-300">Full ({roomRegisteredCount}/{roomMaxTeams})</span>
+                        <span className="text-rose-300 font-bold">Room Full ({roomRegisteredCount}/{roomMaxTeams})</span>
                       </>
                     ) : (
                       <>
                         <Users size={12} className="text-bwb-accent shrink-0" />
-                        <span className="text-bwb-text font-bold">{roomRegisteredCount}/{roomMaxTeams}</span>
-                        <span className="text-bwb-muted text-[11px] font-normal">({slotsRemaining} left)</span>
+                        <span className="text-bwb-text font-bold">{roomRegisteredCount}/{roomMaxTeams} Squads</span>
+                        <span className="text-emerald-400 text-[11px] font-bold">({slotsRemaining} open)</span>
                       </>
                     )}
                   </div>
 
-                  <div className="px-3 py-1.5 rounded-xl bg-bwb-surface-2 border border-bwb-accent/40 font-mono text-xs sm:text-sm tracking-wider font-black text-bwb-accent shadow-sm flex items-center gap-1.5 select-all">
-                    <Radio size={12} className="text-bwb-accent animate-pulse shrink-0" />
-                    <span>{code || currentTargetGame?.code || 'BWB-LIVE'}</span>
-                  </div>
+                  <span className="px-2 py-0.5 rounded-lg text-[10px] font-mono font-bold bg-purple-500/15 text-purple-300 border border-purple-500/30 shrink-0">
+                    Round {currentTargetGame?.currentRound || 1} · {currentTargetGame?.phase ? currentTargetGame.phase.replace('_', ' ') : 'LOBBY'}
+                  </span>
                 </div>
               </div>
             </div>
@@ -510,22 +520,25 @@ export default function JoinPage() {
                             <label className="text-[11px] font-mono text-bwb-muted font-semibold block mb-1">
                               Department
                             </label>
-                            <select
-                              value={department}
-                              onChange={(e) => setDepartment(e.target.value)}
-                              style={{ colorScheme: 'dark' }}
-                              className="w-full px-3 py-2.5 rounded-xl bg-bwb-surface border border-bwb-border text-bwb-text text-xs font-semibold focus:border-bwb-accent outline-none cursor-pointer"
-                            >
-                              <option value="">Select Dept</option>
-                              <option value="AIDS">AIDS (AI & DS)</option>
-                              <option value="CSE">CSE</option>
-                              <option value="IT">IT</option>
-                              <option value="ECE">ECE</option>
-                              <option value="EEE">EEE</option>
-                              <option value="MECH">MECH</option>
-                              <option value="CIVIL">CIVIL</option>
-                              <option value="Other">Other</option>
-                            </select>
+                            <div className="relative">
+                              <select
+                                value={department}
+                                onChange={(e) => setDepartment(e.target.value)}
+                                style={{ colorScheme: 'dark' }}
+                                className="w-full appearance-none pl-3 pr-8 py-2.5 rounded-xl bg-bwb-surface border border-bwb-border text-bwb-text text-xs font-semibold focus:border-bwb-accent outline-none cursor-pointer"
+                              >
+                                <option value="">Select Dept</option>
+                                <option value="AIDS">AIDS (AI & DS)</option>
+                                <option value="CSE">CSE</option>
+                                <option value="IT">IT</option>
+                                <option value="ECE">ECE</option>
+                                <option value="EEE">EEE</option>
+                                <option value="MECH">MECH</option>
+                                <option value="CIVIL">CIVIL</option>
+                                <option value="Other">Other</option>
+                              </select>
+                              <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-bwb-muted pointer-events-none" />
+                            </div>
                           </div>
 
                           {/* Year Dropdown */}
@@ -533,18 +546,21 @@ export default function JoinPage() {
                             <label className="text-[11px] font-mono text-bwb-muted font-semibold block mb-1">
                               Year
                             </label>
-                            <select
-                              value={year}
-                              onChange={(e) => setYear(e.target.value)}
-                              style={{ colorScheme: 'dark' }}
-                              className="w-full px-3 py-2.5 rounded-xl bg-bwb-surface border border-bwb-border text-bwb-text text-xs font-semibold focus:border-bwb-accent outline-none cursor-pointer"
-                            >
-                              <option value="">Select Year</option>
-                              <option value="1st Year">1st Year</option>
-                              <option value="2nd Year">2nd Year</option>
-                              <option value="3rd Year">3rd Year</option>
-                              <option value="4th Year">4th Year</option>
-                            </select>
+                            <div className="relative">
+                              <select
+                                value={year}
+                                onChange={(e) => setYear(e.target.value)}
+                                style={{ colorScheme: 'dark' }}
+                                className="w-full appearance-none pl-3 pr-8 py-2.5 rounded-xl bg-bwb-surface border border-bwb-border text-bwb-text text-xs font-semibold focus:border-bwb-accent outline-none cursor-pointer"
+                              >
+                                <option value="">Select Year</option>
+                                <option value="1st Year">1st Year</option>
+                                <option value="2nd Year">2nd Year</option>
+                                <option value="3rd Year">3rd Year</option>
+                                <option value="4th Year">4th Year</option>
+                              </select>
+                              <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-bwb-muted pointer-events-none" />
+                            </div>
                           </div>
 
                           {/* Section Dropdown */}
@@ -552,17 +568,20 @@ export default function JoinPage() {
                             <label className="text-[11px] font-mono text-bwb-muted font-semibold block mb-1">
                               Section
                             </label>
-                            <select
-                              value={section}
-                              onChange={(e) => setSection(e.target.value)}
-                              style={{ colorScheme: 'dark' }}
-                              className="w-full px-3 py-2.5 rounded-xl bg-bwb-surface border border-bwb-border text-bwb-text text-xs font-semibold focus:border-bwb-accent outline-none cursor-pointer"
-                            >
-                              <option value="">Select Section</option>
-                              <option value="A">Section A</option>
-                              <option value="B">Section B</option>
-                              <option value="Nil">Nil</option>
-                            </select>
+                            <div className="relative">
+                              <select
+                                value={section}
+                                onChange={(e) => setSection(e.target.value)}
+                                style={{ colorScheme: 'dark' }}
+                                className="w-full appearance-none pl-3 pr-8 py-2.5 rounded-xl bg-bwb-surface border border-bwb-border text-bwb-text text-xs font-semibold focus:border-bwb-accent outline-none cursor-pointer"
+                              >
+                                <option value="">Select Section</option>
+                                <option value="A">Section A</option>
+                                <option value="B">Section B</option>
+                                <option value="Nil">Nil</option>
+                              </select>
+                              <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-bwb-muted pointer-events-none" />
+                            </div>
                           </div>
                         </div>
                       </div>

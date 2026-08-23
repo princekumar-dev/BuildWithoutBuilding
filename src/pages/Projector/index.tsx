@@ -972,115 +972,195 @@ export default function ProjectorPage() {
         )}
 
         {/* ============================================================
-            3. CARD REVEAL PHASE: REAL-TIME HOLOGRAPHIC TECH CARD MATRIX
+            3. CARD REVEAL PHASE: REAL-TIME HOLOGRAPHIC TECH CARD MATRIX (16-TEAM OPTIMIZED)
             ============================================================ */}
         {currentPhase === 'CARD_REVEAL' && (
-          <div className="w-full flex flex-col items-center justify-center my-auto">
-            <div className="w-full max-w-6xl mb-8 text-center">
-              <div className="flex items-center justify-center gap-2 mb-3">
+          <div className="w-full max-w-7xl mx-auto flex flex-col items-center justify-center my-auto px-2 sm:px-4">
+            {/* Header with Live Broadcast Badges */}
+            <div className="w-full text-center mb-6">
+              <div className="flex items-center justify-center gap-2 mb-2">
                 <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30">
                   {currentRound === 1
-                    ? 'Round 1 · Open Qualifier (No Elimination)'
+                    ? 'Round 1 · Open Qualifier (100 Pts)'
                     : currentRound === 2
                     ? 'Round 2 · Problem Showdown (Top 8 Qualify)'
-                    : 'Round 3 · Grand Finals (Top 4 Prized)'}
+                    : 'Round 3 · Grand Finals (Top 4 Podium)'}
                 </span>
-                <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
-                  Card Draft
+                <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 flex items-center gap-1.5">
+                  <Sparkles size={12} className="text-cyan-400 animate-spin" />
+                  Live Holographic Card Draft
                 </span>
               </div>
               <h1 className="font-display text-3xl sm:text-5xl font-black flex items-center justify-center gap-3 text-gradient">
                 <Layers className="text-cyan-400" size={36} />
-                Holographic Tech Card Matrix
+                Surprise Tech Card Matrix
               </h1>
-              <p className="text-bwb-muted mt-2">{game.name || 'Build Without Building Tournament'}</p>
-              <p className="text-bwb-muted text-sm mt-1">
-                Live feed of teams drafting and revealing their 3 technology cards
+              <p className="text-bwb-muted text-xs sm:text-sm mt-1 max-w-2xl mx-auto">
+                Real-time draft feed · Each squad unlocks 3 surprise frontier technology cards to integrate into their architecture
               </p>
             </div>
 
-            <div className="w-full max-w-6xl mb-6 flex flex-wrap items-center justify-end gap-4">
+            {/* Live Progress Bar & Stats Ticker */}
+            <div className="w-full mb-6 flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-2xl bg-bwb-surface-2/80 border border-white/10 shadow-lg backdrop-blur-md">
+              <div className="flex items-center gap-2">
+                <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="text-xs font-mono font-bold text-bwb-text">
+                  Squads Live: <strong className="text-bwb-accent">{game.teams.length} Teams</strong>
+                </span>
+              </div>
 
-              <div className="flex items-center gap-4 text-sm bg-bwb-surface-2 px-4 py-2 rounded-2xl border border-bwb-border">
+              <div className="flex items-center gap-4 text-xs font-mono">
                 <div>
                   <span className="text-bwb-muted">Revealed Cards: </span>
-                  <strong className="text-bwb-accent">{totalCardsRevealed}</strong> / {game.teams.length * 3}
+                  <strong className="text-cyan-400 font-bold text-sm">{totalCardsRevealed}</strong>
+                  <span className="text-bwb-muted"> / {Math.max(1, game.teams.length * 3)}</span>
                 </div>
-                <div className="h-4 w-px bg-bwb-border" />
+                <div className="h-4 w-px bg-white/10" />
                 <div>
-                  <span className="text-bwb-muted">Draft Progress: </span>
-                  <strong className="text-bwb-success">
+                  <span className="text-bwb-muted">Draft Complete: </span>
+                  <strong className="text-emerald-400 font-bold text-sm">
                     {game.teams.length > 0 ? Math.round((totalCardsRevealed / (game.teams.length * 3)) * 100) : 0}%
                   </strong>
                 </div>
               </div>
             </div>
 
-            {/* Team Cards Matrix Grid */}
-            <div className="w-full max-w-6xl grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            {/* Responsive Team Card Matrix (Generously sized for 1-16 teams) */}
+            <div className={`w-full grid gap-4 sm:gap-6 mb-6 ${
+              game.teams.length === 1
+                ? 'grid-cols-1 max-w-4xl mx-auto'
+                : game.teams.length === 2
+                ? 'grid-cols-1 sm:grid-cols-2 max-w-5xl mx-auto'
+                : game.teams.length <= 4
+                ? 'grid-cols-1 sm:grid-cols-2 max-w-6xl mx-auto'
+                : game.teams.length <= 8
+                ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
+                : 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
+            }`}>
               {game.teams.map((team, tIdx) => {
                 const teamTechs = (team.technologies && team.technologies.length >= 3)
                   ? team.technologies
                   : (catalog.technologies.length >= 3 ? catalog.technologies.slice(0, 3) : [])
                 const revealedSlots = team.revealedCards ?? []
+                const isFullyUnlocked = revealedSlots.length >= 3
+                const isSingleTeam = game.teams.length === 1
+                const isFewTeams = game.teams.length <= 4
+
                 return (
                   <motion.div
                     key={team.id}
-                    initial={{ opacity: 0, y: 15 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: tIdx * 0.05 }}
-                    className="stereo-card rounded-3xl p-5 border border-bwb-border relative overflow-hidden shadow-xl"
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: tIdx * 0.03, duration: 0.2 }}
+                    className={`rounded-3xl p-5 sm:p-7 border transition-all duration-300 relative overflow-hidden shadow-2xl flex flex-col justify-between backdrop-blur-2xl ${
+                      isFullyUnlocked
+                        ? 'bg-gradient-to-b from-bwb-surface-2/95 via-bwb-surface/90 to-bwb-bg/95 border-cyan-400/50 shadow-[0_0_40px_rgba(0,229,199,0.12)] ring-1 ring-cyan-400/30'
+                        : 'bg-bwb-surface/95 border-white/10 hover:border-white/20'
+                    }`}
                   >
-                    <div className="flex items-center justify-between mb-4 pb-2.5 border-b border-white/5">
-                      <div className="flex items-center gap-2">
-                        <span className="font-mono text-xs text-bwb-accent font-bold px-2 py-0.5 rounded-lg bg-bwb-accent/10 border border-bwb-accent/20">
+                    {/* Atmospheric Glow Flare behind Card */}
+                    <div className="absolute top-0 right-1/4 w-72 h-32 bg-gradient-to-b from-cyan-500/10 to-transparent blur-3xl pointer-events-none" />
+
+                    {/* Top Team Header */}
+                    <div className="flex items-center justify-between gap-3 mb-4 pb-3.5 border-b border-white/10 relative z-10">
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <span className={`font-mono font-black rounded-xl bg-cyan-500/15 border border-cyan-400/30 text-cyan-300 shrink-0 shadow-sm ${
+                          isSingleTeam ? 'text-sm sm:text-base px-3 py-1' : 'text-xs px-2.5 py-0.5'
+                        }`}>
                           #{tIdx + 1}
                         </span>
-                        <h4 className="font-display font-bold text-base text-bwb-text truncate max-w-[180px]">
+                        <h4 className={`font-display font-black text-gradient tracking-tight truncate ${
+                          isSingleTeam ? 'text-2xl sm:text-3xl' : isFewTeams ? 'text-lg sm:text-xl' : 'text-base sm:text-lg'
+                        }`}>
                           {team.name}
                         </h4>
                       </div>
-                      <span className={`text-xs font-mono font-bold px-2.5 py-0.5 rounded-lg ${
-                        revealedSlots.length >= 3
-                          ? 'bg-bwb-success/20 text-bwb-success border border-bwb-success/30'
-                          : 'text-bwb-muted bg-bwb-surface-2'
+                      <span className={`font-mono font-bold px-3.5 py-1 rounded-xl shrink-0 flex items-center gap-1.5 shadow-sm ${
+                        isSingleTeam ? 'text-xs' : 'text-[11px]'
+                      } ${
+                        isFullyUnlocked
+                          ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 shadow-emerald-500/10'
+                          : 'text-amber-300 bg-amber-500/10 border border-amber-400/30'
                       }`}>
-                        {revealedSlots.length}/3 Unlocked
+                        <span className={`w-1.5 h-1.5 rounded-full ${isFullyUnlocked ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`} />
+                        <span>{revealedSlots.length}/3 {isFullyUnlocked ? 'Active' : 'Drafting'}</span>
                       </span>
                     </div>
 
-                    {/* 3 Slots for this team */}
-                    <div className="grid grid-cols-3 gap-3">
+                    {/* 3 Holographic Card Slots with Glowing Chambers & Rich Aesthetics */}
+                    <div className={`grid grid-cols-3 ${isSingleTeam ? 'gap-4 sm:gap-5' : 'gap-3'} relative z-10`}>
                       {[0, 1, 2].map((slotIdx) => {
                         const isRevealed = revealedSlots.includes(slotIdx)
                         const tech = teamTechs[slotIdx] || catalog.technologies[slotIdx]
                         const badgeStyle = tech ? techCategoryBadges[tech.category] ?? 'bg-bwb-surface-2 text-bwb-text border-bwb-border' : ''
+                        const cat = tech?.category || 'Intelligence'
+
+                        const glowTheme = isRevealed && tech ? (
+                          cat === 'Intelligence' ? 'border-purple-500/60 shadow-[0_0_30px_rgba(168,85,247,0.22)] bg-gradient-to-b from-purple-950/30 via-bwb-surface-2/95 to-bwb-bg ring-1 ring-purple-500/30' :
+                          cat === 'Connectivity' ? 'border-cyan-500/60 shadow-[0_0_30px_rgba(6,182,212,0.22)] bg-gradient-to-b from-cyan-950/30 via-bwb-surface-2/95 to-bwb-bg ring-1 ring-cyan-500/30' :
+                          cat === 'Infrastructure' ? 'border-amber-500/60 shadow-[0_0_30px_rgba(245,158,11,0.22)] bg-gradient-to-b from-amber-950/30 via-bwb-surface-2/95 to-bwb-bg ring-1 ring-amber-500/30' :
+                          cat === 'Security' ? 'border-emerald-500/60 shadow-[0_0_30px_rgba(16,185,129,0.22)] bg-gradient-to-b from-emerald-950/30 via-bwb-surface-2/95 to-bwb-bg ring-1 ring-emerald-500/30' :
+                          cat === 'Interface' ? 'border-rose-500/60 shadow-[0_0_30px_rgba(244,63,94,0.22)] bg-gradient-to-b from-rose-950/30 via-bwb-surface-2/95 to-bwb-bg ring-1 ring-rose-500/30' :
+                          'border-indigo-500/60 shadow-[0_0_30px_rgba(99,102,241,0.22)] bg-gradient-to-b from-indigo-950/30 via-bwb-surface-2/95 to-bwb-bg ring-1 ring-indigo-500/30'
+                        ) : 'bg-bwb-bg/85 border-dashed border-white/15 neo-inset'
+
                         return (
                           <div
                             key={slotIdx}
-                            className={`min-h-[125px] rounded-2xl border p-2.5 flex flex-col items-center justify-between text-center transition-all ${
-                              isRevealed && tech
-                                ? 'bg-bwb-surface-2/95 border-bwb-accent/50 shadow-xl shadow-bwb-accent/15 ring-1 ring-bwb-accent/30'
-                                : 'bg-bwb-bg/60 border-dashed border-bwb-border/80 neo-inset'
-                            }`}
+                            className={`rounded-2xl border flex flex-col items-center justify-between text-center transition-all duration-300 relative overflow-hidden group hover:scale-[1.02] ${
+                              isSingleTeam
+                                ? 'min-h-[190px] sm:min-h-[220px] p-4 sm:p-5'
+                                : isFewTeams
+                                ? 'min-h-[155px] sm:min-h-[175px] p-3.5'
+                                : 'min-h-[125px] sm:min-h-[135px] p-2.5'
+                            } ${glowTheme}`}
                           >
+                            {/* Holographic Shimmer Effect */}
+                            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent pointer-events-none" />
+
                             {!isRevealed || !tech ? (
-                              <div className="flex-1 flex flex-col items-center justify-center">
-                                <Sparkles size={20} className="text-bwb-muted/40 mb-1.5 animate-pulse" />
-                                <span className="text-[11px] uppercase font-mono font-semibold text-bwb-muted">
-                                  SLOT #{slotIdx + 1}
+                              <div className="flex-1 flex flex-col items-center justify-center p-2">
+                                <Sparkles size={isSingleTeam ? 28 : 20} className="text-cyan-400/40 mb-2 animate-pulse" />
+                                <span className={`uppercase font-mono font-black text-bwb-muted tracking-widest ${
+                                  isSingleTeam ? 'text-xs' : 'text-[10px]'
+                                }`}>
+                                  Slot #{slotIdx + 1}
                                 </span>
+                                <span className="text-[9px] font-mono text-bwb-muted/60 mt-0.5">Surprise Tech</span>
                               </div>
                             ) : (
                               <>
-                                <div className="text-3xl p-1.5 rounded-xl bg-bwb-bg/60 border border-white/5 shadow-inner">
+                                {/* Top Slot Monospace Tag */}
+                                <div className="w-full flex items-center justify-between text-[9px] font-mono font-bold text-bwb-muted mb-1 px-1">
+                                  <span>SLOT 0{slotIdx + 1}</span>
+                                  <span className="text-cyan-400">UNLOCKED</span>
+                                </div>
+
+                                {/* Futuristic Holographic Icon Chamber */}
+                                <div className={`rounded-2xl bg-gradient-to-b from-white/10 to-transparent border border-white/15 shadow-[inset_0_0_20px_rgba(255,255,255,0.06)] my-auto transition-transform group-hover:scale-110 duration-300 ${
+                                  isSingleTeam
+                                    ? 'text-5xl sm:text-6xl p-3.5'
+                                    : isFewTeams
+                                    ? 'text-4xl sm:text-5xl p-2.5'
+                                    : 'text-2xl sm:text-3xl p-2'
+                                }`}>
                                   {tech.icon}
                                 </div>
-                                <div className="w-full">
-                                  <p className="text-xs font-black text-bwb-text leading-tight truncate">
+
+                                {/* Card Details */}
+                                <div className="w-full mt-2">
+                                  <p className={`font-black text-bwb-text leading-tight line-clamp-2 ${
+                                    isSingleTeam
+                                      ? 'text-base sm:text-lg md:text-xl'
+                                      : isFewTeams
+                                      ? 'text-sm sm:text-base md:text-lg'
+                                      : 'text-xs sm:text-sm font-bold'
+                                  }`} title={tech.name}>
                                     {tech.name}
                                   </p>
-                                  <span className={`inline-block mt-1 px-1.5 py-0.5 rounded-md text-[9px] font-bold border truncate max-w-full ${badgeStyle}`}>
+                                  <span className={`inline-block mt-1.5 px-2 py-0.5 rounded-lg font-mono font-black border uppercase tracking-wider truncate max-w-full ${
+                                    isSingleTeam ? 'text-[10px]' : 'text-[9px]'
+                                  } ${badgeStyle}`}>
                                     {tech.category}
                                   </span>
                                 </div>
@@ -1095,15 +1175,120 @@ export default function ProjectorPage() {
               })}
             </div>
 
-            {/* Catalog Technology Legend */}
-            <div className="w-full max-w-6xl p-4 rounded-2xl glass border border-bwb-border flex flex-wrap items-center justify-around gap-3 text-xs">
-              <span className="text-bwb-muted font-display font-semibold uppercase tracking-wider">Tech Pool:</span>
-              {catalog.technologies.map((tech) => (
-                <div key={tech.id} className="flex items-center gap-1.5 text-bwb-text font-medium">
-                  <span className="text-base">{tech.icon}</span>
-                  <span>{tech.name}</span>
+            {/* Multi-Row Alternating Holographic Tech Pool Marquee (No Scrollbars, Auto-Sliding Left/Right) */}
+            <div className="w-full rounded-3xl bg-bwb-surface/90 border border-cyan-500/20 p-4 sm:p-5 backdrop-blur-xl relative overflow-hidden shadow-2xl space-y-3">
+              {/* Left and Right Ambient Fade Masks */}
+              <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-16 sm:w-28 bg-gradient-to-r from-bwb-surface via-bwb-surface/90 to-transparent z-10" />
+              <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-16 sm:w-28 bg-gradient-to-l from-bwb-surface via-bwb-surface/90 to-transparent z-10" />
+
+              {/* Header Title */}
+              <div className="flex items-center justify-between px-2 mb-1">
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse" />
+                  <span className="text-xs sm:text-sm font-mono uppercase font-black text-cyan-300 tracking-wider flex items-center gap-1.5">
+                    <Sparkles size={14} className="text-cyan-400" /> Frontier Technology Catalog Pool ({Array.from(new Map(catalog.technologies.map((t) => [t.name.trim().toLowerCase(), t])).values()).length} Technologies)
+                  </span>
                 </div>
-              ))}
+                <span className="text-[11px] font-mono text-bwb-muted font-bold hidden sm:inline-block">
+                  Live Holographic Draft Stream
+                </span>
+              </div>
+
+              {/* Row 1: Slides Left */}
+              {(() => {
+                const uniqueTechs = Array.from(
+                  new Map(catalog.technologies.map((t) => [t.name.trim().toLowerCase().replace(/s$/, ''), t])).values()
+                )
+                const total = uniqueTechs.length
+                const r1 = uniqueTechs.slice(0, Math.ceil(total / 3))
+                const r2 = uniqueTechs.slice(Math.ceil(total / 3), Math.ceil((total * 2) / 3))
+                const r3 = uniqueTechs.slice(Math.ceil((total * 2) / 3))
+
+                return (
+                  <div className="space-y-2.5 overflow-hidden">
+                    {/* Row 1: Leftward */}
+                    <div className="flex overflow-hidden">
+                      <motion.div
+                        className="flex items-center gap-3 shrink-0"
+                        animate={{ x: ['0%', '-50%'] }}
+                        transition={{ ease: 'linear', duration: 28, repeat: Infinity }}
+                      >
+                        {[...r1, ...r1].map((tech, idx) => {
+                          const badgeStyle = techCategoryBadges[tech.category] ?? 'bg-bwb-surface-2 text-bwb-text border-bwb-border'
+                          return (
+                            <div
+                              key={`${tech.id}-r1-${idx}`}
+                              className="px-3.5 sm:px-4 py-2 rounded-2xl bg-bwb-surface-2/90 border border-white/10 shadow-md flex items-center gap-2.5 shrink-0 hover:border-cyan-400/60 transition-all hover:scale-105"
+                            >
+                              <span className="text-xl sm:text-2xl">{tech.icon}</span>
+                              <span className="text-xs sm:text-sm font-black text-bwb-text tracking-wide whitespace-nowrap">
+                                {tech.name}
+                              </span>
+                              <span className={`px-1.5 py-0.5 rounded-md text-[9px] font-mono font-bold border uppercase shrink-0 ${badgeStyle}`}>
+                                {tech.category}
+                              </span>
+                            </div>
+                          )
+                        })}
+                      </motion.div>
+                    </div>
+
+                    {/* Row 2: Rightward */}
+                    <div className="flex overflow-hidden">
+                      <motion.div
+                        className="flex items-center gap-3 shrink-0"
+                        animate={{ x: ['-50%', '0%'] }}
+                        transition={{ ease: 'linear', duration: 32, repeat: Infinity }}
+                      >
+                        {[...r2, ...r2].map((tech, idx) => {
+                          const badgeStyle = techCategoryBadges[tech.category] ?? 'bg-bwb-surface-2 text-bwb-text border-bwb-border'
+                          return (
+                            <div
+                              key={`${tech.id}-r2-${idx}`}
+                              className="px-3.5 sm:px-4 py-2 rounded-2xl bg-bwb-surface-2/90 border border-white/10 shadow-md flex items-center gap-2.5 shrink-0 hover:border-purple-400/60 transition-all hover:scale-105"
+                            >
+                              <span className="text-xl sm:text-2xl">{tech.icon}</span>
+                              <span className="text-xs sm:text-sm font-black text-bwb-text tracking-wide whitespace-nowrap">
+                                {tech.name}
+                              </span>
+                              <span className={`px-1.5 py-0.5 rounded-md text-[9px] font-mono font-bold border uppercase shrink-0 ${badgeStyle}`}>
+                                {tech.category}
+                              </span>
+                            </div>
+                          )
+                        })}
+                      </motion.div>
+                    </div>
+
+                    {/* Row 3: Leftward */}
+                    <div className="flex overflow-hidden">
+                      <motion.div
+                        className="flex items-center gap-3 shrink-0"
+                        animate={{ x: ['0%', '-50%'] }}
+                        transition={{ ease: 'linear', duration: 30, repeat: Infinity }}
+                      >
+                        {[...r3, ...r3].map((tech, idx) => {
+                          const badgeStyle = techCategoryBadges[tech.category] ?? 'bg-bwb-surface-2 text-bwb-text border-bwb-border'
+                          return (
+                            <div
+                              key={`${tech.id}-r3-${idx}`}
+                              className="px-3.5 sm:px-4 py-2 rounded-2xl bg-bwb-surface-2/90 border border-white/10 shadow-md flex items-center gap-2.5 shrink-0 hover:border-amber-400/60 transition-all hover:scale-105"
+                            >
+                              <span className="text-xl sm:text-2xl">{tech.icon}</span>
+                              <span className="text-xs sm:text-sm font-black text-bwb-text tracking-wide whitespace-nowrap">
+                                {tech.name}
+                              </span>
+                              <span className={`px-1.5 py-0.5 rounded-md text-[9px] font-mono font-bold border uppercase shrink-0 ${badgeStyle}`}>
+                                {tech.category}
+                              </span>
+                            </div>
+                          )
+                        })}
+                      </motion.div>
+                    </div>
+                  </div>
+                )
+              })()}
             </div>
           </div>
         )}

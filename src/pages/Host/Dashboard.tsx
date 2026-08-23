@@ -1,8 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import { Plus, Play, Settings, Users, Layers, LogOut, Trash2 } from 'lucide-react'
+import { Plus, Play, Users, Layers, LogOut, Trash2, Copy, CheckCircle2, Sliders, Tv, Clock } from 'lucide-react'
 import { PageLayout } from '../../components/layout/PageLayout'
-import { Card } from '../../components/ui/Card'
 import { Button } from '../../components/ui/Button'
 import { Badge } from '../../components/ui/Badge'
 import { Modal } from '../../components/ui/Modal'
@@ -16,11 +15,16 @@ import type { Game } from '../../types'
 function StatCard({ icon: Icon, label, value }: { icon: typeof Play; label: string; value: number }) {
   const count = useCountUp(value)
   return (
-    <Card padding="md" className="hover:border-bwb-accent/30 transition-colors">
-      <Icon className="text-bwb-accent mb-2" size={20} />
-      <p className="text-2xl font-display font-bold">{count}</p>
-      <p className="text-xs text-bwb-muted">{label}</p>
-    </Card>
+    <div className="p-3 sm:p-4 rounded-2xl bg-bwb-surface border border-white/10 hover:border-bwb-accent/30 transition-all flex flex-col justify-between shadow-md">
+      <div className="flex items-center justify-between mb-1.5">
+        <Icon className="text-bwb-accent" size={18} />
+        <span className="text-[9px] sm:text-[10px] font-mono text-bwb-muted uppercase tracking-wider font-bold">
+          Live
+        </span>
+      </div>
+      <p className="text-xl sm:text-2xl font-display font-black text-bwb-text">{count}</p>
+      <p className="text-[10px] sm:text-xs text-bwb-muted font-mono mt-0.5 truncate">{label}</p>
+    </div>
   )
 }
 
@@ -35,8 +39,11 @@ export default function HostDashboardPage() {
   const [creating, setCreating] = useState(false)
   const [deleteTarget, setDeleteTarget] = useState<Game | null>(null)
   const [deleting, setDeleting] = useState(false)
+  const [copiedCodeId, setCopiedCodeId] = useState<string | null>(null)
 
-  useEffect(() => { api.listGames().then(setGames).catch(() => setError('API server is unavailable. Start it with npm run server.')) }, [])
+  useEffect(() => {
+    api.listGames().then(setGames).catch(() => setError('API server is unavailable. Start it with npm run server.'))
+  }, [])
 
   const createGame = async () => {
     if (!newGameName.trim()) { toast.warning('Enter a game name.'); return }
@@ -57,8 +64,18 @@ export default function HostDashboardPage() {
     }
   }
 
+  const handleLogout = () => {
+    localStorage.removeItem('host_token')
+    toast.info('Logged out.')
+    navigate('/host/login')
+  }
 
-  const handleLogout = () => { localStorage.removeItem('host_token'); toast.info('Logged out.'); navigate('/host/login') }
+  const copyGameCode = (code: string, id: string) => {
+    navigator.clipboard.writeText(code)
+    setCopiedCodeId(id)
+    toast.success(`PIN "${code}" copied to clipboard!`)
+    setTimeout(() => setCopiedCodeId(null), 2000)
+  }
 
   const deleteGame = async () => {
     if (!deleteTarget) return
@@ -80,55 +97,195 @@ export default function HostDashboardPage() {
 
   return (
     <PageLayout>
-      <PageTransition>
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
-          <div>
-            <Badge variant="accent" className="mb-2">Host</Badge>
-            <h1 className="font-display text-3xl font-bold">Dashboard</h1>
-            <p className="text-bwb-muted text-sm mt-1">Manage your events and games</p>
-          </div>
-          <div className="flex gap-2">
-            <Button size="lg" onClick={() => setShowCreateModal(true)}><Plus size={18} /> Create Game</Button>
-            <Button variant="ghost" size="lg" onClick={handleLogout}><LogOut size={18} /> Logout</Button>
-          </div>
-        </div>
-      </PageTransition>
+      <div className="max-w-5xl mx-auto px-2 sm:px-4 pb-28 sm:pb-12">
+        <PageTransition>
+          {/* Header Bar */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8 pb-4 border-b border-white/5">
+            <div>
+              <div className="flex items-center gap-2 mb-1.5">
+                <Badge variant="accent">Tournament Host</Badge>
+                <span className="text-xs font-mono text-emerald-400 flex items-center gap-1 font-bold">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" /> Live Server
+                </span>
+              </div>
+              <h1 className="font-display text-2xl sm:text-4xl font-black text-gradient">
+                Host Arena Dashboard
+              </h1>
+              <p className="text-bwb-muted text-xs sm:text-sm mt-0.5">
+                Manage your championship games, participant rosters & live controls
+              </p>
+            </div>
 
-      <StaggerChildren className="grid sm:grid-cols-3 gap-4 mb-10">
-        <StaggerItem><StatCard icon={Play} label="Active Games" value={activeGames} /></StaggerItem>
-        <StaggerItem><StatCard icon={Users} label="Total Teams" value={totalTeams} /></StaggerItem>
-        <StaggerItem><StatCard icon={Layers} label="Games" value={games.length} /></StaggerItem>
-      </StaggerChildren>
+            <div className="grid grid-cols-2 sm:flex items-center gap-2 w-full sm:w-auto">
+              <Button
+                size="md"
+                onClick={() => setShowCreateModal(true)}
+                className="glow-accent shadow-md justify-center font-bold text-xs sm:text-sm"
+              >
+                <Plus size={16} className="mr-1" /> Create Game
+              </Button>
+              <Button
+                variant="secondary"
+                size="md"
+                onClick={handleLogout}
+                className="justify-center border-white/10 text-xs sm:text-sm"
+              >
+                <LogOut size={15} className="mr-1 text-bwb-muted" /> Logout
+              </Button>
+            </div>
+          </div>
+        </PageTransition>
 
-      <PageTransition delay={0.25}>
-        <h2 className="font-display text-lg font-semibold mb-4">Your Games</h2>
-        <StaggerChildren className="space-y-3 mb-10">
-          {games.map((game) => (
-            <StaggerItem key={game.id}>
-              <Card padding="md" className="flex flex-wrap items-center justify-between gap-4 hover:border-bwb-accent/30 transition-colors">
-                <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="font-display font-semibold">{game.name}</span>
-                    <Badge variant={game.phase === 'LOBBY' ? 'default' : 'success'}>
-                      {game.phase === 'LOBBY' ? 'Lobby' : 'Live'}
-                    </Badge>
-                  </div>
-                  <p className="text-sm text-bwb-muted">
-                    Code: <span className="text-bwb-accent font-mono">{game.code}</span> · {game.teams.length} teams
-                  </p>
-                </div>
-                <div className="flex gap-2">
-                  <Link to={`/host/game/${game.id}`}>
-                    <Button size="sm">{game.phase === 'LOBBY' ? 'Setup' : 'Control'}</Button>
-                  </Link>
-                  <Button variant="ghost" size="sm" onClick={() => setDeleteTarget(game)}><Settings size={16} /></Button>
-                </div>
-              </Card>
-            </StaggerItem>
-          ))}
+        {/* Stats Grid */}
+        <StaggerChildren className="grid grid-cols-3 gap-2.5 sm:gap-4 mb-6 sm:mb-8">
+          <StaggerItem><StatCard icon={Play} label="Active Rooms" value={activeGames} /></StaggerItem>
+          <StaggerItem><StatCard icon={Users} label="Total Teams" value={totalTeams} /></StaggerItem>
+          <StaggerItem><StatCard icon={Layers} label="Total Events" value={games.length} /></StaggerItem>
         </StaggerChildren>
-        {error && <p className="text-sm text-bwb-danger">{error}</p>}
-      </PageTransition>
+
+        {/* Your Games Section */}
+        <PageTransition delay={0.2}>
+          <div className="flex items-center justify-between mb-3.5">
+            <h2 className="font-display text-base sm:text-lg font-bold text-bwb-text flex items-center gap-2">
+              <Layers size={18} className="text-bwb-accent" />
+              <span>Your Tournament Games ({games.length})</span>
+            </h2>
+            <span className="text-[11px] font-mono text-bwb-muted">
+              Auto-saved locally
+            </span>
+          </div>
+
+          {games.length === 0 ? (
+            <div className="p-8 sm:p-12 rounded-3xl bg-bwb-surface border border-dashed border-white/10 text-center space-y-4 shadow-inner">
+              <div className="w-14 h-14 rounded-2xl bg-bwb-accent/10 border border-bwb-accent/20 flex items-center justify-center mx-auto text-bwb-accent">
+                <Play size={28} />
+              </div>
+              <div>
+                <h3 className="font-display font-bold text-lg text-bwb-text">No Tournament Games Found</h3>
+                <p className="text-xs text-bwb-muted mt-1 max-w-md mx-auto">
+                  Create your first tournament room to generate a PIN code for participants and start hosting!
+                </p>
+              </div>
+              <Button onClick={() => setShowCreateModal(true)} className="glow-accent mx-auto font-bold text-xs">
+                <Plus size={15} className="mr-1" /> Create Your First Game
+              </Button>
+            </div>
+          ) : (
+            <StaggerChildren className="space-y-3.5">
+              {games.map((game) => {
+                const isLobby = game.phase === 'LOBBY'
+                const roundNum = game.currentRound || 1
+                const maxQuota = game.maxTeams || 32
+                const isFull = game.teams.length >= maxQuota
+                const isCopied = copiedCodeId === game.id
+
+                return (
+                  <StaggerItem key={game.id}>
+                    <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-br from-bwb-surface via-bwb-surface-2/95 to-bwb-surface border border-white/10 hover:border-bwb-accent/40 transition-all shadow-lg flex flex-col justify-between gap-4">
+                      {/* Top Header: Title & Badges */}
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <h3 className="font-display font-black text-base sm:text-lg text-bwb-text truncate">
+                            {game.name}
+                          </h3>
+                        </div>
+
+                        <div className="flex items-center gap-1.5 shrink-0 flex-wrap">
+                          <span className="px-2 py-0.5 rounded-lg text-[10px] font-mono font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                            Round {roundNum}
+                          </span>
+                          <span className={`px-2 py-0.5 rounded-lg text-[10px] font-mono font-bold border ${
+                            isLobby
+                              ? 'bg-cyan-500/15 text-cyan-300 border-cyan-500/30'
+                              : 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
+                          }`}>
+                            {game.phase ? game.phase.replace('_', ' ') : 'LOBBY'}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Info & Meta Pill Row */}
+                      <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-white/5 text-xs font-mono">
+                        {/* PIN Code Pill with Tap-To-Copy */}
+                        <button
+                          type="button"
+                          onClick={() => copyGameCode(game.code, game.id)}
+                          className="px-2.5 py-1 rounded-xl bg-bwb-bg border border-white/10 hover:border-bwb-accent/40 text-bwb-text flex items-center gap-1.5 transition-all text-xs font-bold active:scale-95"
+                          title="Click to copy PIN"
+                        >
+                          <span className="text-bwb-muted font-normal text-[10px]">PIN:</span>
+                          <span className="text-bwb-accent font-black tracking-wider">{game.code}</span>
+                          {isCopied ? <CheckCircle2 size={12} className="text-emerald-400 ml-0.5" /> : <Copy size={12} className="text-bwb-muted ml-0.5" />}
+                        </button>
+
+                        {/* Teams Count Pill */}
+                        <div className={`px-2.5 py-1 rounded-xl border flex items-center gap-1.5 text-xs ${
+                          isFull
+                            ? 'bg-amber-500/15 text-amber-300 border-amber-500/30 font-bold'
+                            : 'bg-bwb-bg/60 text-bwb-text border-white/5'
+                        }`}>
+                          <Users size={12} className={isFull ? 'text-amber-400' : 'text-bwb-accent'} />
+                          <span>
+                            <strong>{game.teams.length}</strong>/{maxQuota} Squads
+                          </span>
+                        </div>
+
+                        {/* Scheduled time if present */}
+                        {game.scheduledStartTime && (
+                          <div className="px-2.5 py-1 rounded-xl bg-bwb-bg/60 border border-white/5 text-bwb-muted flex items-center gap-1.5 text-[11px]">
+                            <Clock size={11} className="text-amber-400" />
+                            <span>{new Date(game.scheduledStartTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Action Bar (Mobile-first grid & flex) */}
+                      <div className="grid grid-cols-1 sm:flex sm:items-center justify-between gap-2 pt-2 border-t border-white/5">
+                        <div className="grid grid-cols-2 sm:flex items-center gap-2">
+                          <Link to={`/host/game/${game.id}`} className="w-full sm:w-auto">
+                            <Button
+                              size="sm"
+                              className="w-full sm:w-auto glow-accent shadow-sm font-bold text-xs justify-center"
+                            >
+                              <Sliders size={13} className="mr-1.5" />
+                              {isLobby ? 'Control Room' : 'Live Game Control'}
+                            </Button>
+                          </Link>
+
+                          <Link to="/projector" className="w-full sm:w-auto">
+                            <Button
+                              variant="secondary"
+                              size="sm"
+                              className="w-full sm:w-auto border-white/10 hover:border-white/20 text-xs justify-center"
+                            >
+                              <Tv size={13} className="mr-1.5 text-purple-400" />
+                              Projector
+                            </Button>
+                          </Link>
+                        </div>
+
+                        <div className="flex items-center justify-end gap-1.5">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setDeleteTarget(game)}
+                            className="text-bwb-muted hover:text-red-400 hover:bg-red-500/10 text-xs px-2.5 py-1.5"
+                            title="Delete tournament game"
+                          >
+                            <Trash2 size={14} className="mr-1" /> Delete
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </StaggerItem>
+                )
+              })}
+            </StaggerChildren>
+          )}
+
+          {error && <p className="text-sm text-bwb-danger mt-4">{error}</p>}
+        </PageTransition>
+      </div>
 
       <Modal open={showCreateModal} onClose={() => setShowCreateModal(false)} title="Create New Game">
         <div className="space-y-4">

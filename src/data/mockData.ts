@@ -11,7 +11,6 @@ export const ALL_TECH_DICTIONARY: Record<string, { icon: string; category: Techn
   'Environmental Sensors': { icon: '🌡️', category: 'Connectivity', description: 'Atmospheric telemetry for temperature, humidity, air quality, and environmental threats.' },
   'Computer Vision': { icon: '👁️', category: 'Intelligence', description: 'Algorithmic visual extraction, object recognition, and spatial scene comprehension.' },
   'Drone': { icon: '🚁', category: 'Mobility', description: 'Autonomous unmanned aerial vehicles providing rapid aerial reconnaissance and dispatch.' },
-  'Drones': { icon: '🚁', category: 'Mobility', description: 'Autonomous unmanned aerial vehicles providing rapid aerial reconnaissance and dispatch.' },
   'Water-Level Sensors': { icon: '🌊', category: 'Connectivity', description: 'Submersible ultrasonic and hydrostatic pressure sensors measuring water volume in real time.' },
   'Satellite Communication': { icon: '🛰️', category: 'Connectivity', description: 'Orbital satellite uplink/downlink ensuring continuous telemetry in zero-infrastructure zones.' },
   'Biometric Authentication': { icon: '🔐', category: 'Security', description: 'Biological verification (fingerprint, facial, retina) for zero-trust identity confirmation.' },
@@ -54,7 +53,7 @@ export const PROBLEM_CARD_STACKS: Record<string, { card1: string[]; card2: strin
   p1: {
     card1: ['IoT', 'GPS', 'Smart Sensors', 'Smart Camera', 'RFID', 'Wearable Devices', 'Motion Sensors', 'Environmental Sensors'],
     card2: ['AI', 'Machine Learning', 'Computer Vision', 'Predictive Analytics', 'NLP', 'Generative AI', 'Data Analytics', 'Recommendation System'],
-    card3: ['Mesh Network', 'LoRaWAN', 'Satellite Communication', 'Edge Computing', 'Drones', 'Robotics', 'Mobile App', 'GIS / Digital Mapping'],
+    card3: ['Mesh Network', 'LoRaWAN', 'Satellite Communication', 'Edge Computing', 'Drone', 'Robotics', 'Mobile App', 'GIS / Digital Mapping'],
   },
   p2: {
     card1: ['Smart Camera', 'IoT', 'GPS', 'Smart Sensors', 'Computer Vision', 'RFID', 'Drone', 'Motion Sensors'],

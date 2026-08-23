@@ -29,6 +29,8 @@ import { PhaseTransitionOverlay } from './components/ui/PhaseTransitionOverlay'
 import { TournamentAlertModal } from './components/ui/TournamentAlertModal'
 import { SoundToggle } from './components/ui/SoundToggle'
 
+import { ProtectedParticipantPhase } from './components/auth/ProtectedParticipantPhase'
+
 function ProtectedHost({ children }: { children: React.ReactNode }) {
   if (!localStorage.getItem('host_token')) return <Navigate to="/host/login" replace />
   return <>{children}</>
@@ -61,25 +63,33 @@ export default function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/how-to-play" element={<HowToPlayPage />} />
         <Route path="/join" element={<JoinPage />} />
-        <Route path="/lobby" element={<LobbyPage />} />
-        <Route path="/problem-select" element={<ProblemSelectPage />} />
-        <Route path="/card-reveal" element={<CardRevealPage />} />
-        <Route path="/game" element={<GamePage />} />
-        <Route path="/pitch" element={<PitchPage />} />
-        <Route path="/judging" element={<JudgingPage />} />
+
+        {/* Phase-Protected Participant Routes */}
+        <Route path="/lobby" element={<ProtectedParticipantPhase allowedPhases={['LOBBY']}><LobbyPage /></ProtectedParticipantPhase>} />
+        <Route path="/problem-select" element={<ProtectedParticipantPhase allowedPhases={['PROBLEM_REVEAL']}><ProblemSelectPage /></ProtectedParticipantPhase>} />
+        <Route path="/card-reveal" element={<ProtectedParticipantPhase allowedPhases={['CARD_REVEAL']}><CardRevealPage /></ProtectedParticipantPhase>} />
+        <Route path="/game" element={<ProtectedParticipantPhase allowedPhases={['BUILDING', 'SUBMISSION_LOCKED']}><GamePage /></ProtectedParticipantPhase>} />
+        <Route path="/pitch" element={<ProtectedParticipantPhase allowedPhases={['PITCHING', 'JUDGE_ATTACK']}><PitchPage /></ProtectedParticipantPhase>} />
+        <Route path="/judging" element={<ProtectedParticipantPhase allowedPhases={['JUDGING']}><JudgingPage /></ProtectedParticipantPhase>} />
         <Route path="/leaderboard" element={<LeaderboardPage />} />
 
+        {/* Real-time Synchronized Projector Stage */}
         <Route path="/projector" element={<ProjectorPage />} />
 
+        {/* Host Operational Routes */}
         <Route path="/host/login" element={<HostLoginPage />} />
         <Route path="/host/dashboard" element={<ProtectedHost><HostDashboardPage /></ProtectedHost>} />
         <Route path="/host/game/:gameId" element={<ProtectedHost><HostGameControlPage /></ProtectedHost>} />
         <Route path="/host/round" element={<ProtectedHost><HostRoundPage /></ProtectedHost>} />
         <Route path="/host/leaderboard" element={<ProtectedHost><HostLeaderboardPage /></ProtectedHost>} />
 
+        {/* Jury Scoring Routes */}
         <Route path="/judge/login" element={<JudgeLoginPage />} />
         <Route path="/judge/dashboard" element={<JudgeDashboardPage />} />
         <Route path="/judge/score/:teamId" element={<JudgeScorePage />} />
+
+        {/* Catch-all fallback */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   )

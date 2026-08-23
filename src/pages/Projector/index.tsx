@@ -120,7 +120,6 @@ export default function ProjectorPage() {
   const [catalog, setCatalog] = useState<{ problems: Problem[]; technologies: Technology[] }>({ problems: [], technologies: [] })
   const [activeProblemIndex, setActiveProblemIndex] = useState(0)
   const [autoCycle, setAutoCycle] = useState(true)
-  const [manualOverridePhase, setManualOverridePhase] = useState<GamePhase | null>(null)
 
   // Stage Mascot & Announcer States
   const [announcementIndex, setAnnouncementIndex] = useState(0)
@@ -242,8 +241,8 @@ export default function ProjectorPage() {
     setTimeout(() => setStageParticles((prev) => prev.filter((p) => !burst.some((b) => b.id === p.id))), 1200)
   }
 
-  // Active display phase (auto follows game phase unless manually overridden)
-  const currentPhase: GamePhase = manualOverridePhase ?? game.phase ?? 'LOBBY'
+  // Active display phase (strictly driven in real-time by host via SSE)
+  const currentPhase: GamePhase = game.phase ?? 'LOBBY'
   const currentRound = game.currentRound || (game.isFinalRound ? 3 : 1)
   const isResults = currentPhase === 'RESULTS' || game.currentRound === 3
   const activeProblem = catalog.problems[activeProblemIndex] ?? game.currentProblem ?? catalog.problems[0]
@@ -296,7 +295,7 @@ export default function ProjectorPage() {
           </div>
         </div>
 
-        {/* Round-Aware Stage Director Phase Bar */}
+        {/* Round-Aware Stage Director Phase Bar (Locked to Host Phase) */}
         <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto justify-end">
           <div className="hidden lg:flex items-center gap-1 bg-bwb-surface-2/80 p-1 rounded-xl border border-white/10 text-[11px] font-mono font-bold">
             <span className="px-2 py-0.5 text-[10px] text-purple-300 bg-purple-500/20 rounded-md mr-1 border border-purple-500/30">
@@ -310,20 +309,28 @@ export default function ProjectorPage() {
                   ? ['LOBBY', 'BUILDING', 'PITCHING', 'JUDGING', 'LEADERBOARD']
                   : ['LOBBY', 'BUILDING', 'PITCHING', 'JUDGING', 'RESULTS']
 
-              return activeRoundPhases.map((p) => (
-                <button
-                  key={p}
-                  type="button"
-                  onClick={() => setManualOverridePhase(p === game.phase ? null : p)}
-                  className={`px-2.5 py-1 rounded-lg transition-all ${
-                    currentPhase === p
-                      ? 'bg-bwb-accent text-bwb-bg shadow-sm font-black'
-                      : 'text-bwb-muted hover:text-bwb-text hover:bg-white/5'
-                  }`}
-                >
-                  {p.replace('_', ' ')}
-                </button>
-              ))
+              const currentStageIdx = activeRoundPhases.indexOf(currentPhase)
+
+              return activeRoundPhases.map((p, idx) => {
+                const isCurrent = currentPhase === p
+                const isPast = currentStageIdx > idx
+                return (
+                  <div
+                    key={p}
+                    className={`px-2.5 py-1 rounded-lg text-xs transition-all flex items-center gap-1.5 ${
+                      isCurrent
+                        ? 'bg-bwb-accent text-bwb-bg shadow-sm font-black ring-1 ring-bwb-accent/50'
+                        : isPast
+                        ? 'text-emerald-400/80 bg-emerald-500/10'
+                        : 'text-bwb-muted/50 bg-white/[0.02]'
+                    }`}
+                  >
+                    {isCurrent && <span className="w-1.5 h-1.5 rounded-full bg-bwb-bg animate-pulse" />}
+                    {isPast && <CheckCircle2 size={11} className="text-emerald-400" />}
+                    <span>{p.replace('_', ' ')}</span>
+                  </div>
+                )
+              })
             })()}
           </div>
 

@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Trophy, Award, Sparkles } from 'lucide-react'
+import { Trophy, Award, Sparkles, User, ArrowLeft } from 'lucide-react'
 import { PageLayout } from '../../components/layout/PageLayout'
 import { Card } from '../../components/ui/Card'
 import { Badge } from '../../components/ui/Badge'
 import { Button } from '../../components/ui/Button'
 import { getScoringCriteriaForRound } from '../../data/mockData'
+import { useGameStore } from '../../store/gameStore'
 
 const tournamentRounds = [
   {
@@ -87,10 +88,56 @@ const rubricRounds = [
 
 export default function HowToPlayPage() {
   const [activeRubricRound, setActiveRubricRound] = useState<1 | 2 | 3>(1)
+  const { session, game } = useGameStore()
+  const hasActiveSession = !!session?.teamId
+
+  const phaseRoutes: Record<string, string> = {
+    LOBBY: '/lobby',
+    PROBLEM_REVEAL: '/problem-select',
+    CARD_REVEAL: '/card-reveal',
+    BUILDING: '/game',
+    SUBMISSION_LOCKED: '/game',
+    PITCHING: '/pitch',
+    JUDGE_ATTACK: '/pitch',
+    JUDGING: '/judging',
+    LEADERBOARD: '/leaderboard',
+    RESULTS: '/leaderboard',
+  }
+
+  const activeGameRoute = (game?.phase && phaseRoutes[game.phase]) || '/lobby'
+  const activePhaseName = game?.phase ? game.phase.replace('_', ' ') : 'LOBBY'
 
   return (
     <PageLayout>
       <div className="max-w-4xl mx-auto px-1 sm:px-4 pb-12">
+        {/* Active Session Notification Header */}
+        {hasActiveSession && (
+          <div className="mb-6 p-4 rounded-2xl bg-gradient-to-r from-bwb-accent/15 via-purple-500/10 to-bwb-surface border border-bwb-accent/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-lg">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-bwb-accent/20 border border-bwb-accent/40 flex items-center justify-center text-bwb-accent font-bold shrink-0">
+                <User size={18} />
+              </div>
+              <div>
+                <p className="text-xs font-mono font-bold text-bwb-text flex items-center gap-2">
+                  Signed in with Squad: <span className="text-bwb-accent">{session?.teamName}</span>
+                  <span className="text-[10px] px-2 py-0.5 rounded-md bg-purple-500/20 text-purple-300 border border-purple-500/30 font-bold">
+                    {activePhaseName}
+                  </span>
+                </p>
+                <p className="text-[11px] text-bwb-muted">
+                  Your tournament session is active. You can review the rules and jump straight back to your squad anytime.
+                </p>
+              </div>
+            </div>
+            <Link to={activeGameRoute}>
+              <Button size="sm" className="glow-accent text-xs font-bold shrink-0 shadow-md">
+                <ArrowLeft size={14} className="mr-1" />
+                Return to {game?.phase === 'LOBBY' ? 'Lobby' : 'Active Game'}
+              </Button>
+            </Link>
+          </div>
+        )}
+
         <Badge variant="accent" className="mb-4">Official Tournament Rules</Badge>
         <h1 className="font-display text-3xl sm:text-5xl font-black mb-3 text-gradient">
           3-Round Tournament System
@@ -325,9 +372,25 @@ export default function HowToPlayPage() {
           </div>
         </Card>
 
-        <div className="flex gap-3">
-          <Link to="/join"><Button size="lg">Join Tournament</Button></Link>
-          <Link to="/"><Button variant="ghost" size="lg">Back Home</Button></Link>
+        <div className="flex flex-wrap gap-3 items-center">
+          {hasActiveSession ? (
+            <>
+              <Link to={activeGameRoute}>
+                <Button size="lg" className="glow-accent font-bold">
+                  <ArrowLeft size={16} className="mr-2" />
+                  Return to {game?.phase === 'LOBBY' ? 'Lobby' : 'Live Game'}
+                </Button>
+              </Link>
+              <Link to="/">
+                <Button variant="ghost" size="lg">Home</Button>
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link to="/join"><Button size="lg">Join Tournament</Button></Link>
+              <Link to="/"><Button variant="ghost" size="lg">Back Home</Button></Link>
+            </>
+          )}
         </div>
       </div>
     </PageLayout>

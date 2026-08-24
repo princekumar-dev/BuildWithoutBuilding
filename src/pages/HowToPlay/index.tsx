@@ -41,41 +41,43 @@ const eventTimeline = [
 ]
 
 const steps = [
-  { num: '01', title: 'Join & Roster Entry (Manual Host Start)', desc: 'Enter the Room PIN provided by your host. Register your squad of 2–3 members and receive your unique Team Passcode.' },
-  { num: '02', title: 'Problem Selection (8 Challenge Tracks)', desc: 'Select 1 of 8 Problem Statements (strictly max 2 teams per problem statement capacity in Round 2).' },
-  { num: '03', title: 'Draft 3 Frontier Tech Cards', desc: 'Each team drafts 3 surprise frontier tech cards that must be incorporated into the architecture.' },
+  { num: '01', title: 'Join & Roster Entry', desc: 'Enter the Room PIN provided by your host. Register your squad of 2–3 members and receive your unique Team Passcode.' },
+  { num: '02', title: 'Problem Selection (8 Tracks · 2 Teams / Track)', desc: 'Select 1 of 8 Problem Statements (max 2 squads per track). These 2 squads will face off head-to-head in a direct 1v1 duel in Round 2.' },
+  { num: '03', title: 'Draft 3 Frontier Tech Cards', desc: 'Each team drafts 3 surprise frontier tech cards that must be meaningfully incorporated into their system architecture.' },
   { num: '04', title: 'Architecture Sprint (45m in R1 · 30m in R2/R3)', desc: 'Design your telemetry pipeline, system architecture, and solution proposal. Timer auto-advances to pitch when time expires.' },
-  { num: '05', title: 'Live Pitch & Stage Defense', desc: 'Present your solution verbally on stage. Judges cross-examine your technical feasibility and system constraints.' },
-  { num: '06', title: 'Jury Deliberation (100 Pts Rubric)', desc: 'The jury panel scores teams across the official 100-point rubric during live deliberation.' },
+  { num: '05', title: '1v1 Live Pitch & Stage Defense', desc: 'Present your solution verbally on stage. In Round 2, your architecture is evaluated directly head-to-head against your problem track opponent.' },
+  { num: '06', title: 'Jury Scoring & Track Champion Resolution', desc: 'Jury evaluates squads on the 100-point rubric. In Round 2, the winner of each problem track duel advances as the Problem Champion (8 Finalists total).' },
   { num: '07', title: 'Official Host Leaderboard Reveal', desc: 'Standings revealed on projector and player screens only when the Host triggers the official reveal!' },
 ]
 
 const buildStrategies = [
   {
     round: 'How to Build in Round 1 (Problem Understanding)',
-    focus: 'Problem Depth & Existing Landscape Critique',
+    focus: 'Problem Depth & Existing Landscape Critique (Zero Elimination)',
     points: [
-      'Deconstruct the root causes and specific user pain points rather than jumping straight to generic solutions.',
-      'Critique existing market solutions and explain clearly why current alternatives fail or cannot scale.',
-      'State your initial technical direction incorporating your 3 drafted frontier tech cards.',
+      'Deconstruct root causes and specific user pain points rather than jumping straight to generic solutions.',
+      'Critique existing market alternatives and explain clearly why current solutions fail or cannot scale.',
+      'Formulate your initial technical direction incorporating your 3 drafted frontier tech cards.',
+      'Zero elimination round — focus on building rock-solid problem understanding to prepare for Round 2.',
     ],
   },
   {
-    round: 'How to Build in Round 2 (Solution Enhancement)',
-    focus: 'Architecture Novelty & 3-Card Tech Integration',
+    round: 'How to Build in Round 2 (1v1 Problem Showdown)',
+    focus: 'Head-to-Head 1v1 Track Superiority & 3-Card Tech Integration',
     points: [
-      'Detail your enhanced solution architecture, system block diagram, and data telemetry flow.',
+      'Differentiate your architecture directly from your rival squad tackling the SAME problem statement.',
+      'Detail your enhanced solution architecture, system block diagram, and data telemetry pipeline.',
       'Demonstrate deep, seamless synergy of all 3 surprise frontier tech cards (not just surface-level buzzwords).',
-      'Address scale, cost efficiency, and edge failover reliability to secure a spot in the Top 8 cut-off.',
+      'Address scale, cost efficiency, and edge failover reliability to win the sole Finals ticket for your problem track.',
     ],
   },
   {
-    round: 'How to Build in Round 3 (Grand Finals)',
-    focus: 'Master Blueprint & Live Defense Resilience',
+    round: 'How to Build in Round 3 (Grand Finals — 8 Problem Champions)',
+    focus: 'Master Blueprint, Live Defense & Prize Podium Honors',
     points: [
       'Refine your master end-to-end blueprint incorporating all feedback from Round 1 and Round 2.',
       'Prepare for adversarial judge questions on hardware BOM cost, offline sync, security, and edge latency.',
-      'Deliver a concise, punchy championship pitch worthy of 1st, 2nd, or 3rd place podium honors.',
+      'Deliver a high-impact championship pitch worthy of 1st, 2nd, or 3rd place podium honors.',
     ],
   },
 ]

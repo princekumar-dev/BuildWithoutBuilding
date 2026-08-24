@@ -140,10 +140,10 @@ export default function ProblemSelectPage() {
         >
           <div className="flex items-center justify-center gap-2 mb-1">
             <Zap className="text-bwb-accent" size={20} />
-            <h2 className="font-display text-lg sm:text-xl font-bold">8 Challenges · Max 2 Teams per Problem</h2>
+            <h2 className="font-display text-lg sm:text-xl font-bold">8 Challenges · 1v1 Head-to-Head Duels (2 Squads / Track)</h2>
           </div>
           <p className="text-bwb-muted text-xs sm:text-sm max-w-lg mx-auto">
-            Choose your challenge below. Each problem statement accepts exactly <strong className="text-bwb-accent">2 teams max</strong>. Once a problem has 2 teams, it locks.
+            Select your challenge track below. Exactly <strong className="text-bwb-accent">2 squads</strong> share each problem statement to duel head-to-head in Round 2. The winner of each 1v1 duel advances to the Grand Finals (8 Problem Champions total).
           </p>
         </motion.div>
 
@@ -359,4 +359,3 @@ export default function ProblemSelectPage() {
     </PageLayout>
   )
 }
-

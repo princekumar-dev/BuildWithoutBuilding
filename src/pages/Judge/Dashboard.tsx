@@ -78,10 +78,10 @@ export default function JudgeDashboardPage() {
             <h1 className="font-display text-3xl sm:text-4xl font-bold text-bwb-text">{game.name || 'Live Competition'}</h1>
             <p className="text-bwb-muted text-sm mt-0.5">
               {currentRound === 1
-                ? 'Round 1 (No Elimination) · Evaluate foundational architecture & presentation.'
+                ? 'Round 1 (Open Qualifier · Zero Elimination) · Evaluate problem root cause understanding & landscape critique. All squads advance.'
                 : currentRound === 2
-                ? 'Round 2 (8 Challenges · Max 2 Teams/Problem) · Top 8 squads advance to Grand Finals.'
-                : 'Round 3 (Grand Finals) · 8 Finalists · Top 4 receive Championship Prizes (1st, 2nd, 3rd x2).'}
+                ? 'Round 2 (1v1 Problem Duel Showdown) · Head-to-head match per problem statement. The winner of each problem track advances as the Problem Champion (8 Finalists total).'
+                : 'Round 3 (Grand Finals) · 8 Problem Champions defend live on stage. Top 4 receive Championship Honors (🥇 1st, 🥈 2nd, 🥉 Dual 3rd).'}
             </p>
           </div>
           <div className="flex items-center gap-3">

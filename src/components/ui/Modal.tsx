@@ -38,24 +38,30 @@ export function Modal({ open, onClose, title, children, maxWidth = 'max-w-md' }:
             exit={{ opacity: 0 }}
           />
           <motion.div
-            className={`relative w-full ${maxWidth} bg-bwb-surface border border-bwb-border rounded-2xl shadow-2xl overflow-hidden`}
+            className={`relative w-full ${maxWidth} max-h-[90dvh] flex flex-col bg-bwb-surface/95 backdrop-blur-2xl border border-white/15 rounded-3xl shadow-2xl shadow-black/80 overflow-hidden my-auto`}
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
           >
             {title && (
-              <div className="flex items-center justify-between px-6 py-4 border-b border-bwb-border">
-                <h2 className="font-display text-lg font-semibold">{title}</h2>
+              <div className="shrink-0 flex items-center justify-between px-6 py-4 border-b border-white/10 bg-bwb-surface-2/70">
+                <h2 className="font-display text-lg font-bold text-bwb-text tracking-tight flex items-center gap-2">
+                  {title}
+                </h2>
                 <button
+                  type="button"
                   onClick={onClose}
-                  className="p-1.5 rounded-lg text-bwb-muted hover:text-bwb-text hover:bg-bwb-surface-2 transition-colors cursor-pointer"
+                  className="p-1.5 rounded-xl text-bwb-muted hover:text-bwb-text hover:bg-white/10 transition-colors cursor-pointer"
+                  aria-label="Close modal"
                 >
                   <X size={18} />
                 </button>
               </div>
             )}
-            <div className="p-6">{children}</div>
+            <div className="p-6 overflow-y-auto overscroll-contain flex-1 custom-scrollbar">
+              {children}
+            </div>
           </motion.div>
         </motion.div>
       )}

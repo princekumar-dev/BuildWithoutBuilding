@@ -558,7 +558,7 @@ createServer(async (request, response) => {
     }
   }
 
-  const match = url.pathname.match(/^\/api\/games\/([^/]+)(?:\/(join|phase|round|finalists|schedule|config|assign-cards|select-problem|reveal-card|submissions|scores|ping|pitch-team|mark-pitched))?$/)
+  const match = url.pathname.match(/^\/api\/games\/([^/]+)(?:\/(join|phase|round|finalists|schedule|config|assign-cards|select-problem|reveal-card|submissions|scores|ping|pitch-team|mark-pitched|timer))?$/)
   if (!match) return json(response, 404, { error: 'API route not found.' })
   const game = gameFor(database, decodeURIComponent(match[1])); if (!game) return json(response, 404, { error: 'Game not found.' })
   if (request.method === 'GET' && !match[2]) return json(response, 200, publicGame(game))
@@ -664,8 +664,51 @@ createServer(async (request, response) => {
     if (!input.phase) return json(response, 400, { error: 'Phase is required.' }); 
     game.phase = input.phase; 
     if (input.problemId) game.currentProblem = catalog.problems.find((problem) => problem.id === input.problemId) ?? game.currentProblem; 
+
+    // Compute Synchronized Wall-Clock Timer for All Devices (Teams, Projector, Host)
+    const currentRound = game.currentRound || 1;
+    let durationSec = 0;
+    if (input.phase === 'BUILDING') {
+      const defaultMins = currentRound === 1 ? 45 : 30;
+      const mins = Number(input.durationMinutes) || Number(game.buildDurationMinutes) || defaultMins;
+      durationSec = mins * 60;
+    } else if (input.phase === 'PITCHING') {
+      durationSec = Number(input.durationSeconds) || 180;
+    } else if (input.phase === 'JUDGE_ATTACK') {
+      durationSec = Number(input.durationSeconds) || 30;
+    }
+
+    if (durationSec > 0) {
+      game.phaseStartedAt = new Date().toISOString();
+      game.phaseDurationSeconds = durationSec;
+      game.phaseExpiresAt = new Date(Date.now() + durationSec * 1000).toISOString();
+    } else {
+      game.phaseStartedAt = null;
+      game.phaseDurationSeconds = null;
+      game.phaseExpiresAt = null;
+    }
+
     save(database); 
-    return json(response, 200, publicGame(game)) 
+    const pGame = publicGame(game);
+    broadcastToClients({ type: 'games-updated', game: pGame });
+    return json(response, 200, pGame);
+  }
+
+  if (request.method === 'PATCH' && action === 'timer') {
+    if (!requireHost(request, response)) return;
+    const sec = Number(input.durationSeconds);
+    if (sec && sec > 0) {
+      game.phaseDurationSeconds = sec;
+      game.phaseStartedAt = new Date().toISOString();
+      game.phaseExpiresAt = new Date(Date.now() + sec * 1000).toISOString();
+      if (input.phase) game.phase = input.phase;
+    } else if (sec === 0) {
+      game.phaseExpiresAt = new Date().toISOString();
+    }
+    save(database);
+    const pGame = publicGame(game);
+    broadcastToClients({ type: 'games-updated', game: pGame });
+    return json(response, 200, pGame);
   }
 
   if ((request.method === 'PATCH' || request.method === 'POST') && action === 'round') {
@@ -679,8 +722,13 @@ createServer(async (request, response) => {
     } else {
       game.phase = 'LOBBY';
     }
+    game.phaseStartedAt = null;
+    game.phaseDurationSeconds = null;
+    game.phaseExpiresAt = null;
     save(database);
-    return json(response, 200, publicGame(game));
+    const pGame = publicGame(game);
+    broadcastToClients({ type: 'games-updated', game: pGame });
+    return json(response, 200, pGame);
   }
 
   if (request.method === 'POST' && action === 'finalists') {
@@ -784,8 +832,20 @@ createServer(async (request, response) => {
   if (request.method === 'PATCH' && action === 'pitch-team') {
     if (!requireHostOrJudge(request, response)) return;
     game.currentPitchTeamId = input.teamId || null;
+    if (game.currentPitchTeamId) {
+      const pitchSec = Number(input.pitchSeconds) || (game.phase === 'JUDGE_ATTACK' ? 30 : 180);
+      game.pitchStartedAt = new Date().toISOString();
+      game.pitchDurationSeconds = pitchSec;
+      game.pitchExpiresAt = new Date(Date.now() + pitchSec * 1000).toISOString();
+    } else {
+      game.pitchStartedAt = null;
+      game.pitchDurationSeconds = null;
+      game.pitchExpiresAt = null;
+    }
     save(database);
-    return json(response, 200, publicGame(game));
+    const pGame = publicGame(game);
+    broadcastToClients({ type: 'games-updated', game: pGame });
+    return json(response, 200, pGame);
   }
 
   if (request.method === 'POST' && action === 'mark-pitched') {

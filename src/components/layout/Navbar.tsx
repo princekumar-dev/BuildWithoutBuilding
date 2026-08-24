@@ -45,7 +45,7 @@ export function Navbar() {
   }
 
   return (
-    <header className="sticky top-0 z-50 border-b border-bwb-border/60 bg-bwb-bg/90 backdrop-blur-xl">
+    <header className="sticky top-0 z-50 border-b border-white/10 bg-bwb-bg/80 backdrop-blur-2xl shadow-[0_8px_32px_rgba(0,0,0,0.6)]">
       <nav className="max-w-7xl mx-auto px-3 sm:px-6 h-16 flex items-center justify-between gap-2">
         {/* BRAND / LOGO SECTION */}
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">

@@ -85,11 +85,12 @@ export default function GamePage() {
           </div>
 
           <CountdownTimer
-            key={`build-timer-r${game.currentRound || 1}`}
+            key={`build-timer-${game.phase}-${game.phaseExpiresAt || game.currentRound || 1}`}
+            targetTime={game.phaseExpiresAt}
             initialSeconds={getPhaseDuration(game.id, game.currentRound || 1, 'BUILDING', game.buildDurationMinutes)}
             running={!hasSubmitted}
             size="md"
-            label="Build Time"
+            label="Build Time Remaining"
           />
 
           {hasSubmitted && (

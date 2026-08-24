@@ -1331,7 +1331,8 @@ export default function ProjectorPage() {
               <div className="stereo-card rounded-3xl p-6 sm:p-8 max-w-2xl mx-auto border-2 border-bwb-accent/40 shadow-2xl mb-6 relative overflow-hidden">
                 <div className="absolute -top-20 -right-20 w-48 h-48 rounded-full bg-bwb-accent/10 blur-3xl pointer-events-none" />
                 <CountdownTimer
-                  key={`proj-build-r${currentRound}`}
+                  key={`proj-build-${currentRound}-${game.phaseExpiresAt}`}
+                  targetTime={game.phaseExpiresAt}
                   initialSeconds={getPhaseDuration(game.id, currentRound, 'BUILDING', game.buildDurationMinutes)}
                   size="xl"
                   label="BUILD PHASE TIME REMAINING"
@@ -1527,7 +1528,9 @@ export default function ProjectorPage() {
                         <span>{currentPhase === 'JUDGE_ATTACK' ? 'Defense Clock' : 'Pitch Clock'}</span>
                       </p>
                       <CountdownTimer
-                        initialSeconds={currentPhase === 'JUDGE_ATTACK' ? 30 : 90}
+                        key={`proj-pitch-${pitchTeam.id}-${currentPhase}-${game.pitchExpiresAt || game.phaseExpiresAt}`}
+                        targetTime={game.pitchExpiresAt || game.phaseExpiresAt}
+                        initialSeconds={currentPhase === 'JUDGE_ATTACK' ? 30 : 180}
                         size="lg"
                       />
                     </div>

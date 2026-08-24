@@ -165,7 +165,7 @@ export default function HostGameControlPage() {
 
   const currentRound = game.currentRound || (game.isFinalRound ? 3 : 1)
 
-  const handleSavePhaseTimers = () => {
+  const handleSavePhaseTimers = async () => {
     if (!game.id) return
     if (buildMinutes < 1 || buildMinutes > 120) {
       toast.error('Build duration must be between 1 and 120 minutes.')
@@ -177,8 +177,17 @@ export default function HostGameControlPage() {
     }
     setPhaseDuration(game.id, currentRound, 'BUILDING', buildMinutes * 60)
     setPhaseDuration(game.id, currentRound, 'PITCHING', pitchSeconds)
+    try {
+      if (game.phase === 'BUILDING') {
+        const updated = await api.updatePhaseTimer(game.id, buildMinutes * 60, 'BUILDING')
+        setGame(updated)
+      } else if (game.phase === 'PITCHING') {
+        const updated = await api.updatePhaseTimer(game.id, pitchSeconds, 'PITCHING')
+        setGame(updated)
+      }
+    } catch {}
     setIsEditingTimer(false)
-    toast.success(`Round ${currentRound} timers updated: Build ${buildMinutes}m, Pitch ${pitchSeconds / 60}m.`)
+    toast.success(`Round ${currentRound} timers updated & synced: Build ${buildMinutes}m, Pitch ${pitchSeconds / 60}m.`)
   }
 
   useEffect(() => {
@@ -363,7 +372,8 @@ export default function HostGameControlPage() {
                   <p className="text-[10px] uppercase font-bold tracking-widest text-bwb-muted">{phaseTimer?.label ?? 'Stage Timer'}</p>
                   {phaseTimer ? (
                     <CountdownTimer
-                      key={`${game.currentRound}-${game.phase}-${timerRevision}`}
+                      key={`host-timer-${game.phase}-${game.phaseExpiresAt || timerRevision}`}
+                      targetTime={game.phaseExpiresAt}
                       initialSeconds={phaseTimer.seconds}
                       running
                       size="sm"

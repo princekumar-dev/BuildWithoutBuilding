@@ -65,6 +65,7 @@ export const api = {
   toggleRegistration: (gameId: string, isRegistrationOpen: boolean) => request<Game>(`/games/${gameId}/config`, { method: 'PATCH', body: JSON.stringify({ isRegistrationOpen }) }, true),
   setCurrentPitchTeam: (gameId: string, teamId: string | null) => request<Game>(`/games/${gameId}/pitch-team`, { method: 'PATCH', body: JSON.stringify({ teamId }) }, true),
   markTeamPitched: (gameId: string, teamId: string) => request<Game>(`/games/${gameId}/mark-pitched`, { method: 'POST', body: JSON.stringify({ teamId }) }, true),
+  updatePhaseTimer: (gameId: string, durationSeconds: number, phase?: GamePhase) => request<Game>(`/games/${gameId}/timer`, { method: 'PATCH', body: JSON.stringify({ durationSeconds, phase }) }, true),
 }
 
 

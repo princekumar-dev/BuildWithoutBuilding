@@ -146,22 +146,22 @@ export default function HowToPlayPage() {
           BUILD WITHOUT BUILDING is a competitive architecture and technical innovation tournament. You don&apos;t write code — you design, architect, and defend real engineering solutions under strict constraints.
         </p>
 
-        {/* 3-Round Tournament Overview */}
+        {/* 3-Round Tournament Progression */}
         <h2 className="font-display text-xl sm:text-2xl font-bold mb-4 flex items-center gap-2">
           <Trophy className="text-bwb-gold" size={22} />
           Tournament Progression Format
         </h2>
         <div className="grid md:grid-cols-3 gap-3.5 sm:gap-4 mb-10 sm:mb-12">
           {tournamentRounds.map((r) => (
-            <Card key={r.num} padding="md" className="border-purple-500/20 flex flex-col justify-between">
+            <Card key={r.num} padding="md" className="stereo-card border border-white/10 hover:border-purple-400/50 flex flex-col justify-between transition-all duration-300 group shadow-xl">
               <div>
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-2xl">{r.icon}</span>
+                  <span className="text-2xl group-hover:scale-110 transition-transform">{r.icon}</span>
                   <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-purple-500/20 text-purple-300 border border-purple-500/30">
                     {r.badge}
                   </span>
                 </div>
-                <span className="text-[10px] font-mono uppercase text-bwb-muted font-bold block mb-1">
+                <span className="text-[10px] font-mono uppercase text-purple-400 font-bold block mb-1">
                   {r.num}
                 </span>
                 <h3 className="font-display font-bold text-base text-bwb-text mb-2">

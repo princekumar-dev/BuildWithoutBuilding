@@ -99,6 +99,12 @@ export interface Game {
   maxTeams?: number
   whatsappGroupUrl?: string
   isRegistrationOpen?: boolean
+  phaseStartedAt?: string | null
+  phaseExpiresAt?: string | null
+  phaseDurationSeconds?: number | null
+  pitchStartedAt?: string | null
+  pitchExpiresAt?: string | null
+  pitchDurationSeconds?: number | null
   createdAt?: string
 }
 

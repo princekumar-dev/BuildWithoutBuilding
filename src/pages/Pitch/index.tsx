@@ -160,7 +160,13 @@ export default function PitchPage() {
               <p className="text-xs sm:text-sm text-bwb-text font-semibold max-w-md mx-auto mb-4">
                 Judges Challenge: &ldquo;How does your architecture handle edge failure, failover resilience, and real-time scaling?&rdquo;
               </p>
-              <CountdownTimer initialSeconds={20} size="xl" label="DEFENSE TIME" />
+              <CountdownTimer
+                key={`defense-${game.phaseExpiresAt}`}
+                targetTime={game.phaseExpiresAt}
+                initialSeconds={30}
+                size="xl"
+                label="DEFENSE TIME"
+              />
             </div>
           ) : isJudging ? (
             <div className="flex flex-col items-center py-4">
@@ -186,7 +192,13 @@ export default function PitchPage() {
                 <div className="w-14 h-14 rounded-2xl bg-bwb-accent/20 text-bwb-accent border border-bwb-accent/40 flex items-center justify-center mb-3 shadow-lg">
                   <Mic size={28} />
                 </div>
-                <CountdownTimer initialSeconds={60} size="xl" label="PITCH TIME" />
+                <CountdownTimer
+                  key={`pitch-${pitchTeam.id}-${game.pitchExpiresAt || game.phaseExpiresAt}`}
+                  targetTime={game.pitchExpiresAt || game.phaseExpiresAt}
+                  initialSeconds={180}
+                  size="xl"
+                  label="PITCH TIME"
+                />
               </div>
             ) : (
               <div className="flex flex-col items-center py-6">
@@ -259,7 +271,13 @@ export default function PitchPage() {
                 </div>
               ) : (
                 <div className="text-center py-4">
-                  <CountdownTimer initialSeconds={900} size="xl" label="BUILD TIME" />
+                  <CountdownTimer
+                    key={`pitch-build-${game.phaseExpiresAt}`}
+                    targetTime={game.phaseExpiresAt}
+                    initialSeconds={900}
+                    size="xl"
+                    label="BUILD TIME"
+                  />
                   <p className="text-xs text-bwb-muted mt-3 font-mono">Formulate your architecture and submit before time runs out.</p>
                 </div>
               )}

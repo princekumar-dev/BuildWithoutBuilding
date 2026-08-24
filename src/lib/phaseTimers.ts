@@ -1,6 +1,6 @@
-import type { GamePhase } from '../types'
+import type { Game, GamePhase } from '../types'
 
-export type TimedPhase = Extract<GamePhase, 'BUILDING' | 'PITCHING'>
+export type TimedPhase = Extract<GamePhase, 'BUILDING' | 'PITCHING' | 'JUDGE_ATTACK'>
 
 const TIMER_CHANGE_EVENT = 'bwb:phase-timer-change'
 
@@ -23,7 +23,26 @@ export function getPhaseDuration(gameId: string, round: number, phase: TimedPhas
     } catch { /* Use the event defaults when saved settings are invalid. */ }
   }
   const defaultMinutes = getDefaultBuildMinutes(round, buildMinutes)
-  return phase === 'BUILDING' ? defaultMinutes * 60 : 3 * 60
+  return phase === 'BUILDING' ? defaultMinutes * 60 : phase === 'JUDGE_ATTACK' ? 30 : 3 * 60
+}
+
+export function getSyncedPhaseDuration(game: Partial<Game>, phase?: TimedPhase): number {
+  if (game.phaseDurationSeconds && game.phaseDurationSeconds > 0) {
+    return game.phaseDurationSeconds
+  }
+  const currentRound = game.currentRound || 1
+  const targetPhase = (phase || game.phase || 'BUILDING') as TimedPhase
+  return getPhaseDuration(game.id || '', currentRound, targetPhase, game.buildDurationMinutes)
+}
+
+export function getSyncedPhaseRemaining(game: Partial<Game>): number {
+  if (game.phaseExpiresAt) {
+    const targetMs = new Date(game.phaseExpiresAt).getTime()
+    if (!isNaN(targetMs) && targetMs > 0) {
+      return Math.max(0, Math.round((targetMs - Date.now()) / 1000))
+    }
+  }
+  return getSyncedPhaseDuration(game)
 }
 
 export function setPhaseDuration(gameId: string, round: number, phase: TimedPhase, seconds: number) {
@@ -33,3 +52,4 @@ export function setPhaseDuration(gameId: string, round: number, phase: TimedPhas
 }
 
 export { TIMER_CHANGE_EVENT }
+

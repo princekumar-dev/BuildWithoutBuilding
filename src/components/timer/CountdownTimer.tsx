@@ -3,6 +3,7 @@ import { useCountdown } from '../../hooks/useCountdown'
 
 interface CountdownTimerProps {
   initialSeconds: number
+  targetTime?: string | number | Date | null
   running?: boolean
   size?: 'sm' | 'md' | 'lg' | 'xl'
   label?: string
@@ -20,13 +21,14 @@ const sizeClasses = {
 
 export function CountdownTimer({
   initialSeconds,
+  targetTime,
   running = true,
   size = 'md',
   label,
   showExpired = true,
   onComplete,
 }: CountdownTimerProps) {
-  const { formatted, isUrgent, isExpired } = useCountdown(initialSeconds, running)
+  const { formatted, isUrgent, isExpired } = useCountdown(initialSeconds, running, targetTime)
   const completedRef = useRef(false)
 
   useEffect(() => {

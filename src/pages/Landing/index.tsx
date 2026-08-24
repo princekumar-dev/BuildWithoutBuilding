@@ -457,13 +457,13 @@ export default function LandingPage() {
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-3xl">🚀</span>
                   <span className="px-2.5 py-0.5 rounded-lg text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                    No Elimination · 45m Build
+                    Zero Elimination · 45m Build
                   </span>
                 </div>
-                <p className="text-[10px] font-mono text-purple-400 uppercase font-bold tracking-wider mb-1">ROUND 01 · 100 PTS</p>
-                <h3 className="font-display font-bold text-lg text-bwb-text mb-2">Open Qualifier</h3>
+                <p className="text-[10px] font-mono text-purple-400 uppercase font-bold tracking-wider mb-1">ROUND 01 · OPEN QUALIFIER</p>
+                <h3 className="font-display font-bold text-lg text-bwb-text mb-2">Problem Depth & Landscape</h3>
                 <p className="text-xs text-bwb-muted leading-relaxed">
-                  All registered squads receive frontier tech cards, formulate system blueprints, and pitch on stage. All squads advance!
+                  All 16 squads draft surprise frontier tech cards, formulate system blueprints, and pitch. Zero elimination — all squads advance to Round 2!
                 </p>
               </div>
             </div>
@@ -474,13 +474,13 @@ export default function LandingPage() {
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-3xl">⚡</span>
                   <span className="px-2.5 py-0.5 rounded-lg text-[10px] font-mono font-bold bg-bwb-accent/20 text-bwb-accent border border-bwb-accent/30">
-                    Top 8 Qualify · 30m Build
+                    8 Problem Champions Qualify
                   </span>
                 </div>
-                <p className="text-[10px] font-mono text-bwb-accent uppercase font-bold tracking-wider mb-1">ROUND 02 · 100 PTS</p>
-                <h3 className="font-display font-bold text-lg text-bwb-text mb-2">8 Challenges Showdown</h3>
+                <p className="text-[10px] font-mono text-bwb-accent uppercase font-bold tracking-wider mb-1">ROUND 02 · 1v1 SHOWDOWN</p>
+                <h3 className="font-display font-bold text-lg text-bwb-text mb-2">Head-to-Head Track Battle</h3>
                 <p className="text-xs text-bwb-muted leading-relaxed">
-                  8 real-world challenge tracks (strictly max 2 teams per problem). Top 8 ranked squads punch their ticket to the Finals.
+                  Direct 1v1 duel against the rival squad on your Problem Statement. The winner of each problem track advances to the Finals (8 Champions).
                 </p>
               </div>
             </div>
@@ -497,7 +497,7 @@ export default function LandingPage() {
                 <p className="text-[10px] font-mono text-amber-400 uppercase font-bold tracking-wider mb-1">ROUND 03 · GRAND FINALS</p>
                 <h3 className="font-display font-bold text-lg text-bwb-text mb-2">Grand Finals & Podium</h3>
                 <p className="text-xs text-bwb-muted leading-relaxed">
-                  Top 8 battle on stage. Top 4 teams awarded: 🥇 1st Champion, 🥈 2nd Runner-Up, 🥉 3rd Dual Bronze Winners!
+                  The 8 Problem Champions defend live on stage against jury attacks. Top 4 squads crowned: 🥇 1st Champion, 🥈 Runner-Up, 🥉 Dual 3rd Place!
                 </p>
               </div>
             </div>

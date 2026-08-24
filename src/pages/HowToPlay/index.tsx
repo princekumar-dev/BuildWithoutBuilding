@@ -10,34 +10,34 @@ import { useGameStore } from '../../store/gameStore'
 
 const tournamentRounds = [
   {
-    num: 'ROUND 01 · 100 PTS',
+    num: 'ROUND 01 · OPEN QUALIFIER',
     title: 'Problem & Existing Landscape',
     badge: 'Zero Elimination · 45m Build',
-    desc: 'Select 1 of 8 problems, draft 3 frontier tech cards, and pitch how deeply your team understands the problem root causes and limitations of existing alternatives. 45-minute build sprint. Evaluated for 100 pts. All squads advance to Round 2!',
+    desc: 'Select 1 of 8 challenge tracks, draft 3 frontier tech cards, and pitch your deep understanding of the problem root causes and limitations of existing market alternatives. Unscored qualifying checkpoint — all 16 squads advance to Round 2!',
     icon: '🚀',
   },
   {
-    num: 'ROUND 02 · 100 PTS',
-    title: 'Solution & Tech Architecture',
-    badge: 'Top 8 Qualify · 30m Build',
-    desc: 'Teams present how they enhance their solution, integrate all 3 surprise frontier tech cards, and deliver novel ideation and system flow. 30-minute build sprint. Evaluated for 100 pts. The Top 8 squads advance to the Grand Finals.',
+    num: 'ROUND 02 · 1v1 PROBLEM SHOWDOWN',
+    title: 'Head-to-Head Track Battle',
+    badge: '8 Problem Champions Qualify · 30m Build',
+    desc: 'Teams face off head-to-head against the direct rival squad tackling the SAME problem statement. The winner of each 1v1 problem track duel advances to the Grand Finals (creating exactly 8 Problem Champions). The 8 defeated squads are eliminated.',
     icon: '⚡',
   },
   {
     num: 'ROUND 03 · GRAND FINALS',
     title: 'Master Pitch & Stage Defense',
-    badge: 'Top 4 Crowned · 30m Polish',
-    desc: 'The Top 8 Finalists polish their master blueprints (30m) and defend live on stage against rigorous judge cross-examination. Top 4 positions receive Championship Honors: 🥇 1st Champion, 🥈 2nd Runner-Up, 🥉 Dual 3rd Bronze Winners.',
+    badge: 'Top 4 Podium Awards · 30m Polish',
+    desc: 'The 8 Problem Champions defend their master architecture blueprints live on stage against aggressive judge cross-examination. The Top 4 squads are crowned on the Prize Podium: 🥇 1st Champion, 🥈 2nd Runner-Up, 🥉 Dual 3rd Bronze Winners.',
     icon: '🏆',
   },
 ]
 
 const eventTimeline = [
   { phase: 'Registration & Kickoff', estTime: '20 Mins', desc: 'Squad roster check-in, room PIN entry, and opening tournament briefing.' },
-  { phase: 'Round 1: Open Qualifier', estTime: '~1h 45m', desc: 'Problem & Card Reveal (10m) ➔ 45m Build Sprint ➔ Live Pitches (16 teams × ~2.5m) ➔ 100-Pt Deliberation & Leaderboard.' },
-  { phase: 'Round 2: Solution Showdown', estTime: '~1h 30m', desc: 'Round 2 Briefing (10m) ➔ 30m Build Sprint ➔ Live Enhancement Pitches (16 teams) ➔ Top 8 Finalist Announcement.' },
-  { phase: 'Finals Intermission', estTime: '15 Mins', desc: 'Stage transition, Top 8 Finalist briefing, and strategy prep.' },
-  { phase: 'Round 3: Grand Finals', estTime: '~1h 15m', desc: '30m Master Blueprint Polish ➔ Live Stage Defense (8 Finalists) ➔ Final Deliberation & Championship Podium Ceremony.' },
+  { phase: 'Round 1: Open Qualifier', estTime: '~1h 45m', desc: 'Problem & Card Reveal (10m) ➔ 45m Build Sprint ➔ Live Pitches (16 teams) ➔ Zero Elimination Checkpoint (All advance to R2).' },
+  { phase: 'Round 2: Problem Showdown', estTime: '~1h 30m', desc: '1v1 Duel Briefing ➔ 30m Build Sprint ➔ Head-to-Head Pitches ➔ 8 Problem Champions Announced (Defeated squads left behind).' },
+  { phase: 'Finals Intermission', estTime: '15 Mins', desc: 'Stage transition, 8 Problem Finalists briefing, and master polish.' },
+  { phase: 'Round 3: Grand Finals', estTime: '~1h 15m', desc: '30m Master Blueprint Polish ➔ Live Stage Defense (8 Finalists) ➔ Deliberation & Top 4 Podium Ceremony.' },
 ]
 
 const steps = [

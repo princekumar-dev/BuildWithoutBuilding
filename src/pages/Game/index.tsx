@@ -52,6 +52,9 @@ export default function GamePage() {
     : drawProblemCards(myTeam?.selectedProblemId || selectedProblem?.id || 'p1')
 
   const problem = selectedProblem ?? game.currentProblem
+  const opponentTeam = myTeam?.selectedProblemId
+    ? game.teams.find((t) => t.id !== myTeam.id && t.selectedProblemId === myTeam.selectedProblemId)
+    : null
 
   const handleSubmit = async (data: Submission) => {
     if (!myTeam) return
@@ -70,9 +73,9 @@ export default function GamePage() {
     }
   }
 
-  const hasSubmitted = !!currentSubmission
-  const isFormLocked = hasSubmitted && !isEditing
   const isPitchingPhase = game.phase === 'PITCHING' || game.phase === 'JUDGE_ATTACK'
+  const hasSubmitted = !!currentSubmission && !isEditing
+  const isFormLocked = hasSubmitted && !isEditing
 
   return (
     <PageLayout fullWidth className="pb-8">
@@ -82,6 +85,11 @@ export default function GamePage() {
           <div className="flex items-center gap-3">
             <PhaseIndicator phase={isPitchingPhase ? 'PITCHING' : hasSubmitted ? 'SUBMISSION_LOCKED' : 'BUILDING'} />
             <Badge>{myTeam?.name ?? 'Loading squad…'}</Badge>
+            {game.currentRound === 2 && (
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">
+                Round 2 · 1v1 Problem Duel
+              </span>
+            )}
           </div>
 
           <CountdownTimer
@@ -102,6 +110,39 @@ export default function GamePage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
+        {/* ROUND 2 1V1 HEAD-TO-HEAD DUEL OPPONENT CARD */}
+        {game.currentRound === 2 && (
+          <div className="mb-6 p-4 sm:p-5 rounded-2xl stereo-card border border-cyan-500/30 bg-gradient-to-r from-cyan-950/40 via-bwb-surface-2 to-bwb-surface shadow-xl">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-center gap-3.5">
+                <div className="w-11 h-11 rounded-2xl bg-cyan-500/20 text-cyan-400 border border-cyan-500/40 flex items-center justify-center font-bold text-xl shrink-0 shadow-inner">
+                  ⚔️
+                </div>
+                <div>
+                  <span className="text-[10px] font-mono uppercase font-bold text-cyan-400 tracking-wider block">
+                    Head-to-Head Problem Statement Duel
+                  </span>
+                  <p className="font-display font-bold text-base text-bwb-text mt-0.5">
+                    Your Direct Opponent:{' '}
+                    <span className="text-amber-400 font-extrabold">{opponentTeam?.name || 'Competing Squad'}</span>
+                  </p>
+                  <p className="text-xs text-bwb-muted mt-0.5">
+                    Both squads are tackling &ldquo;{problem?.title || 'this challenge'}&rdquo;. The winner of this head-to-head match qualifies for Round 3 (Grand Finals)!
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center border-t sm:border-t-0 pt-2 sm:pt-0 border-white/10 shrink-0">
+                <span className="text-xs font-mono font-bold text-emerald-400 bg-emerald-500/15 px-3 py-1 rounded-xl border border-emerald-500/30">
+                  1 Winner Advances to Finals
+                </span>
+                <span className="text-[10px] text-bwb-muted font-mono mt-1">
+                  8 Unique Problem Champions
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
         {/* SUBMITTED STATUS & ACTION BANNER */}
         {hasSubmitted && (
           <div className="mb-6 p-5 sm:p-6 rounded-2xl bg-gradient-to-r from-bwb-surface via-bwb-surface-2 to-bwb-surface border border-bwb-success/40 shadow-xl">

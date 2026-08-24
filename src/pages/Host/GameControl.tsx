@@ -22,6 +22,7 @@ import { api } from '../../lib/api'
 import { WhatsAppIcon, OFFICIAL_WHATSAPP_GROUP_URL } from '../../components/ui/WhatsAppGroupCard'
 import { getPhaseDuration, setPhaseDuration, TIMER_CHANGE_EVENT } from '../../lib/phaseTimers'
 import { useRealtimeGame } from '../../hooks/useRealtimeGame'
+import { getProblemWinners } from '../../lib/tournament'
 
 const stagesForRound = (round: number, buildMin: number, pitchSec: number) => {
   const buildLabel = buildMin >= 60 ? `${buildMin / 60}h` : `${buildMin}m`
@@ -30,17 +31,17 @@ const stagesForRound = (round: number, buildMin: number, pitchSec: number) => {
     { phase: 'LOBBY' as GamePhase, title: 'Lobby', desc: 'Squad check-in & readiness', icon: '🚪' },
     { phase: 'PROBLEM_REVEAL' as GamePhase, title: 'Problem Reveal', desc: 'Teams select 1 of 8 challenges', icon: '💡' },
     { phase: 'CARD_REVEAL' as GamePhase, title: 'Card Reveal', desc: 'Teams draft 3 surprise tech cards', icon: '🎴' },
-    { phase: 'BUILDING' as GamePhase, title: 'Build Phase', desc: `${buildLabel} Problem & Existing Landscape (100 Pts)`, icon: '⚡' },
-    { phase: 'PITCHING' as GamePhase, title: 'Pitching', desc: `${pitchLabel} Problem Understanding & Landscape`, icon: '🎤' },
-    { phase: 'JUDGING' as GamePhase, title: 'Judging', desc: '100-pt problem evaluation', icon: '⚖️' },
+    { phase: 'BUILDING' as GamePhase, title: 'Build Phase', desc: `${buildLabel} Problem Understanding (Zero Elimination)`, icon: '⚡' },
+    { phase: 'PITCHING' as GamePhase, title: 'Pitching', desc: `${pitchLabel} Problem Understanding Checkpoint`, icon: '🎤' },
+    { phase: 'JUDGING' as GamePhase, title: 'Judging', desc: 'Qualifying check · All 16 squads advance to R2', icon: '⚖️' },
     { phase: 'LEADERBOARD' as GamePhase, title: 'Leaderboard', desc: 'Zero elimination · All advance to R2', icon: '🏆' },
   ]
   if (round === 2) return [
     { phase: 'LOBBY' as GamePhase, title: 'Round 2 Lobby', desc: 'Briefing for Solution Enhancement', icon: '🚪' },
-    { phase: 'BUILDING' as GamePhase, title: 'Build Phase', desc: `${buildLabel} Solution Enhancement & Tech (100 Pts)`, icon: '⚡' },
-    { phase: 'PITCHING' as GamePhase, title: 'Pitching', desc: `${pitchLabel} Enhanced Architecture & Ideation`, icon: '🎤' },
-    { phase: 'JUDGING' as GamePhase, title: 'Judging', desc: '100-pt solution evaluation', icon: '⚖️' },
-    { phase: 'LEADERBOARD' as GamePhase, title: 'Leaderboard', desc: 'Top 8 squads qualify for Finals', icon: '🏆' },
+    { phase: 'BUILDING' as GamePhase, title: 'Build Phase', desc: `${buildLabel} Solution Enhancement & 1v1 Showdown`, icon: '⚡' },
+    { phase: 'PITCHING' as GamePhase, title: 'Pitching', desc: `${pitchLabel} Head-to-Head Architecture Pitch`, icon: '🎤' },
+    { phase: 'JUDGING' as GamePhase, title: 'Judging', desc: '100-pt problem track evaluation', icon: '⚖️' },
+    { phase: 'LEADERBOARD' as GamePhase, title: 'Leaderboard', desc: '8 Problem Champions advance to Finals', icon: '🏆' },
   ]
   return [
     { phase: 'LOBBY' as GamePhase, title: 'Finals Lobby', desc: 'Top 8 Finalists Stage Prep', icon: '🚪' },
@@ -266,19 +267,18 @@ export default function HostGameControlPage() {
 
   const handleAdvanceTop8ToFinals = async () => {
     if (!game.id) return
-    const sorted = [...game.teams].sort((a, b) => (b.score ?? 0) - (a.score ?? 0))
-    const top8Ids = sorted.slice(0, 8).map((t) => t.id)
-    if (top8Ids.length === 0) {
+    const finalistIds = getProblemWinners(game.teams, problems)
+    if (finalistIds.length === 0) {
       toast.error('No teams available to advance.')
       return
     }
-    const confirmed = window.confirm(`Advance the Top ${top8Ids.length} teams to Round 3 (Grand Finals)?`)
+    const confirmed = window.confirm(`Advance the ${finalistIds.length} Problem Champions (1 winner per unique problem statement) to Round 3 (Grand Finals)?`)
     if (!confirmed) return
     try {
-      await api.setFinalists(game.id, top8Ids)
+      await api.setFinalists(game.id, finalistIds)
       const updated = await api.setRound(game.id, 3, 'LOBBY')
       setGame(updated)
-      toast.success(`Top ${top8Ids.length} squads advanced to the Round 3 lobby!`)
+      toast.success(`The 8 Problem Champions advanced to the Grand Finals lobby! Defeated squads left behind.`)
     } catch (err: any) {
       toast.error(err.message || 'Unable to advance finalists.')
     }

@@ -372,6 +372,38 @@ function assignTeamTechs(team) {
   if (!team.revealedCards) team.revealedCards = []
 }
 
+function calculateProblemTrackWinners(game) {
+  const winners = [];
+  const problemIds = ['p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8'];
+  
+  problemIds.forEach((pid) => {
+    const teamsForProblem = game.teams.filter((t) => t.selectedProblemId === pid);
+    if (teamsForProblem.length > 0) {
+      // Sort by Round 2 score or current score
+      const sorted = [...teamsForProblem].sort((a, b) => {
+        const scoreA = a.round2Score ?? a.score ?? 0;
+        const scoreB = b.round2Score ?? b.score ?? 0;
+        return scoreB - scoreA;
+      });
+      winners.push(sorted[0].id);
+    }
+  });
+
+  // If fewer than 8 unique problem tracks have teams, backfill with top scoring teams
+  if (winners.length < 8) {
+    const remainingTeams = [...game.teams]
+      .filter((t) => !winners.includes(t.id))
+      .sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
+    
+    while (winners.length < 8 && remainingTeams.length > 0) {
+      const next = remainingTeams.shift();
+      if (next) winners.push(next.id);
+    }
+  }
+
+  return winners;
+}
+
 function publicGame(game) {
   const counts = {};
   game.teams.forEach((team) => {
@@ -386,7 +418,14 @@ function publicGame(game) {
   });
 
   game.currentRound = game.currentRound || (game.isFinalRound ? 3 : 1);
-  game.finalistTeamIds = game.finalistTeamIds || [];
+  const problemWinners = calculateProblemTrackWinners(game);
+  
+  if (game.currentRound >= 3 && (!game.finalistTeamIds || game.finalistTeamIds.length === 0)) {
+    game.finalistTeamIds = problemWinners;
+  } else {
+    game.finalistTeamIds = game.finalistTeamIds || [];
+  }
+
   game.pitchedTeamIds = game.pitchedTeamIds || [];
   game.currentPitchTeamId = game.currentPitchTeamId || null;
   game.problemTeamCounts = counts;
@@ -397,8 +436,23 @@ function publicGame(game) {
   const ranked = [...game.teams].sort((a, b) => (b.score ?? 0) - (a.score ?? 0)).map((team, index) => {
     const isFinalist = game.finalistTeamIds.length > 0
       ? game.finalistTeamIds.includes(team.id)
-      : index < 8;
-    return { ...team, rank: index + 1, isFinalist };
+      : problemWinners.includes(team.id);
+
+    // Identify problem track head-to-head opponent
+    const opponent = team.selectedProblemId
+      ? game.teams.find((t) => t.id !== team.id && t.selectedProblemId === team.selectedProblemId)
+      : null;
+
+    const isProblemTrackLeader = problemWinners.includes(team.id);
+
+    return {
+      ...team,
+      rank: index + 1,
+      isFinalist,
+      isProblemTrackLeader,
+      problemTrackOpponentId: opponent ? opponent.id : null,
+      problemTrackOpponentName: opponent ? opponent.name : null,
+    };
   });
 
   return { ...game, teams: ranked };
@@ -811,13 +865,22 @@ createServer(async (request, response) => {
     if (!team || !input.score) return json(response, 400, { error: 'A team and score are required.' });
     team.scoreBreakdown = input.score;
     const total = Object.values(input.score).reduce((sum, value) => sum + Number(value || 0), 0);
-    team.score = total;
     const currentRound = game.currentRound || (game.isFinalRound ? 3 : 1);
-    if (currentRound === 1) team.round1Score = total;
-    if (currentRound === 2) team.round2Score = total;
-    if (currentRound === 3) team.round3Score = total;
+    
+    if (currentRound === 1) {
+      team.round1Score = 0;
+      team.score = 0;
+    } else if (currentRound === 2) {
+      team.round2Score = total;
+      team.score = total;
+    } else if (currentRound === 3) {
+      team.round3Score = total;
+      team.score = total;
+    }
     save(database);
-    return json(response, 200, publicGame(game));
+    const pGame = publicGame(game);
+    broadcastToClients({ type: 'games-updated', game: pGame });
+    return json(response, 200, pGame);
   }
 
   if (request.method === 'POST' && action === 'ping') {

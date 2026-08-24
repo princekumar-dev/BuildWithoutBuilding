@@ -1768,7 +1768,7 @@ export default function ProjectorPage() {
               <TournamentPodium teams={game.teams} />
             )}
 
-            {/* Complete Rank Breakdown */}
+            {/* Complete Rank Breakdown & 1v1 Duels */}
             <LeaderboardTable
               teams={game.teams}
               showMovement
@@ -1779,20 +1779,20 @@ export default function ProjectorPage() {
             {/* Round Explanatory Card */}
             <div className="mt-6 rounded-2xl border border-purple-500/20 bg-gradient-to-r from-bwb-surface via-bwb-surface-2 to-bwb-surface p-4 text-center">
               {currentRound === 1 ? (
-                <p className="text-xs sm:text-sm text-bwb-text">
-                  ✨ <strong className="text-bwb-accent">Round 1 (No Elimination)</strong>: All registered teams advance to Round 2 to compete across the 8 Problem Statements (max 2 teams per problem).
+                <p className="text-xs sm:text-sm text-bwb-text font-medium">
+                  ✨ <strong className="text-bwb-accent font-bold">Round 1 Open Qualifier (Zero Elimination)</strong>: All 16 registered squads advance directly to Round 2 to compete head-to-head across the 8 Problem Statements.
                 </p>
               ) : currentRound === 2 ? (
-                <p className="text-xs sm:text-sm text-bwb-text">
-                  ⚡ <strong className="text-emerald-400">Round 2 Showdown</strong>: The <strong className="text-bwb-accent">Top 8 teams</strong> on this leaderboard advance to the Grand Finals (Round 3).
+                <p className="text-xs sm:text-sm text-bwb-text font-medium">
+                  ⚡ <strong className="text-emerald-400 font-bold">Round 2 Problem Showdown</strong>: The <strong className="text-bwb-accent">8 Problem Track Champions</strong> (1 winner per unique problem statement duel) advance to the Grand Finals (Round 3). Defeated squads are left behind.
                 </p>
               ) : (
                 <div className="flex flex-wrap items-center justify-center gap-4 text-xs font-mono font-bold text-bwb-text">
-                  <span className="flex items-center gap-1 text-bwb-gold"><Trophy size={14} /> 1st: Champion (1)</span>
+                  <span className="flex items-center gap-1 text-bwb-gold"><Trophy size={14} /> 🥇 1st: Tournament Champion</span>
                   <span>·</span>
-                  <span className="flex items-center gap-1 text-slate-300"><Award size={14} /> 2nd: Runner-Up (1)</span>
+                  <span className="flex items-center gap-1 text-slate-300"><Award size={14} /> 🥈 2nd: Runner-Up</span>
                   <span>·</span>
-                  <span className="flex items-center gap-1 text-amber-400"><Award size={14} /> 3rd: Dual Bronze (2)</span>
+                  <span className="flex items-center gap-1 text-amber-400"><Award size={14} /> 🥉 3rd: Dual Bronze Winners (Top 4 Prized)</span>
                 </div>
               )}
             </div>

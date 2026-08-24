@@ -55,6 +55,9 @@ export interface Team {
   rank?: number
   rankChange?: number
   isFinalist?: boolean
+  isProblemTrackLeader?: boolean
+  problemTrackOpponentId?: string
+  problemTrackOpponentName?: string
   submission?: Submission
   scoreBreakdown?: ScoreBreakdown
   isOnline?: boolean

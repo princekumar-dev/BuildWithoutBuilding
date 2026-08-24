@@ -332,11 +332,12 @@ export default function HostDashboardPage() {
         </PageTransition>
       </div>
 
-      <Modal open={showCreateModal} onClose={() => setShowCreateModal(false)} title="Create New Tournament Game" maxWidth="max-w-xl">
-        <div className="space-y-4">
+      <Modal open={showCreateModal} onClose={() => setShowCreateModal(false)} title="Create New Tournament Game" maxWidth="max-w-lg">
+        <div className="space-y-3.5">
+          {/* Game Name */}
           <div>
-            <label className="text-xs font-mono uppercase text-bwb-muted font-bold block mb-1.5 flex items-center justify-between">
-              <span>Game / Tournament Room Name <span className="text-bwb-accent">*</span></span>
+            <label className="text-xs font-mono uppercase text-bwb-muted font-bold block mb-1">
+              Game / Tournament Name <span className="text-bwb-accent">*</span>
             </label>
             <input
               type="text"
@@ -344,73 +345,71 @@ export default function HostDashboardPage() {
               value={newGameName}
               onChange={(e) => setNewGameName(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter') createGame() }}
-              className="w-full px-4 py-3 rounded-xl bg-bwb-surface-2 border border-white/10 text-bwb-text text-sm font-sans placeholder:text-bwb-muted/50 focus:border-bwb-accent focus:ring-1 focus:ring-bwb-accent outline-none transition-all shadow-inner"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-bwb-surface-2 border border-white/10 text-bwb-text text-sm font-sans placeholder:text-bwb-muted/50 focus:border-bwb-accent focus:ring-1 focus:ring-bwb-accent outline-none shadow-inner"
             />
           </div>
 
-          <div>
-            <label className="text-xs font-mono uppercase text-bwb-muted font-bold block mb-1.5 flex items-center gap-1.5">
-              <Clock size={14} className="text-bwb-accent" />
-              <span>Scheduled Date &amp; Time (Optional)</span>
-            </label>
-            <input
-              type="datetime-local"
-              value={newGameSchedule}
-              onChange={(e) => setNewGameSchedule(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-xl bg-bwb-surface-2 border border-white/10 text-bwb-text text-sm font-mono focus:border-bwb-accent focus:ring-1 focus:ring-bwb-accent outline-none transition-all"
-            />
-            <p className="text-[11px] text-bwb-muted mt-1 font-mono">
-              Squads connecting with Passcodes will see an interactive real-time countdown clock until this time.
-            </p>
-          </div>
-
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <label className="text-xs font-mono uppercase text-bwb-muted font-bold flex items-center gap-1.5">
-                <Users size={14} className="text-bwb-accent" />
-                <span>Max Team Capacity Limit <span className="text-bwb-accent">*</span></span>
+          {/* 2-Column Grid: Schedule & Capacity */}
+          <div className="grid sm:grid-cols-2 gap-3">
+            {/* Scheduled Date & Time */}
+            <div>
+              <label className="text-xs font-mono uppercase text-bwb-muted font-bold block mb-1 flex items-center gap-1.5">
+                <Clock size={13} className="text-bwb-accent" />
+                <span>Schedule (Optional)</span>
               </label>
-              <span className="text-xs font-mono font-bold text-bwb-accent bg-bwb-accent/15 px-2.5 py-0.5 rounded-full border border-bwb-accent/30">
-                {newGameMaxTeams} Teams Selected
-              </span>
-            </div>
-            
-            <div className="grid grid-cols-6 gap-2 mb-2.5">
-              {[8, 16, 24, 32, 48, 64].map((count) => (
-                <button
-                  key={count}
-                  type="button"
-                  onClick={() => setNewGameMaxTeams(count)}
-                  className={`py-2 rounded-xl text-xs font-mono font-bold transition-all border cursor-pointer ${
-                    newGameMaxTeams === count
-                      ? 'bg-bwb-accent text-bwb-bg border-bwb-accent shadow-md shadow-bwb-accent/20 scale-[1.02]'
-                      : 'bg-bwb-surface-2 border-white/10 text-bwb-muted hover:text-bwb-text hover:border-white/25'
-                  }`}
-                >
-                  {count}
-                </button>
-              ))}
+              <input
+                type="datetime-local"
+                value={newGameSchedule}
+                onChange={(e) => setNewGameSchedule(e.target.value)}
+                className="w-full px-3 py-2 rounded-xl bg-bwb-surface-2 border border-white/10 text-bwb-text text-xs font-mono focus:border-bwb-accent outline-none"
+              />
+              <p className="text-[10px] text-bwb-muted mt-1 font-mono">
+                Live countdown clock for teams until start.
+              </p>
             </div>
 
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-bwb-muted font-mono shrink-0">Custom limit:</span>
+            {/* Max Team Capacity */}
+            <div>
+              <div className="flex items-center justify-between mb-1">
+                <label className="text-xs font-mono uppercase text-bwb-muted font-bold flex items-center gap-1.5">
+                  <Users size={13} className="text-bwb-accent" />
+                  <span>Max Capacity <span className="text-bwb-accent">*</span></span>
+                </label>
+                <span className="text-[10px] font-mono font-bold text-bwb-accent bg-bwb-accent/15 px-2 py-0.5 rounded-md border border-bwb-accent/30">
+                  {newGameMaxTeams} Teams
+                </span>
+              </div>
+              <div className="grid grid-cols-4 gap-1 mb-1.5">
+                {[8, 16, 32, 64].map((count) => (
+                  <button
+                    key={count}
+                    type="button"
+                    onClick={() => setNewGameMaxTeams(count)}
+                    className={`py-1.5 rounded-lg text-[11px] font-mono font-bold transition-all border cursor-pointer ${
+                      newGameMaxTeams === count
+                        ? 'bg-bwb-accent text-bwb-bg border-bwb-accent shadow-sm'
+                        : 'bg-bwb-surface-2 border-white/10 text-bwb-muted hover:text-bwb-text'
+                    }`}
+                  >
+                    {count}
+                  </button>
+                ))}
+              </div>
               <input
                 type="number"
                 min={2}
                 max={128}
                 value={newGameMaxTeams}
                 onChange={(e) => setNewGameMaxTeams(Math.max(2, Math.min(128, Number(e.target.value) || 32)))}
-                className="w-full px-3.5 py-2 rounded-xl bg-bwb-surface-2 border border-white/10 text-bwb-text text-xs font-mono focus:border-bwb-accent outline-none"
-                placeholder="Or type custom capacity (e.g. 40)"
+                className="w-full px-2.5 py-1.5 rounded-lg bg-bwb-surface-2 border border-white/10 text-bwb-text text-xs font-mono focus:border-bwb-accent outline-none"
+                placeholder="Custom (e.g. 24)"
               />
             </div>
-            <p className="text-[11px] text-bwb-muted mt-1 font-mono">
-              Once reached, registration closes automatically and newly arriving squads see a friendly notice.
-            </p>
           </div>
 
+          {/* WhatsApp Group Link */}
           <div>
-            <label className="text-xs font-mono uppercase text-bwb-muted font-bold block mb-1.5 flex items-center gap-1.5">
+            <label className="text-xs font-mono uppercase text-bwb-muted font-bold block mb-1 flex items-center gap-1.5">
               <WhatsAppIcon className="w-4 h-4 text-[#25D366]" />
               <span>WhatsApp Group Invite Link</span>
             </label>
@@ -419,43 +418,39 @@ export default function HostDashboardPage() {
               value={newGameWhatsappUrl}
               onChange={(e) => setNewGameWhatsappUrl(e.target.value)}
               placeholder="https://chat.whatsapp.com/..."
-              className="w-full px-4 py-2.5 rounded-xl bg-bwb-surface-2 border border-white/10 text-bwb-text text-xs font-mono focus:border-[#25D366] focus:ring-1 focus:ring-[#25D366]/40 outline-none transition-all"
+              className="w-full px-3.5 py-2 rounded-xl bg-bwb-surface-2 border border-white/10 text-bwb-text text-xs font-mono focus:border-[#25D366] focus:ring-1 focus:ring-[#25D366]/40 outline-none"
             />
-            <p className="text-[11px] text-bwb-muted mt-1 font-mono">
-              Squads who register for this room will see this direct WhatsApp join button on their squad pass &amp; lobby waiting room.
-            </p>
           </div>
 
-          {/* Registration Status Toggle for New Room */}
-          <div className="p-4 rounded-2xl bg-bwb-surface-2/80 border border-white/10 flex items-center justify-between gap-4">
+          {/* Registration Status Toggle */}
+          <div className="p-3 rounded-2xl bg-bwb-surface-2/80 border border-white/10 flex items-center justify-between gap-3">
             <div>
               <p className="text-xs font-mono font-bold text-bwb-text flex items-center gap-1.5">
-                {newGameRegistrationOpen ? <Unlock size={14} className="text-emerald-400" /> : <Lock size={14} className="text-rose-400" />}
-                <span>Initial Registration Status</span>
+                {newGameRegistrationOpen ? <Unlock size={13} className="text-emerald-400" /> : <Lock size={13} className="text-rose-400" />}
+                <span>Registration Status</span>
               </p>
-              <p className="text-[11px] text-bwb-muted mt-0.5 font-mono">
-                {newGameRegistrationOpen
-                  ? 'Accepting new team registrations immediately upon room creation.'
-                  : 'New registrations will start in paused/closed state.'}
+              <p className="text-[10px] text-bwb-muted mt-0.5 font-mono">
+                {newGameRegistrationOpen ? 'Open — Teams can register immediately upon room creation.' : 'Closed — Room starts in paused/locked state.'}
               </p>
             </div>
             <button
               type="button"
               onClick={() => setNewGameRegistrationOpen(!newGameRegistrationOpen)}
-              className={`px-4 py-2 rounded-xl text-xs font-mono font-bold border transition-all flex items-center gap-1.5 shrink-0 cursor-pointer shadow-sm ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold border transition-all flex items-center gap-1.5 shrink-0 cursor-pointer shadow-sm ${
                 newGameRegistrationOpen
                   ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 hover:bg-emerald-500/30'
                   : 'bg-rose-500/20 text-rose-300 border-rose-500/40 hover:bg-rose-500/30'
               }`}
             >
-              {newGameRegistrationOpen ? <Unlock size={13} /> : <Lock size={13} />}
+              {newGameRegistrationOpen ? <Unlock size={12} /> : <Lock size={12} />}
               <span>{newGameRegistrationOpen ? 'OPEN' : 'CLOSED'}</span>
             </button>
           </div>
 
-          <div className="flex gap-3 justify-end pt-3 border-t border-white/10 mt-4">
-            <Button variant="ghost" onClick={() => setShowCreateModal(false)}>Cancel</Button>
-            <Button onClick={createGame} disabled={creating}>
+          {/* Action Footer */}
+          <div className="flex gap-3 justify-end pt-2 border-t border-white/10">
+            <Button variant="ghost" size="sm" onClick={() => setShowCreateModal(false)}>Cancel</Button>
+            <Button size="sm" onClick={createGame} disabled={creating} className="bg-bwb-accent text-bwb-bg font-bold shadow-md">
               {creating ? 'Creating...' : 'Create Game'}
             </Button>
           </div>

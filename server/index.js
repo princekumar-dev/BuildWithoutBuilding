@@ -1,5 +1,5 @@
 import { createServer } from 'node:http'
-import { existsSync, mkdirSync, readFileSync, writeFileSync, createReadStream } from 'node:fs'
+import { existsSync, mkdirSync, readFileSync, writeFileSync, createReadStream, readdirSync, unlinkSync } from 'node:fs'
 import { dirname, join, extname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import dns from 'node:dns'
@@ -16,6 +16,9 @@ try {
 const root = dirname(fileURLToPath(import.meta.url))
 const distDir = join(root, '..', 'dist')
 const databaseFile = join(root, 'database.json')
+const backupFile = join(root, 'database.backup.json')
+const archivedFile = join(root, 'archived_games.json')
+const backupsDir = join(root, 'backups')
 const MAX_TEAMS = 32
 const PROBLEM_MAX_TEAMS = 2
 const MAX_MEMBERS_PER_TEAM = 3
@@ -45,9 +48,10 @@ const MIME_TYPES = {
   '.woff2': 'font/woff2',
 }
 
-
 let mongoClient = null
 let dbCollection = null
+let dbArchiveCollection = null
+let dbBackupCollection = null
 
 async function initMongo() {
   try {
@@ -55,6 +59,8 @@ async function initMongo() {
     await mongoClient.connect()
     const db = mongoClient.db(DB_NAME)
     dbCollection = db.collection(COLLECTION_NAME)
+    dbArchiveCollection = db.collection(COLLECTION_NAME + '_archived')
+    dbBackupCollection = db.collection(COLLECTION_NAME + '_backups')
 
     // Load from MongoDB into local cache
     const remoteGames = await dbCollection.find({}).toArray()
@@ -79,6 +85,21 @@ async function initMongo() {
       }
       count = database.games.length
     }
+
+    // Sync remote archived games into local archive
+    try {
+      const remoteArchived = await dbArchiveCollection.find({}).toArray()
+      if (remoteArchived && remoteArchived.length > 0) {
+        const archivedDb = readArchivedDatabase()
+        remoteArchived.forEach((rg) => {
+          const { _id, ...cleanGame } = rg
+          if (!archivedDb.games.some((g) => g.id === cleanGame.id)) {
+            archivedDb.games.push(cleanGame)
+          }
+        })
+        saveArchivedDatabase(archivedDb)
+      }
+    } catch {}
 
     console.log(`\n======================================================`)
     console.log(`  🍃 MONGODB ATLAS CONNECTED`)
@@ -268,7 +289,41 @@ const catalog = {
   ],
 }
 
-function readDatabase() { return existsSync(databaseFile) ? JSON.parse(readFileSync(databaseFile, 'utf8')) : { games: [] } }
+function readDatabase() {
+  if (existsSync(databaseFile)) {
+    try {
+      const data = JSON.parse(readFileSync(databaseFile, 'utf8'))
+      if (data && Array.isArray(data.games)) return data
+    } catch {}
+  }
+  // Fallback to backupFile if databaseFile was corrupted or empty
+  if (existsSync(backupFile)) {
+    try {
+      const bData = JSON.parse(readFileSync(backupFile, 'utf8'))
+      if (bData && Array.isArray(bData.games) && bData.games.length > 0) return bData
+    } catch {}
+  }
+  return { games: [] }
+}
+
+function readArchivedDatabase() {
+  if (existsSync(archivedFile)) {
+    try {
+      const data = JSON.parse(readFileSync(archivedFile, 'utf8'))
+      if (data && Array.isArray(data.games)) return data
+    } catch {}
+  }
+  return { games: [] }
+}
+
+function saveArchivedDatabase(archivedDb) {
+  try {
+    mkdirSync(root, { recursive: true })
+    writeFileSync(archivedFile, JSON.stringify(archivedDb, null, 2))
+  } catch (err) {
+    console.error('Error saving archived database:', err.message)
+  }
+}
 
 function broadcastToClients(payload) {
   const dataString = `data: ${JSON.stringify(payload)}\n\n`
@@ -282,8 +337,32 @@ function broadcastToClients(payload) {
 }
 
 function saveLocal(database) {
-  mkdirSync(root, { recursive: true })
-  writeFileSync(databaseFile, JSON.stringify(database, null, 2))
+  try {
+    mkdirSync(root, { recursive: true })
+    mkdirSync(backupsDir, { recursive: true })
+    writeFileSync(databaseFile, JSON.stringify(database, null, 2))
+
+    // Maintain persistent secondary backup whenever active games exist
+    if (database.games && database.games.length > 0) {
+      writeFileSync(backupFile, JSON.stringify(database, null, 2))
+
+      // Keep rolling snapshots
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
+      writeFileSync(join(backupsDir, `snapshot_${timestamp}.json`), JSON.stringify(database, null, 2))
+
+      try {
+        const files = readdirSync(backupsDir)
+          .filter((f) => f.startsWith('snapshot_') && f.endsWith('.json'))
+          .sort()
+        while (files.length > 10) {
+          const oldest = files.shift()
+          if (oldest) unlinkSync(join(backupsDir, oldest))
+        }
+      } catch {}
+    }
+  } catch (err) {
+    console.error('Error writing local database backup:', err.message)
+  }
   broadcastToClients({ type: 'games-updated' })
 }
 
@@ -304,24 +383,76 @@ function save(database) {
         console.log(`🍃 [MONGODB SYNC] ${database.games.length} game(s), ${allTeams} registered team(s) saved to "${COLLECTION_NAME}".`)
       })
       .catch((err) => console.error('MongoDB sync error:', err.message))
+
+    // Also persist backup in dbBackupCollection
+    if (dbBackupCollection && database.games.length > 0) {
+      database.games.forEach((g) => {
+        dbBackupCollection.replaceOne({ id: g.id }, { ...g, backedUpAt: new Date().toISOString() }, { upsert: true }).catch(() => {})
+      })
+    }
   }
 }
 
 function deleteGameFromDb(database, gameId) {
   const target = database.games.find((g) => g.id === gameId || g.code === gameId.toUpperCase())
   if (target) {
-    // Completely purge all registered teams, members, scores, and submissions
-    target.teams = []
+    // PRESERVE ALL TEAMS, MEMBERS, PASSCODES, AND SCORES IN ARCHIVE
+    const archivedGame = {
+      ...JSON.parse(JSON.stringify(target)),
+      archivedAt: new Date().toISOString(),
+    }
+
+    const archivedDb = readArchivedDatabase()
+    archivedDb.games = archivedDb.games.filter((g) => g.id !== target.id && g.code !== target.code)
+    archivedDb.games.unshift(archivedGame)
+    saveArchivedDatabase(archivedDb)
+
+    if (dbArchiveCollection) {
+      dbArchiveCollection.replaceOne({ id: target.id }, archivedGame, { upsert: true })
+        .catch((err) => console.error('MongoDB archive error:', err.message))
+    }
+
+    console.log(`📦 [GAME ARCHIVED SAFELY] "${target.name}" (${target.code}) archived with ${target.teams.length} teams intact. (Can be restored anytime)`)
   }
+
   database.games = database.games.filter((g) => g.id !== gameId && g.code !== gameId.toUpperCase())
   saveLocal(database)
+
   if (dbCollection) {
     dbCollection.deleteMany({ $or: [{ id: gameId }, { code: String(gameId).toUpperCase() }] })
-      .then((res) => console.log(`🗑️ Purged game & all registered teams/users from MongoDB (${res.deletedCount} documents deleted).`))
+      .then((res) => console.log(`🗑️ Moved game from active pool to archive (${res.deletedCount} active doc removed).`))
       .catch((err) => console.error('MongoDB delete error:', err.message))
   }
   // Broadcast game deletion to all live SSE clients
   clients.forEach((client) => client.write(`data: ${JSON.stringify({ type: 'game-deleted', gameId })}\n\n`))
+}
+
+function restoreGameInDb(database, gameId) {
+  const archivedDb = readArchivedDatabase()
+  const targetIdx = archivedDb.games.findIndex((g) => g.id === gameId || g.code === gameId.toUpperCase())
+  let target = targetIdx >= 0 ? archivedDb.games[targetIdx] : null
+
+  if (target) {
+    archivedDb.games.splice(targetIdx, 1)
+    saveArchivedDatabase(archivedDb)
+  }
+
+  if (target) {
+    const restoredGame = { ...target }
+    delete restoredGame.archivedAt
+
+    const exists = database.games.some((g) => g.id === restoredGame.id || g.code === restoredGame.code)
+    if (!exists) {
+      database.games.unshift(restoredGame)
+      save(database)
+      if (dbArchiveCollection) {
+        dbArchiveCollection.deleteOne({ id: restoredGame.id }).catch(() => {})
+      }
+      console.log(`♻️ [GAME RESTORED] "${restoredGame.name}" (${restoredGame.code}) restored with all ${restoredGame.teams.length} teams and scores!`)
+      return restoredGame
+    }
+  }
+  return null
 }
 
 function json(response, status, body) { response.writeHead(status, { 'Content-Type': 'application/json' }); response.end(JSON.stringify(body)) }
@@ -573,6 +704,11 @@ createServer(async (request, response) => {
     return;
   }
   if (request.method === 'GET' && url.pathname === '/api/catalog') return json(response, 200, catalog)
+  if (request.method === 'GET' && url.pathname === '/api/games/archived') {
+    if (!requireHost(request, response)) return;
+    const archivedDb = readArchivedDatabase();
+    return json(response, 200, archivedDb.games.map(publicGame));
+  }
   if (request.method === 'GET' && url.pathname === '/api/games') return json(response, 200, database.games.map(publicGame))
   if (request.method === 'POST' && url.pathname === '/api/games') {
     if (!requireHost(request, response)) return;
@@ -612,12 +748,35 @@ createServer(async (request, response) => {
     }
   }
 
-  const match = url.pathname.match(/^\/api\/games\/([^/]+)(?:\/(join|phase|round|finalists|schedule|config|assign-cards|select-problem|reveal-card|submissions|scores|ping|pitch-team|mark-pitched|timer))?$/)
+  const match = url.pathname.match(/^\/api\/games\/([^/]+)(?:\/(join|phase|round|finalists|schedule|config|assign-cards|select-problem|reveal-card|submissions|scores|ping|pitch-team|mark-pitched|timer|restore|permanent))?$/)
   if (!match) return json(response, 404, { error: 'API route not found.' })
-  const game = gameFor(database, decodeURIComponent(match[1])); if (!game) return json(response, 404, { error: 'Game not found.' })
+
+  const rawKey = decodeURIComponent(match[1])
+  const action = match[2]
+
+  if (request.method === 'POST' && action === 'restore') {
+    if (!requireHost(request, response)) return;
+    const restored = restoreGameInDb(database, rawKey);
+    if (!restored) return json(response, 404, { error: 'Archived tournament room not found or already active.' });
+    return json(response, 200, publicGame(restored));
+  }
+
+  if (request.method === 'DELETE' && action === 'permanent') {
+    if (!requireHost(request, response)) return;
+    const archivedDb = readArchivedDatabase();
+    archivedDb.games = archivedDb.games.filter((g) => g.id !== rawKey && g.code !== rawKey.toUpperCase());
+    saveArchivedDatabase(archivedDb);
+    if (dbArchiveCollection) {
+      dbArchiveCollection.deleteMany({ $or: [{ id: rawKey }, { code: String(rawKey).toUpperCase() }] }).catch(() => {});
+    }
+    return json(response, 200, { ok: true });
+  }
+
+  const game = gameFor(database, rawKey);
+  if (!game) return json(response, 404, { error: 'Game not found.' })
   if (request.method === 'GET' && !match[2]) return json(response, 200, publicGame(game))
   if (request.method === 'DELETE' && !match[2]) { if (!requireHost(request, response)) return; deleteGameFromDb(database, game.id); return json(response, 200, { ok: true }) }
-  const action = match[2]; const input = await body(request)
+  const input = await body(request)
 
   if (request.method === 'POST' && action === 'join') {
     const rawMembers = Array.isArray(input.members) ? input.members.map((m) => String(m).trim()).filter(Boolean) : [];

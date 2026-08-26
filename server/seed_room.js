@@ -1,0 +1,465 @@
+import dns from 'node:dns'
+import { MongoClient } from 'mongodb'
+import { writeFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+try {
+  dns.setServers(['8.8.8.8', '8.8.4.4', '1.1.1.1'])
+  if (dns.setDefaultResultOrder) {
+    dns.setDefaultResultOrder('ipv4first')
+  }
+} catch {}
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
+
+const MONGO_URI = 'mongodb+srv://prince:prince55833@cluster1.niqvdam.mongodb.net/?appName=Cluster1'
+const DB_NAME = 'buildwithoutbuilding'
+const COLLECTION_NAME = 'buildwithoutbuilding'
+
+const teamsData = [
+  {
+    id: 'team_duox_992',
+    name: 'DuoX',
+    passcode: 'DUOX-992',
+    gameCode: 'BWB-638',
+    leaderName: 'Shahana S',
+    email: '243115104096@msec.edu.in',
+    phone: '9790945129',
+    department: 'CSE',
+    year: '3rd Year',
+    section: 'B',
+    members: ['Shahana S', 'Vishwa B'],
+    memberCount: 2,
+    technologies: [],
+    selectedProblemId: null,
+    revealedCards: [],
+    score: 0,
+    round1Score: 0,
+    round2Score: 0,
+    round3Score: 0,
+    rank: 1,
+    isOnline: true,
+    registeredAt: '2026-08-25T10:05:00.000Z'
+  },
+  {
+    id: 'team_spri_988',
+    name: 'Sprinting Snails',
+    passcode: 'SPRI-988',
+    gameCode: 'BWB-638',
+    leaderName: 'Geethika J',
+    email: 'jgeethika04@gmail.com',
+    phone: '9360200624',
+    department: 'AIDS',
+    year: '3rd Year',
+    section: 'A',
+    members: ['Geethika J', 'Kavya T'],
+    memberCount: 2,
+    technologies: [],
+    selectedProblemId: null,
+    revealedCards: [],
+    score: 0,
+    round1Score: 0,
+    round2Score: 0,
+    round3Score: 0,
+    rank: 2,
+    isOnline: false,
+    registeredAt: '2026-08-25T10:08:00.000Z'
+  },
+  {
+    id: 'team_aini_473',
+    name: "AI NINJA'S",
+    passcode: 'AINI-473',
+    gameCode: 'BWB-638',
+    leaderName: 'KAKU SASIDHAR',
+    email: 'mukesh092007@gmail.com',
+    phone: '8248350745',
+    department: 'IT',
+    year: '2nd Year',
+    section: 'B',
+    members: ['KAKU SASIDHAR', 'MUKESH G', 'HARIHARAN S'],
+    memberCount: 3,
+    technologies: [],
+    selectedProblemId: null,
+    revealedCards: [],
+    score: 0,
+    round1Score: 0,
+    round2Score: 0,
+    round3Score: 0,
+    rank: 3,
+    isOnline: false,
+    registeredAt: '2026-08-25T10:12:00.000Z'
+  },
+  {
+    id: 'team_code_474',
+    name: 'Codecraft',
+    passcode: 'CODE-474',
+    gameCode: 'BWB-638',
+    leaderName: 'Oviya S',
+    email: 'oviyasivakumar6565@gmail.com',
+    phone: '8667663413',
+    department: 'IT',
+    year: '2nd Year',
+    section: 'B',
+    members: ['Oviya S', 'Swetha J', 'Shiny Christina S'],
+    memberCount: 3,
+    technologies: [],
+    selectedProblemId: null,
+    revealedCards: [],
+    score: 0,
+    round1Score: 0,
+    round2Score: 0,
+    round3Score: 0,
+    rank: 4,
+    isOnline: false,
+    registeredAt: '2026-08-25T10:15:00.000Z'
+  },
+  {
+    id: 'team_team_650',
+    name: 'TeamHere',
+    passcode: 'TEAM-650',
+    gameCode: 'BWB-638',
+    leaderName: 'Kaushieek P',
+    email: 'skaushieek@gmail.com',
+    phone: '9841739924',
+    department: 'AIDS',
+    year: '3rd Year',
+    section: 'A',
+    members: ['Kaushieek P', 'Jayanth B', 'Krithika M'],
+    memberCount: 3,
+    technologies: [],
+    selectedProblemId: null,
+    revealedCards: [],
+    score: 0,
+    round1Score: 0,
+    round2Score: 0,
+    round3Score: 0,
+    rank: 5,
+    isOnline: false,
+    registeredAt: '2026-08-25T10:18:00.000Z'
+  },
+  {
+    id: 'team_code_325',
+    name: 'Code builders',
+    passcode: 'CODE-325',
+    gameCode: 'BWB-638',
+    leaderName: 'Ritika. S',
+    email: 'ritikaselvakumaran3@gmail.com',
+    phone: '9176769684',
+    department: 'CSE',
+    year: '3rd Year',
+    section: 'B',
+    members: ['Ritika. S', 'Vaishnavi. S', 'Tanushri. S'],
+    memberCount: 3,
+    technologies: [],
+    selectedProblemId: null,
+    revealedCards: [],
+    score: 0,
+    round1Score: 0,
+    round2Score: 0,
+    round3Score: 0,
+    rank: 6,
+    isOnline: true,
+    registeredAt: '2026-08-25T10:20:00.000Z'
+  },
+  {
+    id: 'team_k2_664',
+    name: 'K2',
+    passcode: 'K2-664',
+    gameCode: 'BWB-638',
+    leaderName: 'Kanishka R',
+    email: 'Kanishkaravichandran20@gmail.com',
+    phone: '9655510117',
+    department: 'AIDS',
+    year: '3rd Year',
+    section: 'A',
+    members: ['Kanishka R', 'Kamalini M'],
+    memberCount: 2,
+    technologies: [],
+    selectedProblemId: null,
+    revealedCards: [],
+    score: 0,
+    round1Score: 0,
+    round2Score: 0,
+    round3Score: 0,
+    rank: 7,
+    isOnline: false,
+    registeredAt: '2026-08-25T10:22:00.000Z'
+  },
+  {
+    id: 'team_resh_179',
+    name: 'RESHA',
+    passcode: 'RESH-179',
+    gameCode: 'BWB-638',
+    leaderName: 'SELVA SUBIKSHA M',
+    email: 'selvasubiksha5@gmail.com',
+    phone: '8122633886',
+    department: 'ECE',
+    year: '2nd Year',
+    section: 'B',
+    members: ['SELVA SUBIKSHA M', 'RESHMA S'],
+    memberCount: 2,
+    technologies: [],
+    selectedProblemId: null,
+    revealedCards: [],
+    score: 0,
+    round1Score: 0,
+    round2Score: 0,
+    round3Score: 0,
+    rank: 8,
+    isOnline: true,
+    registeredAt: '2026-08-25T10:25:00.000Z'
+  },
+  {
+    id: 'team_shee_927',
+    name: 'SheEnergy',
+    passcode: 'SHEE-927',
+    gameCode: 'BWB-638',
+    leaderName: 'P. Sai Dharshini',
+    email: '243115104075@msec.edu.in',
+    phone: '6379184011',
+    department: 'CSE',
+    year: '3rd Year',
+    section: 'B',
+    members: ['P. Sai Dharshini', 'Nithya Devi', 'B.K Shanmuga Priya'],
+    memberCount: 3,
+    technologies: [],
+    selectedProblemId: null,
+    revealedCards: [],
+    score: 0,
+    round1Score: 0,
+    round2Score: 0,
+    round3Score: 0,
+    rank: 9,
+    isOnline: true,
+    registeredAt: '2026-08-25T10:28:00.000Z'
+  },
+  {
+    id: 'team_code_785',
+    name: 'Code Crafters',
+    passcode: 'CODE-785',
+    gameCode: 'BWB-638',
+    leaderName: 'J.Sandhya',
+    email: 'sadhanakumaran10@gmail.com',
+    phone: '6380629255',
+    department: 'CSE',
+    year: '2nd Year',
+    section: 'B',
+    members: ['J.Sandhya', 'K.Sadhana', 'M.Swathi'],
+    memberCount: 3,
+    technologies: [],
+    selectedProblemId: null,
+    revealedCards: [],
+    score: 0,
+    round1Score: 0,
+    round2Score: 0,
+    round3Score: 0,
+    rank: 10,
+    isOnline: false,
+    registeredAt: '2026-08-25T10:30:00.000Z'
+  },
+  {
+    id: 'team_rage_427',
+    name: 'Ragefire',
+    passcode: 'RAGE-427',
+    gameCode: 'BWB-638',
+    leaderName: 'S.tharun',
+    email: 'sivatharun1976@gmail.com',
+    phone: '7200030040',
+    department: 'IT',
+    year: '2nd Year',
+    section: 'B',
+    members: ['S.tharun', 'J.shafin ahmed1', 'S.selva srinivasan'],
+    memberCount: 3,
+    technologies: [],
+    selectedProblemId: null,
+    revealedCards: [],
+    score: 0,
+    round1Score: 0,
+    round2Score: 0,
+    round3Score: 0,
+    rank: 11,
+    isOnline: false,
+    registeredAt: '2026-08-25T10:33:00.000Z'
+  },
+  {
+    id: 'team_george_445',
+    name: 'Team georgekutty',
+    passcode: 'TEAM-445',
+    gameCode: 'BWB-638',
+    leaderName: 'Roobhasri K',
+    email: 'roobhasri07@gmail.com',
+    phone: '9962981994',
+    department: 'ECE',
+    year: '2nd Year',
+    section: 'B',
+    members: ['Roobhasri K', 'Prabaavathy H'],
+    memberCount: 2,
+    technologies: [],
+    selectedProblemId: null,
+    revealedCards: [],
+    score: 0,
+    round1Score: 0,
+    round2Score: 0,
+    round3Score: 0,
+    rank: 12,
+    isOnline: false,
+    registeredAt: '2026-08-25T10:36:00.000Z'
+  },
+  {
+    id: 'team_aura_146',
+    name: 'AuraNexus',
+    passcode: 'AURA-146',
+    gameCode: 'BWB-638',
+    leaderName: 'Preethi Y',
+    email: 'preethiy694@gmail.com',
+    phone: '9884996355',
+    department: 'AIDS',
+    year: '3rd Year',
+    section: 'B',
+    members: ['Preethi Y', 'Priyanka Y', 'RagaviSree'],
+    memberCount: 3,
+    technologies: [],
+    selectedProblemId: null,
+    revealedCards: [],
+    score: 0,
+    round1Score: 0,
+    round2Score: 0,
+    round3Score: 0,
+    rank: 13,
+    isOnline: false,
+    registeredAt: '2026-08-25T10:40:00.000Z'
+  },
+  {
+    id: 'team_tech_438',
+    name: 'Tech nova',
+    passcode: 'TECH-438',
+    gameCode: 'BWB-638',
+    leaderName: 'Aadhini.T',
+    email: 'aadhini791@gmail.com',
+    phone: '9445148864',
+    department: 'ECE',
+    year: '3rd Year',
+    section: 'A',
+    members: ['Aadhini.T', 'Mahasri.D', 'Bavatharani.S'],
+    memberCount: 3,
+    technologies: [],
+    selectedProblemId: null,
+    revealedCards: [],
+    score: 0,
+    round1Score: 0,
+    round2Score: 0,
+    round3Score: 0,
+    rank: 14,
+    isOnline: false,
+    registeredAt: '2026-08-25T10:42:00.000Z'
+  },
+  {
+    id: 'team_delt_425',
+    name: 'Delta boys',
+    passcode: 'DELT-425',
+    gameCode: 'BWB-638',
+    leaderName: 'SOORAJ V P',
+    email: 'vpsooraj17@gmail.com',
+    phone: '6383864135',
+    department: 'ECE',
+    year: '2nd Year',
+    section: 'B',
+    members: ['SOORAJ V P', 'PRANAV KEERTHI V', 'SANJAY J'],
+    memberCount: 3,
+    technologies: [],
+    selectedProblemId: null,
+    revealedCards: [],
+    score: 0,
+    round1Score: 0,
+    round2Score: 0,
+    round3Score: 0,
+    rank: 15,
+    isOnline: true,
+    registeredAt: '2026-08-25T10:45:00.000Z'
+  },
+  {
+    id: 'team_focu_473',
+    name: 'Focus freak',
+    passcode: 'FOCU-473',
+    gameCode: 'BWB-638',
+    leaderName: 'Sahana M',
+    email: 'sahanamuthumanoharan@gmail.com',
+    phone: '9444520913',
+    department: 'IT',
+    year: '2nd Year',
+    section: 'B',
+    members: ['Sahana M', 'Sangeethavani S', 'Nithya P'],
+    memberCount: 3,
+    technologies: [],
+    selectedProblemId: null,
+    revealedCards: [],
+    score: 0,
+    round1Score: 0,
+    round2Score: 0,
+    round3Score: 0,
+    rank: 16,
+    isOnline: false,
+    registeredAt: '2026-08-25T10:48:00.000Z'
+  }
+]
+
+const restoredGame = {
+  id: 'game_bwb638',
+  code: 'BWB-638',
+  name: 'BuildWithoutBuilding#001',
+  phase: 'LOBBY',
+  currentRound: 1,
+  finalistTeamIds: [],
+  teams: teamsData,
+  currentProblem: {
+    id: 'p1',
+    title: 'Emergency Response Without the Internet',
+    category: 'Disaster Response',
+    description: 'During a major disaster such as a flood, cyclone, or earthquake, mobile networks and internet connectivity may become unavailable. Emergency teams still need to identify people who need help, prioritize locations, and coordinate rescue operations.',
+    challenge: 'Design a system that can identify, prioritize, and coordinate emergency assistance without relying on normal internet connectivity.',
+    twist: 'No Internet — the solution must work without normal internet connectivity.'
+  },
+  buildDurationMinutes: 45,
+  maxTeams: 16,
+  scheduledStartTime: '2026-09-01T23:45:00.000Z',
+  whatsappGroupUrl: 'https://chat.whatsapp.com/DHke2VBDQnbKxVBiLcpN5t?s=cl&p=a&ilr=1',
+  isRegistrationOpen: true,
+  isFinalRound: false,
+  createdAt: '2026-08-25T10:00:00.000Z',
+  updatedAt: new Date().toISOString(),
+  totalTeams: 16
+}
+
+async function run() {
+  console.log('Writing local database file...')
+  const dbFile = join(__dirname, 'database.json')
+  const backupFile = join(__dirname, 'database.backup.json')
+  const database = { games: [restoredGame] }
+  writeFileSync(dbFile, JSON.stringify(database, null, 2))
+  writeFileSync(backupFile, JSON.stringify(database, null, 2))
+  console.log('✅ Local files written successfully.')
+
+  console.log('Connecting to MongoDB Atlas...')
+  const client = new MongoClient(MONGO_URI)
+  await client.connect()
+  const db = client.db(DB_NAME)
+  const coll = db.collection(COLLECTION_NAME)
+  const backupColl = db.collection(COLLECTION_NAME + '_backups')
+
+  console.log('Upserting game into MongoDB collections...')
+  await coll.replaceOne({ id: restoredGame.id }, restoredGame, { upsert: true })
+  await backupColl.replaceOne({ id: restoredGame.id }, restoredGame, { upsert: true })
+
+  const count = await coll.countDocuments()
+  console.log(`🍃 [MONGODB ATLAS SYNC] Active documents: ${count}`)
+  console.log(`🎉 Room "${restoredGame.name}" (${restoredGame.code}) with all 16 teams (43 players) successfully restored in MongoDB Atlas!`)
+
+  await client.close()
+}
+
+run().catch((err) => {
+  console.error('Seed error:', err)
+  process.exit(1)
+})

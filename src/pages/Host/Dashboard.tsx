@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import { Plus, Play, Users, Layers, LogOut, Trash2, Copy, CheckCircle2, Sliders, Tv, Clock, Lock, Unlock } from 'lucide-react'
+import { Plus, Play, Users, Layers, LogOut, Trash2, Copy, CheckCircle2, Sliders, Tv, Clock, Lock, Unlock, Archive, RotateCcw, AlertTriangle } from 'lucide-react'
 import { PageLayout } from '../../components/layout/PageLayout'
 import { Button } from '../../components/ui/Button'
 import { Badge } from '../../components/ui/Badge'
@@ -31,6 +31,10 @@ function StatCard({ icon: Icon, label, value }: { icon: typeof Play; label: stri
 export default function HostDashboardPage() {
   const navigate = useNavigate()
   const [games, setGames] = useState<Game[]>([])
+  const [archivedGames, setArchivedGames] = useState<Game[]>([])
+  const [showArchivedModal, setShowArchivedModal] = useState(false)
+  const [loadingArchived, setLoadingArchived] = useState(false)
+  const [restoringId, setRestoringId] = useState<string | null>(null)
   const [error, setError] = useState('')
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [newGameName, setNewGameName] = useState('')
@@ -40,11 +44,29 @@ export default function HostDashboardPage() {
   const [newGameRegistrationOpen, setNewGameRegistrationOpen] = useState(true)
   const [creating, setCreating] = useState(false)
   const [deleteTarget, setDeleteTarget] = useState<Game | null>(null)
+  const [deleteConfirmInput, setDeleteConfirmInput] = useState('')
   const [deleting, setDeleting] = useState(false)
   const [copiedCodeId, setCopiedCodeId] = useState<string | null>(null)
 
-  useEffect(() => {
+  const loadGames = () => {
     api.listGames().then(setGames).catch(() => setError('API server is unavailable. Start it with npm run server.'))
+  }
+
+  const loadArchivedGames = async () => {
+    setLoadingArchived(true)
+    try {
+      const list = await api.listArchivedGames()
+      setArchivedGames(list)
+    } catch {
+      toast.error('Unable to fetch archived rooms.')
+    } finally {
+      setLoadingArchived(false)
+    }
+  }
+
+  useEffect(() => {
+    loadGames()
+    loadArchivedGames()
   }, [])
 
   const createGame = async () => {
@@ -100,16 +122,47 @@ export default function HostDashboardPage() {
 
   const deleteGame = async () => {
     if (!deleteTarget) return
+    if (deleteTarget.teams.length > 0 && deleteConfirmInput.trim().toUpperCase() !== deleteTarget.code.toUpperCase()) {
+      toast.warning(`Please type "${deleteTarget.code}" to confirm archiving.`)
+      return
+    }
     setDeleting(true)
     try {
       await api.deleteGame(deleteTarget.id)
       setGames((prev) => prev.filter((g) => g.id !== deleteTarget.id))
-      toast.success(`Game "${deleteTarget.name}" deleted.`)
+      toast.success(`Room "${deleteTarget.name}" safely archived. You can restore it anytime from Archive/Trash!`)
       setDeleteTarget(null)
+      setDeleteConfirmInput('')
+      loadArchivedGames()
     } catch (reason) {
-      toast.error(reason instanceof Error ? reason.message : 'Unable to delete game.')
+      toast.error(reason instanceof Error ? reason.message : 'Unable to archive room.')
     } finally {
       setDeleting(false)
+    }
+  }
+
+  const handleRestoreGame = async (gameId: string) => {
+    setRestoringId(gameId)
+    try {
+      const restored = await api.restoreGame(gameId)
+      setArchivedGames((prev) => prev.filter((g) => g.id !== gameId))
+      setGames((prev) => [restored, ...prev.filter((g) => g.id !== restored.id)])
+      toast.success(`Room "${restored.name}" restored with all ${restored.teams.length} teams intact!`)
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Unable to restore room.')
+    } finally {
+      setRestoringId(null)
+    }
+  }
+
+  const handlePermanentDelete = async (gameId: string, gameName: string) => {
+    if (!window.confirm(`Are you sure you want to permanently delete "${gameName}"? This cannot be undone.`)) return
+    try {
+      await api.permanentDeleteGame(gameId)
+      setArchivedGames((prev) => prev.filter((g) => g.id !== gameId))
+      toast.success(`Room "${gameName}" permanently deleted.`)
+    } catch {
+      toast.error('Unable to delete room permanently.')
     }
   }
 
@@ -137,13 +190,27 @@ export default function HostDashboardPage() {
               </p>
             </div>
 
-            <div className="grid grid-cols-2 sm:flex items-center gap-2 w-full sm:w-auto">
+            <div className="grid grid-cols-3 sm:flex items-center gap-2 w-full sm:w-auto">
               <Button
                 size="md"
                 onClick={() => setShowCreateModal(true)}
                 className="glow-accent shadow-md justify-center font-bold text-xs sm:text-sm"
               >
                 <Plus size={16} className="mr-1" /> Create Game
+              </Button>
+              <Button
+                variant="secondary"
+                size="md"
+                onClick={() => { setShowArchivedModal(true); loadArchivedGames() }}
+                className="justify-center border-white/10 text-xs sm:text-sm relative"
+                title="View & Restore Archived Rooms"
+              >
+                <Archive size={15} className="mr-1 text-bwb-accent" /> Archive
+                {archivedGames.length > 0 && (
+                  <span className="ml-1.5 px-1.5 py-0.2 text-[10px] rounded-full bg-bwb-accent/20 text-bwb-accent font-bold">
+                    {archivedGames.length}
+                  </span>
+                )}
               </Button>
               <Button
                 variant="secondary"
@@ -458,16 +525,112 @@ export default function HostDashboardPage() {
         </div>
       </Modal>
 
-      <Modal open={!!deleteTarget} onClose={() => setDeleteTarget(null)} title="Delete Game">
+      {/* Safe Delete & Archive Modal */}
+      <Modal open={!!deleteTarget} onClose={() => { setDeleteTarget(null); setDeleteConfirmInput('') }} title="Archive Tournament Room">
         <div className="space-y-4">
-          <p className="text-sm text-bwb-muted">
-            Are you sure you want to delete <span className="text-bwb-text font-semibold">{deleteTarget?.name}</span>? This action cannot be undone.
-          </p>
-          <div className="flex gap-3 justify-end">
-            <Button variant="ghost" onClick={() => setDeleteTarget(null)}>Cancel</Button>
-            <Button variant="danger" onClick={deleteGame} disabled={deleting}>
-              <Trash2 size={14} /> {deleting ? 'Deleting...' : 'Delete Game'}
+          {deleteTarget && deleteTarget.teams.length > 0 ? (
+            <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-300 space-y-2">
+              <div className="flex items-center gap-2 font-bold text-xs">
+                <AlertTriangle size={16} className="text-amber-400 shrink-0" />
+                <span>Active Tournament Warning: {deleteTarget.teams.length} Registered Team(s)</span>
+              </div>
+              <p className="text-[11px] text-amber-200/80 leading-relaxed">
+                This room currently contains <strong className="text-amber-300">{deleteTarget.teams.length} team(s)</strong> with registered members and problem selections.
+                Archiving will safely preserve all team rosters, passcodes, and scores in your <strong>Archive/Trash</strong> where it can be restored anytime.
+              </p>
+              <div className="pt-1">
+                <label className="block text-[11px] font-mono text-amber-300/90 mb-1">
+                  Type room PIN <strong className="text-white bg-black/40 px-1.5 py-0.5 rounded">{deleteTarget.code}</strong> to confirm:
+                </label>
+                <input
+                  type="text"
+                  placeholder={deleteTarget.code}
+                  value={deleteConfirmInput}
+                  onChange={(e) => setDeleteConfirmInput(e.target.value)}
+                  className="w-full px-3 py-1.5 rounded-xl bg-black/40 border border-amber-500/40 text-white font-mono text-xs focus:border-amber-400 outline-none uppercase"
+                />
+              </div>
+            </div>
+          ) : (
+            <p className="text-sm text-bwb-muted">
+              Are you sure you want to archive <span className="text-bwb-text font-semibold">{deleteTarget?.name}</span>? It will be moved to the Archive/Trash and can be restored at any time.
+            </p>
+          )}
+
+          <div className="flex gap-3 justify-end pt-1 border-t border-white/10">
+            <Button variant="ghost" onClick={() => { setDeleteTarget(null); setDeleteConfirmInput('') }}>Cancel</Button>
+            <Button
+              variant="danger"
+              onClick={deleteGame}
+              disabled={deleting || (!!deleteTarget && deleteTarget.teams.length > 0 && deleteConfirmInput.trim().toUpperCase() !== deleteTarget.code.toUpperCase())}
+            >
+              <Trash2 size={14} /> {deleting ? 'Archiving...' : 'Archive Room'}
             </Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Archived Rooms Recovery Modal */}
+      <Modal open={showArchivedModal} onClose={() => setShowArchivedModal(false)} title="Archived & Deleted Rooms">
+        <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-1">
+          <p className="text-xs text-bwb-muted">
+            All deleted tournament rooms and their registered teams are safely backed up here. Click <strong>Restore</strong> to reactivate any room instantly.
+          </p>
+
+          {loadingArchived ? (
+            <div className="py-8 text-center text-xs font-mono text-bwb-muted">Loading archived rooms...</div>
+          ) : archivedGames.length === 0 ? (
+            <div className="p-8 rounded-2xl bg-bwb-surface-2/60 border border-dashed border-white/10 text-center space-y-2">
+              <Archive size={28} className="mx-auto text-bwb-muted/50" />
+              <p className="text-xs font-bold text-bwb-text">No Archived Rooms</p>
+              <p className="text-[11px] text-bwb-muted">Whenever you delete a room, it will be kept here safely.</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {archivedGames.map((ag) => (
+                <div
+                  key={ag.id}
+                  className="p-3.5 rounded-2xl bg-bwb-surface-2 border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                >
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h4 className="text-sm font-bold text-bwb-text">{ag.name}</h4>
+                      <span className="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-bwb-surface border border-white/10 text-bwb-accent">
+                        {ag.code}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3 text-[11px] text-bwb-muted font-mono mt-1">
+                      <span>👥 {ag.teams?.length || 0} teams registered</span>
+                      <span>•</span>
+                      <span>Round {ag.currentRound || 1}</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 shrink-0">
+                    <Button
+                      size="sm"
+                      onClick={() => handleRestoreGame(ag.id)}
+                      disabled={restoringId === ag.id}
+                      className="bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 border border-emerald-500/40 font-bold text-xs"
+                    >
+                      <RotateCcw size={12} className="mr-1" />
+                      {restoringId === ag.id ? 'Restoring...' : 'Restore Room'}
+                    </Button>
+                    <button
+                      onClick={() => handlePermanentDelete(ag.id, ag.name)}
+                      className="p-2 rounded-xl text-rose-400 hover:bg-rose-500/20 transition-colors"
+                      title="Permanently remove"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div className="flex justify-end pt-2 border-t border-white/10">
+            <Button variant="ghost" size="sm" onClick={() => setShowArchivedModal(false)}>Close</Button>
           </div>
         </div>
       </Modal>

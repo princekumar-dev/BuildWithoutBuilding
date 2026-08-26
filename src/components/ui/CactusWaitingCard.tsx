@@ -910,8 +910,14 @@ export function CactusWaitingCard({
               </div>
 
               {/* How to Build Without Building Note */}
-              <div className="p-2.5 rounded-xl bg-purple-950/30 border border-purple-500/20 text-[11px] text-purple-200 text-left">
-                <strong className="text-purple-300">💡 How to &quot;Build Without Building&quot;:</strong> You don&apos;t code! Formulate system diagrams, telemetry pipelines, hardware BOM constraints, and 3-card tech integration.
+              <div className="p-2.5 rounded-xl bg-purple-950/30 border border-purple-500/20 text-[11px] text-purple-200 text-left space-y-1">
+                <div>
+                  <strong className="text-purple-300">💡 How to &quot;Build Without Building&quot;:</strong> You don&apos;t code! Formulate system diagrams, telemetry pipelines, hardware BOM constraints, and 3-card tech integration.
+                </div>
+                <div className="pt-1 border-t border-purple-500/20 text-cyan-300 flex items-center gap-1">
+                  <span>📊</span>
+                  <span><strong>Live Pitch PPT / PDF:</strong> In the build phase, submit your Google Slides/Canva link or upload an exported PDF. Your slides will appear on the Stadium Projector and be controlled live from your device!</span>
+                </div>
               </div>
 
               {/* 7-Stage Flow */}

@@ -44,8 +44,8 @@ const steps = [
   { num: '01', title: 'Join & Roster Entry', desc: 'Enter the Room PIN provided by your host. Register your squad of 2–3 members and receive your unique Team Passcode.' },
   { num: '02', title: 'Problem Selection (8 Tracks · 2 Teams / Track)', desc: 'Select 1 of 8 Problem Statements (max 2 squads per track). These 2 squads will face off head-to-head in a direct 1v1 duel in Round 2.' },
   { num: '03', title: 'Draft 3 Frontier Tech Cards', desc: 'Each team drafts 3 surprise frontier tech cards that must be meaningfully incorporated into their system architecture.' },
-  { num: '04', title: 'Architecture Sprint (45m in R1 · 30m in R2/R3)', desc: 'Design your telemetry pipeline, system architecture, and solution proposal. Timer auto-advances to pitch when time expires.' },
-  { num: '05', title: '1v1 Live Pitch & Stage Defense', desc: 'Present your solution verbally on stage. In Round 2, your architecture is evaluated directly head-to-head against your problem track opponent.' },
+  { num: '04', title: 'Architecture Sprint & PPT / PDF Submission', desc: 'Design your telemetry pipeline and system architecture. In the submission form, submit your Google Slides / Canva link OR upload an exported PDF slide deck.' },
+  { num: '05', title: 'Live Pitch & Stadium Projector Remote', desc: 'Present your blueprint on stage! Your submitted presentation appears on the big Stadium Projector and is controlled live from your phone/laptop controller.' },
   { num: '06', title: 'Jury Scoring & Track Champion Resolution', desc: 'Jury evaluates squads on the 100-point rubric. In Round 2, the winner of each problem track duel advances as the Problem Champion (8 Finalists total).' },
   { num: '07', title: 'Official Host Leaderboard Reveal', desc: 'Standings revealed on projector and player screens only when the Host triggers the official reveal!' },
 ]
@@ -73,9 +73,11 @@ const buildStrategies = [
   },
   {
     round: 'How to Build in Round 3 (Grand Finals — 8 Problem Champions)',
-    focus: 'Master Blueprint, Live Defense & Prize Podium Honors',
+    focus: 'Master Blueprint, PPT / PDF Presentation & Live Stage Defense',
     points: [
       'Refine your master end-to-end blueprint incorporating all feedback from Round 1 and Round 2.',
+      'Submit your presentation deck: Paste a Google Slides / Canva link OR upload your exported PDF slides directly in the build form.',
+      'Use your mobile phone or laptop on stage as a live remote clicker (◀ Prev, Next ▶, or Arrow keys) to control the Stadium Projector in real time.',
       'Prepare for adversarial judge questions on hardware BOM cost, offline sync, security, and edge latency.',
       'Deliver a high-impact championship pitch worthy of 1st, 2nd, or 3rd place podium honors.',
     ],
@@ -283,6 +285,47 @@ export default function HowToPlayPage() {
             </Card>
           ))}
         </div>
+
+        {/* Live Presentation Deck & Stadium Projector Remote Feature */}
+        <Card padding="lg" className="mb-12 border-cyan-500/40 bg-gradient-to-br from-cyan-950/25 via-bwb-surface-2 to-bwb-surface text-left">
+          <div className="flex items-center gap-2.5 mb-3">
+            <span className="text-xl">📊</span>
+            <div>
+              <span className="text-[10px] font-mono uppercase tracking-widest text-cyan-400 font-bold block">
+                LIVE STAGE TECHNOLOGY
+              </span>
+              <h2 className="font-display text-xl font-bold text-bwb-text">
+                Live Pitch Slides & Stadium Projector Remote
+              </h2>
+            </div>
+          </div>
+          <p className="text-xs text-bwb-muted leading-relaxed mb-4">
+            During the build phase (especially Round 3 Grand Finals), teams submit their presentation. When your squad is called on stage, your presentation is broadcast on the main stadium projector and controlled directly from your phone or laptop!
+          </p>
+
+          <div className="grid sm:grid-cols-3 gap-3 text-xs font-mono">
+            <div className="p-3.5 rounded-2xl bg-bwb-bg/70 border border-white/10 space-y-1">
+              <span className="text-cyan-400 font-bold text-sm block">1. Share URL or Upload PDF</span>
+              <p className="text-bwb-muted text-[11px] font-sans">
+                Paste a public Google Slides, Canva, Pitch, or Figma link, or upload an exported PDF slide deck (up to 25MB).
+              </p>
+            </div>
+
+            <div className="p-3.5 rounded-2xl bg-bwb-bg/70 border border-white/10 space-y-1">
+              <span className="text-purple-400 font-bold text-sm block">2. Smart Auto-Deck</span>
+              <p className="text-bwb-muted text-[11px] font-sans">
+                Don't have a pre-made PPT? The platform auto-constructs an interactive 5-slide holographic presentation from your submission.
+              </p>
+            </div>
+
+            <div className="p-3.5 rounded-2xl bg-bwb-bg/70 border border-white/10 space-y-1">
+              <span className="text-amber-400 font-bold text-sm block">3. On-Stage Clicker Remote</span>
+              <p className="text-bwb-muted text-[11px] font-sans">
+                Advance slides live on the big projector screen using Prev/Next buttons on your device or keyboard arrow keys (<kbd>→</kbd>, <kbd>←</kbd>, <kbd>Space</kbd>).
+              </p>
+            </div>
+          </div>
+        </Card>
 
         {/* Rubric */}
         <Card padding="lg" className="mb-10 border-bwb-accent/30 bg-gradient-to-b from-bwb-surface-2/80 to-bwb-surface">

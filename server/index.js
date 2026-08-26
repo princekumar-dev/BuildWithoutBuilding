@@ -709,7 +709,20 @@ createServer(async (request, response) => {
     const archivedDb = readArchivedDatabase();
     return json(response, 200, archivedDb.games.map(publicGame));
   }
-  if (request.method === 'GET' && url.pathname === '/api/games') return json(response, 200, database.games.map(publicGame))
+  if (request.method === 'GET' && url.pathname === '/api/games') {
+    if (dbCollection) {
+      try {
+        const remoteGames = await dbCollection.find({}).toArray();
+        if (remoteGames && remoteGames.length > 0) {
+          database.games = remoteGames.map(({ _id, ...rest }) => rest);
+          saveLocal(database);
+        }
+      } catch (err) {
+        console.error('MongoDB fetch error:', err.message);
+      }
+    }
+    return json(response, 200, database.games.map(publicGame));
+  }
   if (request.method === 'POST' && url.pathname === '/api/games') {
     if (!requireHost(request, response)) return;
     const input = await body(request);

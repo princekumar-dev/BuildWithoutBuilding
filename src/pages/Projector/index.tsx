@@ -10,6 +10,7 @@ import { CountdownTimer } from '../../components/timer/CountdownTimer'
 import { LeaderboardTable } from '../../components/leaderboard/LeaderboardTable'
 import { TournamentPodium } from '../../components/leaderboard/TournamentPodium'
 import { PhaseIndicator } from '../../components/ui/PhaseIndicator'
+import { LivePitchDeck } from '../../components/pitch/LivePitchDeck'
 import { SoundFX } from '../../lib/soundEffects'
 import { useGameStore } from '../../store/gameStore'
 import { useRealtimeGame } from '../../hooks/useRealtimeGame'
@@ -1576,17 +1577,15 @@ export default function ProjectorPage() {
                     </div>
                   </div>
 
-                  {/* Architecture Summary */}
-                  {pitchTeam.submission && (
-                    <div className="p-4 sm:p-5 rounded-2xl bg-bwb-bg/90 border border-white/10 text-left space-y-1.5">
-                      <p className="text-xs uppercase font-mono tracking-widest text-bwb-accent font-bold">
-                        {pitchTeam.submission.solutionName || 'System Architecture Proposal'}
-                      </p>
-                      <p className="text-sm text-bwb-text/90 leading-relaxed font-medium">
-                        {pitchTeam.submission.whatItDoes || pitchTeam.submission.howItWorks}
-                      </p>
-                    </div>
-                  )}
+                  {/* Synchronized Live Presentation Deck / PPT */}
+                  <div className="w-full mt-4">
+                    <LivePitchDeck
+                      team={pitchTeam}
+                      activeSlideIndex={game.currentSlideIndex ?? pitchTeam.currentSlideIndex ?? 0}
+                      isController={false}
+                      catalogProblems={catalog.problems}
+                    />
+                  </div>
                 </motion.div>
               ) : (
                 /* MINIMAL SLEEK WAITING CARD */

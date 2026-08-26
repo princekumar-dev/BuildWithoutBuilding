@@ -62,6 +62,18 @@ export interface Team {
   scoreBreakdown?: ScoreBreakdown
   isOnline?: boolean
   lastSeenAt?: string
+  currentSlideIndex?: number
+}
+
+export interface SlideItem {
+  id: string
+  title: string
+  subtitle?: string
+  bulletPoints?: string[]
+  badge?: string
+  icon?: string
+  content?: string
+  visualType?: 'architecture' | 'bullets' | 'tech-stack' | 'comparison' | 'conclusion'
 }
 
 export interface Submission {
@@ -71,6 +83,9 @@ export interface Submission {
   techUsage: Record<string, string>
   mainAdvantage: string
   mainLimitation: string
+  presentationUrl?: string
+  presentationEmbedUrl?: string
+  slides?: SlideItem[]
   submittedAt?: string
 }
 
@@ -94,6 +109,7 @@ export interface Game {
   currentProblem?: Problem
   buildDurationMinutes: number
   currentPitchTeamId?: string
+  currentSlideIndex?: number
   pitchedTeamIds?: string[]
   isFinalRound: boolean
   finalistTeamIds?: string[]

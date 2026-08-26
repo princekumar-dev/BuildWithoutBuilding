@@ -66,6 +66,7 @@ export const api = {
   setCurrentPitchTeam: (gameId: string, teamId: string | null) => request<Game>(`/games/${gameId}/pitch-team`, { method: 'PATCH', body: JSON.stringify({ teamId }) }, true),
   markTeamPitched: (gameId: string, teamId: string) => request<Game>(`/games/${gameId}/mark-pitched`, { method: 'POST', body: JSON.stringify({ teamId }) }, true),
   updatePhaseTimer: (gameId: string, durationSeconds: number, phase?: GamePhase) => request<Game>(`/games/${gameId}/timer`, { method: 'PATCH', body: JSON.stringify({ durationSeconds, phase }) }, true),
+  updatePitchSlide: (gameId: string, teamId: string, slideIndex: number) => request<Game>(`/games/${gameId}/slide`, { method: 'POST', body: JSON.stringify({ teamId, slideIndex }) }),
   listArchivedGames: () => request<Game[]>('/games/archived', undefined, true),
   restoreGame: (gameId: string) => request<Game>(`/games/${gameId}/restore`, { method: 'POST' }, true),
   permanentDeleteGame: (gameId: string) => request<{ ok: boolean }>(`/games/${gameId}/permanent`, { method: 'DELETE' }, true),

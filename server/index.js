@@ -761,7 +761,7 @@ createServer(async (request, response) => {
     }
   }
 
-  const match = url.pathname.match(/^\/api\/games\/([^/]+)(?:\/(join|phase|round|finalists|schedule|config|assign-cards|select-problem|reveal-card|submissions|scores|ping|pitch-team|mark-pitched|timer|restore|permanent))?$/)
+  const match = url.pathname.match(/^\/api\/games\/([^/]+)(?:\/(join|phase|round|finalists|schedule|config|assign-cards|select-problem|reveal-card|submissions|scores|ping|pitch-team|mark-pitched|timer|restore|permanent|slide))?$/)
   if (!match) return json(response, 404, { error: 'API route not found.' })
 
   const rawKey = decodeURIComponent(match[1])
@@ -1079,6 +1079,19 @@ createServer(async (request, response) => {
     }
     save(database);
     const pGame = publicGame(game);
+    broadcastToClients({ type: 'games-updated', game: pGame });
+    return json(response, 200, pGame);
+  }
+
+  if (request.method === 'POST' && action === 'slide') {
+    const team = game.teams.find((item) => item.id === input.teamId);
+    if (!team) return json(response, 400, { error: 'Team is required.' });
+    const slideIdx = Math.max(0, Number(input.slideIndex ?? 0));
+    team.currentSlideIndex = slideIdx;
+    game.currentSlideIndex = slideIdx;
+    save(database);
+    const pGame = publicGame(game);
+    broadcastToClients({ type: 'slide-updated', gameId: game.id, teamId: team.id, slideIndex: slideIdx });
     broadcastToClients({ type: 'games-updated', game: pGame });
     return json(response, 200, pGame);
   }

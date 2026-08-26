@@ -7,6 +7,7 @@ import { Badge } from '../../components/ui/Badge'
 import { PhaseIndicator } from '../../components/ui/PhaseIndicator'
 import { CountdownTimer } from '../../components/timer/CountdownTimer'
 import { LeaderboardTable } from '../../components/leaderboard/LeaderboardTable'
+import { LivePitchDeck } from '../../components/pitch/LivePitchDeck'
 import { useGameStore } from '../../store/gameStore'
 import { useRealtimeGame } from '../../hooks/useRealtimeGame'
 import { PHASE_LABELS } from '../../data/mockData'
@@ -188,17 +189,34 @@ export default function PitchPage() {
             </div>
           ) : isPitching ? (
             pitchTeam ? (
-              <div className="flex flex-col items-center">
-                <div className="w-14 h-14 rounded-2xl bg-bwb-accent/20 text-bwb-accent border border-bwb-accent/40 flex items-center justify-center mb-3 shadow-lg">
-                  <Mic size={28} />
+              <div className="flex flex-col items-center space-y-5">
+                <div className="flex items-center gap-4 flex-wrap justify-center">
+                  <div className="w-12 h-12 rounded-2xl bg-bwb-accent/20 text-bwb-accent border border-bwb-accent/40 flex items-center justify-center shadow-lg">
+                    <Mic size={24} />
+                  </div>
+                  <CountdownTimer
+                    key={`pitch-${pitchTeam.id}-${game.pitchExpiresAt || game.phaseExpiresAt}`}
+                    targetTime={game.pitchExpiresAt || game.phaseExpiresAt}
+                    initialSeconds={180}
+                    size="lg"
+                    label="PITCH TIME"
+                  />
                 </div>
-                <CountdownTimer
-                  key={`pitch-${pitchTeam.id}-${game.pitchExpiresAt || game.phaseExpiresAt}`}
-                  targetTime={game.pitchExpiresAt || game.phaseExpiresAt}
-                  initialSeconds={180}
-                  size="xl"
-                  label="PITCH TIME"
-                />
+
+                {/* Live Pitch Deck & Remote Controller */}
+                <div className="w-full">
+                  <LivePitchDeck
+                    team={pitchTeam}
+                    activeSlideIndex={game.currentSlideIndex ?? pitchTeam.currentSlideIndex ?? 0}
+                    isController={isMyTeamOnStage}
+                    onSlideChange={(slideIdx) => {
+                      if (game?.id && pitchTeam?.id) {
+                        api.updatePitchSlide(game.id, pitchTeam.id, slideIdx).catch(() => {})
+                      }
+                    }}
+                    catalogProblems={problems}
+                  />
+                </div>
               </div>
             ) : (
               <div className="flex flex-col items-center py-6">

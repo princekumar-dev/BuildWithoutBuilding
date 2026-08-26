@@ -242,6 +242,11 @@ export default function ProjectorPage() {
     setTimeout(() => setStageParticles((prev) => prev.filter((p) => !burst.some((b) => b.id === p.id))), 1200)
   }
 
+  // Live Lobby Team Showcase 3D Auto-Pagination States (8 teams per view)
+  const [teamPageIndex, setTeamPageIndex] = useState(0)
+  const [isTeamPagePaused, setIsTeamPagePaused] = useState(false)
+  const [teamPageSwapProgress, setTeamPageSwapProgress] = useState(0)
+
   // Active display phase (strictly driven in real-time by host via SSE)
   const currentPhase: GamePhase = game.phase ?? 'LOBBY'
   const currentRound = game.currentRound || (game.isFinalRound ? 3 : 1)
@@ -259,6 +264,36 @@ export default function ProjectorPage() {
     ? game.teams.filter((team) => game.finalistTeamIds?.includes(team.id))
     : game.teams
   const currentAnnouncement = STADIUM_ANNOUNCEMENTS[announcementIndex]
+
+  const TEAMS_PER_PAGE = 8
+  const totalTeamPages = Math.max(1, Math.ceil(lobbyTeams.length / TEAMS_PER_PAGE))
+  const safeTeamPageIndex = teamPageIndex % totalTeamPages
+  const currentBatchTeams = lobbyTeams.slice(safeTeamPageIndex * TEAMS_PER_PAGE, (safeTeamPageIndex + 1) * TEAMS_PER_PAGE)
+
+  // Auto-cycle lobby teams every 7.5s with progress bar when > 8 teams
+  useEffect(() => {
+    if (totalTeamPages <= 1 || isTeamPagePaused || currentPhase !== 'LOBBY') {
+      setTeamPageSwapProgress(0)
+      return
+    }
+
+    const DURATION_MS = 7500
+    const STEP_MS = 50
+    let elapsed = 0
+
+    const progressTimer = setInterval(() => {
+      elapsed += STEP_MS
+      setTeamPageSwapProgress(Math.min(100, (elapsed / DURATION_MS) * 100))
+
+      if (elapsed >= DURATION_MS) {
+        elapsed = 0
+        setTeamPageSwapProgress(0)
+        setTeamPageIndex((prev) => (prev + 1) % totalTeamPages)
+      }
+    }, STEP_MS)
+
+    return () => clearInterval(progressTimer)
+  }, [totalTeamPages, isTeamPagePaused, currentPhase])
 
   return (
     <div className="projector-mobile-view min-h-screen bg-bwb-bg grid-bg text-bwb-text flex flex-col select-none overflow-x-hidden font-sans">
@@ -707,23 +742,97 @@ export default function ProjectorPage() {
               </div>
             </motion.div>
 
-            {/* Live Teams & Players Arena Wall (NO PASSCODES DISPLAYED) */}
-            <div className="w-full max-w-6xl">
-              <div className="mb-5 pb-3 border-b border-bwb-border">
-                <div className="flex items-center justify-center gap-3 mb-2">
-                  <Users className="text-bwb-accent shrink-0" size={24} />
-                  <h2 className="font-display text-xl sm:text-2xl font-bold text-bwb-text">
-                    {game.currentRound === 3 ? 'Grand Finalists (Top 8)' : `Registered Arena Teams (${lobbyTeams.length})`}
-                  </h2>
+            {/* Live Teams & Players Arena Wall with 3D Holographic Staggered Matrix Showcase */}
+            <div
+              className="w-full max-w-6xl"
+              onMouseEnter={() => setIsTeamPagePaused(true)}
+              onMouseLeave={() => setIsTeamPagePaused(false)}
+            >
+              <div className="mb-5 pb-3 border-b border-bwb-border flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <div className="flex items-center gap-3 mb-1">
+                    <Users className="text-bwb-accent shrink-0" size={24} />
+                    <h2 className="font-display text-xl sm:text-2xl font-bold text-bwb-text">
+                      {game.currentRound === 3 ? 'Grand Finalists (Top 8)' : `Registered Arena Teams (${lobbyTeams.length})`}
+                    </h2>
+                  </div>
+                  <div className="flex items-center gap-3 sm:gap-4 text-xs font-mono text-bwb-muted">
+                    <span className="flex items-center gap-1.5 text-emerald-400 font-bold">
+                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                      Live in Room: {lobbyTeams.filter((t) => t.isOnline).length} / {lobbyTeams.length}
+                    </span>
+                    <span className="hidden sm:inline">·</span>
+                    <span>Total Players: <strong className="text-bwb-text">{totalParticipants}</strong></span>
+                  </div>
                 </div>
-                <div className="flex items-center justify-center gap-3 sm:gap-4 text-xs font-mono text-bwb-muted">
-                  <span className="flex items-center gap-1.5 text-emerald-400 font-bold">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                    Live in Room: {lobbyTeams.filter((t) => t.isOnline).length} / {lobbyTeams.length}
-                  </span>
-                  <span className="hidden sm:inline">·</span>
-                  <span>Total Players: <strong className="text-bwb-text">{totalParticipants}</strong></span>
-                </div>
+
+                {/* Cyber Matrix Showcase Page HUD & Auto-Swap Countdown (Only when > 8 squads) */}
+                {totalTeamPages > 1 && (
+                  <div className="flex items-center gap-2.5 bg-bwb-surface-2/90 border border-cyan-500/30 px-3.5 py-1.5 rounded-2xl shadow-lg backdrop-blur-xl shrink-0">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
+                      <span className="text-xs font-mono font-black text-cyan-300 tracking-wide">
+                        PAGE {safeTeamPageIndex + 1}/{totalTeamPages}
+                      </span>
+                      <span className="text-[11px] font-mono text-bwb-muted hidden sm:inline">
+                        (Squads #{safeTeamPageIndex * TEAMS_PER_PAGE + 1}–#{Math.min(lobbyTeams.length, (safeTeamPageIndex + 1) * TEAMS_PER_PAGE)})
+                      </span>
+                    </div>
+
+                    {/* Progress Countdown Line */}
+                    <div className="w-14 sm:w-20 bg-white/10 h-1.5 rounded-full overflow-hidden relative" title="Time until next batch rotates">
+                      <motion.div
+                        className="h-full bg-gradient-to-r from-cyan-400 to-amber-400 rounded-full"
+                        style={{ width: `${teamPageSwapProgress}%` }}
+                      />
+                    </div>
+
+                    {/* Interactive Page Dot Pills */}
+                    <div className="flex items-center gap-1">
+                      {Array.from({ length: totalTeamPages }).map((_, pIdx) => (
+                        <button
+                          key={pIdx}
+                          onClick={() => setTeamPageIndex(pIdx)}
+                          className={`w-4 h-4 rounded-full text-[9px] font-mono font-bold flex items-center justify-center transition-all ${
+                            pIdx === safeTeamPageIndex
+                              ? 'bg-cyan-400 text-black font-black scale-110 shadow-[0_0_10px_rgba(0,229,199,0.5)]'
+                              : 'bg-white/10 text-bwb-muted hover:bg-white/20 hover:text-white'
+                          }`}
+                          title={`Jump to Page ${pIdx + 1}`}
+                        >
+                          {pIdx + 1}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Pause / Play and Arrows */}
+                    <div className="flex items-center gap-1 pl-1 border-l border-white/10">
+                      <button
+                        onClick={() => setTeamPageIndex((prev) => (prev - 1 + totalTeamPages) % totalTeamPages)}
+                        className="p-1 rounded-lg bg-white/5 hover:bg-white/15 text-bwb-muted hover:text-white transition-colors"
+                        title="Previous Squads"
+                      >
+                        <ChevronLeft size={13} />
+                      </button>
+                      <button
+                        onClick={() => setIsTeamPagePaused(!isTeamPagePaused)}
+                        className={`p-1 rounded-lg transition-colors ${
+                          isTeamPagePaused ? 'bg-amber-400/20 text-amber-300' : 'bg-white/5 hover:bg-white/15 text-bwb-muted hover:text-white'
+                        }`}
+                        title={isTeamPagePaused ? 'Resume Auto-Rotation' : 'Pause on these Squads'}
+                      >
+                        {isTeamPagePaused ? <Play size={13} /> : <Pause size={13} />}
+                      </button>
+                      <button
+                        onClick={() => setTeamPageIndex((prev) => (prev + 1) % totalTeamPages)}
+                        className="p-1 rounded-lg bg-white/5 hover:bg-white/15 text-bwb-muted hover:text-white transition-colors"
+                        title="Next Squads"
+                      >
+                        <ChevronRight size={13} />
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {lobbyTeams.length === 0 ? (
@@ -735,69 +844,102 @@ export default function ProjectorPage() {
                   <p className="text-sm text-bwb-muted">Open /join on your device and enter PIN {game.code}</p>
                 </div>
               ) : (
-                <motion.div layout className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                  <AnimatePresence>
-                    {lobbyTeams.map((team, idx) => (
-                      <motion.div
-                        key={team.id}
-                        initial={{ opacity: 0, scale: 0.85, y: 15 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.85 }}
-                        transition={{ delay: idx * 0.04, type: 'spring', stiffness: 260, damping: 20 }}
-                        className="stereo-card rounded-2xl p-5 border border-bwb-border/80 hover:border-bwb-accent/50 transition-all flex flex-col justify-between"
-                      >
-                        <div>
-                          <div className="flex items-start justify-between gap-2 mb-3">
-                            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-bwb-accent/20 to-bwb-purple/20 border border-bwb-accent/30 flex items-center justify-center font-display font-bold text-sm text-bwb-accent shadow-inner">
-                              #{idx + 1}
+                <div style={{ perspective: 1200 }} className="relative min-h-[360px]">
+                  {/* Staggered 3D Holographic Morph Matrix */}
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={`lobby-teams-page-${safeTeamPageIndex}`}
+                      initial="hidden"
+                      animate="show"
+                      exit="exit"
+                      variants={{
+                        hidden: {},
+                        show: { transition: { staggerChildren: 0.045 } },
+                        exit: { transition: { staggerChildren: 0.025, staggerDirection: -1 } },
+                      }}
+                      className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
+                    >
+                      {currentBatchTeams.map((team, idx) => {
+                        const teamAbsoluteIndex = safeTeamPageIndex * TEAMS_PER_PAGE + idx + 1
+                        return (
+                          <motion.div
+                            key={team.id}
+                            variants={{
+                              hidden: { opacity: 0, rotateY: 70, scale: 0.86, y: 22 },
+                              show: {
+                                opacity: 1,
+                                rotateY: 0,
+                                scale: 1,
+                                y: 0,
+                                transition: { duration: 0.48, ease: [0.16, 1, 0.3, 1] },
+                              },
+                              exit: {
+                                opacity: 0,
+                                rotateY: -70,
+                                scale: 0.86,
+                                y: -22,
+                                transition: { duration: 0.32, ease: 'easeIn' },
+                              },
+                            }}
+                            className="stereo-card rounded-2xl p-5 border border-bwb-border/80 hover:border-cyan-400/60 hover:shadow-[0_0_25px_rgba(0,229,199,0.18)] transition-all flex flex-col justify-between group relative overflow-hidden transform-gpu"
+                          >
+                            {/* Ambient Top Glow Line on Hover */}
+                            <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-cyan-400/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+
+                            <div>
+                              <div className="flex items-start justify-between gap-2 mb-3">
+                                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-bwb-accent/20 to-bwb-purple/20 border border-bwb-accent/30 flex items-center justify-center font-display font-bold text-sm text-bwb-accent shadow-inner">
+                                  #{teamAbsoluteIndex}
+                                </div>
+
+                                {/* Live Presence Badge */}
+                                {team.isOnline ? (
+                                  <span className="flex items-center gap-1 text-[10px] font-mono font-bold text-emerald-400 bg-emerald-500/15 px-2 py-0.5 rounded-lg border border-emerald-500/30">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> LIVE
+                                  </span>
+                                ) : (
+                                  <span className="flex items-center gap-1 text-[10px] font-mono font-medium text-bwb-muted bg-white/5 px-2 py-0.5 rounded-lg border border-white/10">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-gray-500" /> OFFLINE
+                                  </span>
+                                )}
+                              </div>
+
+                              <h4 className="font-display font-black text-lg text-bwb-text mb-2 truncate group-hover:text-cyan-300 transition-colors">
+                                {team.name}
+                              </h4>
+
+                              {/* Member Chips with Leader Crown (NO PASSCODES) */}
+                              <div className="flex flex-wrap gap-1.5 mb-2">
+                                {team.members && team.members.length > 0 ? (
+                                  team.members.map((member, mIdx) => (
+                                    <span
+                                      key={mIdx}
+                                      className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold border flex items-center gap-1 truncate max-w-[140px] ${
+                                        mIdx === 0
+                                          ? 'bg-amber-400/10 border-amber-400/30 text-amber-300'
+                                          : 'bg-bwb-surface-2 text-bwb-muted border-white/5'
+                                      }`}
+                                    >
+                                      {mIdx === 0 && <Crown size={11} className="text-amber-400 shrink-0" />}
+                                      <span className="truncate">{member}</span>
+                                    </span>
+                                  ))
+                                ) : (
+                                  <span className="text-xs text-bwb-muted italic">1 player joined</span>
+                                )}
+                              </div>
                             </div>
 
-                            {/* Live Presence Badge */}
-                            {team.isOnline ? (
-                              <span className="flex items-center gap-1 text-[10px] font-mono font-bold text-emerald-400 bg-emerald-500/15 px-2 py-0.5 rounded-lg border border-emerald-500/30">
-                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> LIVE
-                              </span>
-                            ) : (
-                              <span className="flex items-center gap-1 text-[10px] font-mono font-medium text-bwb-muted bg-white/5 px-2 py-0.5 rounded-lg border border-white/10">
-                                <span className="w-1.5 h-1.5 rounded-full bg-gray-500" /> OFFLINE
-                              </span>
-                            )}
-                          </div>
-
-                          <h4 className="font-display font-black text-lg text-bwb-text mb-2 truncate">
-                            {team.name}
-                          </h4>
-
-                          {/* Member Chips with Leader Crown (NO PASSCODES) */}
-                          <div className="flex flex-wrap gap-1.5 mb-2">
-                            {team.members && team.members.length > 0 ? (
-                              team.members.map((member, mIdx) => (
-                                <span
-                                  key={mIdx}
-                                  className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold border flex items-center gap-1 truncate max-w-[140px] ${
-                                    mIdx === 0
-                                      ? 'bg-amber-400/10 border-amber-400/30 text-amber-300'
-                                      : 'bg-bwb-surface-2 text-bwb-muted border-white/5'
-                                  }`}
-                                >
-                                  {mIdx === 0 && <Crown size={11} className="text-amber-400 shrink-0" />}
-                                  <span className="truncate">{member}</span>
-                                </span>
-                              ))
-                            ) : (
-                              <span className="text-xs text-bwb-muted italic">1 player joined</span>
-                            )}
-                          </div>
-                        </div>
-
-                        <div className="pt-2.5 mt-2 border-t border-white/5 flex items-center justify-between text-[11px] text-bwb-muted font-mono">
-                          <span>{team.members?.length || 1}/3 Players</span>
-                          <span className="text-bwb-accent font-semibold">Registered</span>
-                        </div>
-                      </motion.div>
-                    ))}
+                            <div className="pt-2.5 mt-2 border-t border-white/5 flex items-center justify-between text-[11px] text-bwb-muted font-mono">
+                              <span>{team.members?.length || 1}/3 Players</span>
+                              <span className="text-bwb-accent font-semibold">Registered</span>
+                            </div>
+                          </motion.div>
+                        )
+                      })}
+                    </motion.div>
                   </AnimatePresence>
-                </motion.div>
+                </div>
               )}
             </div>
           </div>

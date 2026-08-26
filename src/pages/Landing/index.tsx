@@ -106,35 +106,39 @@ const particles = [
 function HeroSection() {
   const heroRef = useRef<HTMLElement>(null)
   const reduceMotion = useReducedMotion()
+  const rafId = useRef<number | null>(null)
 
   const handlePointerMove = (event: MouseEvent<HTMLElement>) => {
-    if (reduceMotion) return
-    const node = heroRef.current
-    if (!node) return
-    const bounds = node.getBoundingClientRect()
-    const x = ((event.clientX - bounds.left) / bounds.width) * 100
-    const y = ((event.clientY - bounds.top) / bounds.height) * 100
-    node.style.setProperty('--mx', `${x}%`)
-    node.style.setProperty('--my', `${y}%`)
+    if (reduceMotion || window.innerWidth < 768) return
+    if (rafId.current) cancelAnimationFrame(rafId.current)
+
+    rafId.current = requestAnimationFrame(() => {
+      const node = heroRef.current
+      if (!node) return
+      const bounds = node.getBoundingClientRect()
+      const x = ((event.clientX - bounds.left) / bounds.width) * 100
+      const y = ((event.clientY - bounds.top) / bounds.height) * 100
+      node.style.setProperty('--mx', `${x}%`)
+      node.style.setProperty('--my', `${y}%`)
+    })
   }
 
-  const ease = [0.22, 1, 0.36, 1] as const
+  const ease = [0.16, 1, 0.3, 1] as const
   const container = {
     hidden: {},
     show: {
       transition: {
-        staggerChildren: reduceMotion ? 0 : 0.09,
-        delayChildren: reduceMotion ? 0 : 0.06,
+        staggerChildren: reduceMotion ? 0 : 0.06,
+        delayChildren: reduceMotion ? 0 : 0.03,
       },
     },
   }
   const item = {
-    hidden: reduceMotion ? { opacity: 1, y: 0, filter: 'blur(0px)' } : { opacity: 0, y: 24, filter: 'blur(6px)' },
+    hidden: reduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 },
     show: {
       opacity: 1,
       y: 0,
-      filter: 'blur(0px)',
-      transition: { duration: reduceMotion ? 0 : 0.65, ease },
+      transition: { duration: reduceMotion ? 0 : 0.45, ease },
     },
   }
 

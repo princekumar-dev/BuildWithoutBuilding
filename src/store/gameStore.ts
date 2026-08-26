@@ -28,6 +28,33 @@ export const useGameStore = create<GameStore>()(
       selectedProblem: null,
       setGame: (game) => {
         if (!game || !game.id) return
+        const current = get().game
+        if (
+          current.id === game.id &&
+          current.phase === game.phase &&
+          current.currentRound === game.currentRound &&
+          current.currentPitchTeamId === game.currentPitchTeamId &&
+          current.currentSlideIndex === game.currentSlideIndex &&
+          current.phaseExpiresAt === game.phaseExpiresAt &&
+          current.pitchExpiresAt === game.pitchExpiresAt &&
+          current.isRegistrationOpen === game.isRegistrationOpen &&
+          current.teams?.length === game.teams?.length &&
+          current.teams?.every((t, i) => {
+            const gt = game.teams[i]
+            return (
+              gt &&
+              t.id === gt.id &&
+              t.score === gt.score &&
+              t.rank === gt.rank &&
+              t.isOnline === gt.isOnline &&
+              t.selectedProblemId === gt.selectedProblemId &&
+              t.currentSlideIndex === gt.currentSlideIndex &&
+              t.submission?.submittedAt === gt.submission?.submittedAt
+            )
+          })
+        ) {
+          return
+        }
         set({ game, demoPhase: game.phase })
       },
       demoPhase: 'LOBBY',

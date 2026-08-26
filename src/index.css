@@ -163,9 +163,22 @@ h1, h2, h3, h4, h5, h6 {
 
 .hero-orb {
   border-radius: 9999px;
-  filter: blur(80px);
+  filter: blur(36px);
+  -webkit-filter: blur(36px);
   pointer-events: none;
+  transform: translate3d(0, 0, 0);
+  -webkit-transform: translate3d(0, 0, 0);
+  will-change: transform;
   animation: hero-orb-drift 14s ease-in-out infinite;
+}
+
+@media (max-width: 768px) {
+  .hero-orb {
+    filter: blur(16px);
+    -webkit-filter: blur(16px);
+    animation: none !important;
+    opacity: 0.6;
+  }
 }
 
 .hero-orb-cyan {
@@ -464,6 +477,22 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* GPU Hardware Acceleration & Smooth 60-120fps Rendering */
+*, ::before, ::after {
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+  touch-action: manipulation;
+}
+
+button, a, input, select, textarea {
+  touch-action: manipulation;
+}
+
 .gpu-layer {
   transform: translate3d(0, 0, 0);
   -webkit-transform: translate3d(0, 0, 0);
@@ -472,17 +501,23 @@ h1, h2, h3, h4, h5, h6 {
   will-change: transform, opacity;
 }
 
+/* Momentum Touch Scrolling for All Devices */
+.overflow-y-auto, .overflow-x-auto {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
 /* Mobile & Low-End GPU Optimization */
 @media (max-width: 768px) {
   .glass, .glass-card, .holo-card, .stereo-card {
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
   }
 
   .stereo-card {
     box-shadow:
-      0 12px 30px rgba(0, 0, 0, 0.55),
-      0 2px 8px rgba(0, 229, 199, 0.04);
+      0 8px 24px rgba(0, 0, 0, 0.45),
+      0 2px 6px rgba(0, 229, 199, 0.04);
   }
 }
 
@@ -505,4 +540,5 @@ h1, h2, h3, h4, h5, h6 {
     animation: none !important;
   }
 }
+
 

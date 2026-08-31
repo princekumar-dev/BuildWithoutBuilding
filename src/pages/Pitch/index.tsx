@@ -220,9 +220,12 @@ export default function PitchPage() {
                 </div>
               </div>
             ) : (
-              <div className="flex flex-col items-center py-6">
-                <Mic size={28} className="text-bwb-muted/40 mb-3" />
-                <p className="text-sm text-bwb-muted font-mono">Waiting for judge to call a team...</p>
+              <div className="flex flex-col items-center py-8 text-center">
+                <div className="w-14 h-14 rounded-2xl bg-bwb-accent/15 text-bwb-accent border border-bwb-accent/30 flex items-center justify-center mb-3 shadow-lg">
+                  <Mic size={28} className="animate-pulse" />
+                </div>
+                <p className="font-display font-bold text-base text-bwb-text">Stage Standby</p>
+                <p className="text-xs text-bwb-muted font-mono mt-1">Waiting for judge to call the next team to pitch...</p>
               </div>
             )
           ) : isProblemReveal ? (

@@ -1157,6 +1157,11 @@ createServer(async (request, response) => {
       game.pitchDurationSeconds = null;
     }
 
+    // Always reset room phase to PITCHING so stage returns to standby waiting for judge to call another squad
+    if (game.phase === 'JUDGING' || game.phase === 'PITCHING') {
+      game.phase = 'PITCHING';
+    }
+
     save(database);
     const pGame = publicGame(game);
     broadcastToClients({ type: 'games-updated', game: pGame });
@@ -1176,6 +1181,9 @@ createServer(async (request, response) => {
     if (!requireHostOrJudge(request, response)) return;
     game.currentPitchTeamId = input.teamId || null;
     if (game.currentPitchTeamId) {
+      if (game.phase !== 'PITCHING' && game.phase !== 'JUDGE_ATTACK') {
+        game.phase = 'PITCHING';
+      }
       const pitchSec = Number(input.pitchSeconds) || (game.phase === 'JUDGE_ATTACK' ? 30 : 180);
       game.pitchStartedAt = new Date().toISOString();
       game.pitchDurationSeconds = pitchSec;

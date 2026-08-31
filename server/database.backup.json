@@ -467,7 +467,7 @@
       "isRegistrationOpen": true,
       "isFinalRound": false,
       "createdAt": "2026-08-25T10:00:00.000Z",
-      "updatedAt": "2026-08-31T18:17:14.127Z",
+      "updatedAt": "2026-08-31T18:20:13.143Z",
       "totalTeams": 16,
       "phaseStartedAt": null,
       "phaseDurationSeconds": null,
@@ -722,13 +722,22 @@
             1,
             2
           ],
-          "score": 0,
-          "round1Score": 0,
+          "score": 58,
+          "round1Score": 58,
           "round2Score": 0,
           "round3Score": 0,
           "rank": 8,
           "registeredAt": "2026-08-31T16:32:02.590Z",
-          "isOnline": true
+          "isOnline": true,
+          "scoreBreakdown": {
+            "problemUnderstanding": 11,
+            "creativity": 0,
+            "technologyUsage": 20,
+            "technicalFeasibility": 11,
+            "realWorldImpact": 0,
+            "pitch": 11,
+            "defense": 5
+          }
         },
         {
           "id": "team_63f2e9e9-a492-47e5-a1f7-709701a9e014",
@@ -774,15 +783,15 @@
       "isRegistrationOpen": true,
       "isFinalRound": false,
       "createdAt": "2026-08-31T16:21:23.920Z",
-      "updatedAt": "2026-08-31T18:17:14.127Z",
+      "updatedAt": "2026-08-31T18:20:13.143Z",
       "totalTeams": 8,
-      "phaseStartedAt": "2026-08-31T18:15:55.967Z",
+      "phaseStartedAt": "2026-08-31T18:20:13.139Z",
       "phaseDurationSeconds": 180,
-      "phaseExpiresAt": "2026-08-31T18:18:55.967Z",
-      "currentPitchTeamId": "team_f4726671-0072-42cf-8c9b-e7c207225437",
-      "pitchStartedAt": "2026-08-31T18:16:03.937Z",
-      "pitchDurationSeconds": 180,
-      "pitchExpiresAt": "2026-08-31T18:19:03.937Z",
+      "phaseExpiresAt": "2026-08-31T18:23:13.139Z",
+      "currentPitchTeamId": null,
+      "pitchStartedAt": null,
+      "pitchDurationSeconds": null,
+      "pitchExpiresAt": null,
       "currentSlideIndex": 3,
       "pitchedTeamIds": [
         "team_45ab5c8e-2d10-42f1-ada5-ce089d032bf9"

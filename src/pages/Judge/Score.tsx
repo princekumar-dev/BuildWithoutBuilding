@@ -155,41 +155,86 @@ export default function JudgeScorePage() {
             </div>
 
             <div className="space-y-4 text-xs sm:text-sm">
+              {/* Problem-Solution Alignment / Round 1 Problem Understanding */}
               <div className="p-3.5 rounded-2xl bg-bwb-surface-2/90 border border-white/5">
-                <p className="text-[10px] uppercase font-bold tracking-wider text-bwb-accent mb-1">
-                  1. What does your solution do? (Core Function)
+                <p className="text-[10px] uppercase font-bold tracking-wider text-bwb-accent mb-1 flex items-center justify-between">
+                  <span>{game.currentRound === 2 ? 'Problem-Solution Alignment & Purpose (10 Pts)' : '1. Problem Understanding / Core Purpose'}</span>
+                  {game.currentRound === 2 && <span className="font-mono text-purple-300">Max 10 Pts</span>}
                 </p>
                 <p className="text-bwb-text/90 leading-relaxed font-medium">
                   {submission.whatItDoes || 'No description provided.'}
                 </p>
               </div>
 
+              {/* System Flow & Feasibility / Round 1 Gap Analysis */}
               <div className="p-3.5 rounded-2xl bg-bwb-surface-2/90 border border-white/5">
-                <p className="text-[10px] uppercase font-bold tracking-wider text-bwb-accent mb-1">
-                  2. How does it work? (Architecture & Flow)
+                <p className="text-[10px] uppercase font-bold tracking-wider text-cyan-400 mb-1 flex items-center justify-between">
+                  <span>{game.currentRound === 2 ? 'System Flow & Scaling Feasibility (20 Pts)' : '2. Architecture & Flow / Gap Analysis'}</span>
+                  {game.currentRound === 2 && <span className="font-mono text-cyan-300">Max 20 Pts</span>}
                 </p>
                 <p className="text-bwb-text/90 leading-relaxed font-medium">
                   {submission.howItWorks || 'No architecture flow provided.'}
                 </p>
               </div>
 
+              {/* 3-Card Frontier Tech Integration */}
+              <div className="p-3.5 rounded-2xl bg-purple-950/20 border border-purple-500/20 space-y-2">
+                <p className="text-[10px] uppercase font-bold tracking-wider text-purple-300 mb-1 flex items-center justify-between">
+                  <span>{game.currentRound === 2 ? '3-Card Frontier Tech Integration (30 Pts)' : 'Tech Stack Integration'}</span>
+                  {game.currentRound === 2 && <span className="font-mono text-purple-300">Max 30 Pts</span>}
+                </p>
+                <div className="grid sm:grid-cols-3 gap-2">
+                  {teamTechs.map((tech) => (
+                    <div key={tech.id} className="p-2.5 rounded-xl bg-bwb-surface border border-white/5 space-y-0.5">
+                      <span className="font-mono font-bold text-xs text-bwb-text flex items-center gap-1">
+                        <span>{tech.icon}</span> {tech.name}
+                      </span>
+                      <p className="text-[11px] text-bwb-muted line-clamp-3">
+                        {submission.techUsage?.[tech.id] || 'Integrated into pipeline'}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+                {submission.techUsage?.['cross_synthesis'] && (
+                  <div className="p-2.5 rounded-xl bg-bwb-surface/70 border border-white/5 text-xs text-bwb-muted mt-2">
+                    <strong className="text-purple-300 font-mono text-[10px] block uppercase">3-Card Cross-Tech Synthesis:</strong>
+                    <p className="mt-0.5 text-bwb-text">{submission.techUsage['cross_synthesis']}</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Novelty & Architecture and Elevator Pitch Delivery */}
               <div className="grid sm:grid-cols-2 gap-3">
                 <div className="p-3 rounded-2xl bg-bwb-surface-2 border border-white/5">
-                  <p className="text-[10px] uppercase font-bold tracking-wider text-bwb-success mb-1">
-                    Key Advantage
+                  <p className="text-[10px] uppercase font-bold tracking-wider text-bwb-success mb-1 flex items-center justify-between">
+                    <span>{game.currentRound === 2 ? 'Novelty & Architecture (25 Pts)' : 'Core Advantage / Novelty'}</span>
+                    {game.currentRound === 2 && <span className="font-mono text-emerald-400">Max 25 Pts</span>}
                   </p>
                   <p className="text-bwb-text/90 leading-relaxed">
                     {submission.mainAdvantage || '—'}
                   </p>
                 </div>
+
                 <div className="p-3 rounded-2xl bg-bwb-surface-2 border border-white/5">
-                  <p className="text-[10px] uppercase font-bold tracking-wider text-bwb-warn mb-1">
-                    Main Limitation
+                  <p className="text-[10px] uppercase font-bold tracking-wider text-amber-400 mb-1 flex items-center justify-between">
+                    <span>{game.currentRound === 2 ? 'Elevator Pitch Delivery (10 Pts)' : 'Pitch Structure'}</span>
+                    {game.currentRound === 2 && <span className="font-mono text-amber-400">Max 10 Pts</span>}
                   </p>
                   <p className="text-bwb-text/90 leading-relaxed">
-                    {submission.mainLimitation || '—'}
+                    {submission.techUsage?.['elevatorPitch'] || '60-second architecture pitch delivered live'}
                   </p>
                 </div>
+              </div>
+
+              {/* Judge Attack Defense & Failure Modes */}
+              <div className="p-3.5 rounded-2xl bg-bwb-surface-2 border border-white/5">
+                <p className="text-[10px] uppercase font-bold tracking-wider text-rose-400 mb-1 flex items-center justify-between">
+                  <span>{game.currentRound === 2 ? 'Judge Attack Defense & Failure Modes (5 Pts)' : 'Risk Mitigation & Defense'}</span>
+                  {game.currentRound === 2 && <span className="font-mono text-rose-400">Max 5 Pts</span>}
+                </p>
+                <p className="text-bwb-text/90 leading-relaxed">
+                  {submission.mainLimitation || '—'}
+                </p>
               </div>
             </div>
           </Card>

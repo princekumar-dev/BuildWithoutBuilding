@@ -456,11 +456,15 @@ export function SolutionForm({ technologies, onSubmit, disabled, initial, submit
         label={
           currentRound === 1
             ? "Problem Understanding & Root Cause Analysis *"
+            : currentRound === 2
+            ? "Problem-Solution Alignment & Core Purpose (10 Pts) *"
             : "What does your solution do? *"
         }
         placeholder={
           currentRound === 1
             ? "Detail the deep root causes, target stakeholder pain points, and specific ecosystem bottlenecks this challenge addresses."
+            : currentRound === 2
+            ? "How precisely does your enhanced system solve the verified problem statement and eliminate user pain points? (2-3 sentences)"
             : "Describe the core purpose and enhanced capabilities in 2-3 sentences"
         }
         value={form.whatItDoes}
@@ -473,11 +477,15 @@ export function SolutionForm({ technologies, onSubmit, disabled, initial, submit
         label={
           currentRound === 1
             ? "Critique of Existing Solutions & Market Gaps *"
+            : currentRound === 2
+            ? "System Flow & Feasibility (20 Pts) *"
             : "How does your solution work & System Flow? *"
         }
         placeholder={
           currentRound === 1
             ? "Why do current methods fail? What gaps or architectural shortcomings exist in today's alternatives, and where is the opportunity?"
+            : currentRound === 2
+            ? "Explain the end-to-end architecture flow, edge-to-cloud handshakes, failover resilience, offline capability, and BOM cost realism."
             : "Explain the architecture flow, edge-to-cloud handshakes, and execution logic"
         }
         value={form.howItWorks}
@@ -500,23 +508,34 @@ export function SolutionForm({ technologies, onSubmit, disabled, initial, submit
         <div className="space-y-3">
           <div>
             <p className="text-sm font-medium text-bwb-text">
-              3 Frontier Tech Cards Integration *
+              {currentRound === 2 ? '3-Card Tech Integration (30 Pts) *' : '3 Frontier Tech Cards Integration *'}
             </p>
             <p className="text-[11px] text-bwb-muted mt-0.5">
-              Explain how your architecture synthesizes and deeply integrates all 3 drawn constraint cards:
+              Deep technical synthesis of all 3 drawn constraint cards into your system architecture:
             </p>
           </div>
           {technologies.map((tech) => (
             <Textarea
               key={tech.id}
-              label={`${tech.icon} ${tech.name}`}
-              placeholder={`How does ${tech.name} fit into your architecture?`}
+              label={`${tech.icon} ${tech.name} (Integration & Technical Role)`}
+              placeholder={`Explain specifically how ${tech.name} is synthesized into your pipeline execution.`}
               value={form.techUsage[tech.id] ?? ''}
               onChange={(e) => updateTech(tech.id, e.target.value)}
               disabled={disabled}
               required
             />
           ))}
+
+          {currentRound === 2 && (
+            <Textarea
+              label="3-Card Cross-Tech Interoperability & Synthesis *"
+              placeholder="How do all 3 frontier tech cards communicate and work cohesively together in your architecture pipeline?"
+              value={form.techUsage['cross_synthesis'] ?? ''}
+              onChange={(e) => updateTech('cross_synthesis', e.target.value)}
+              disabled={disabled}
+              required
+            />
+          )}
         </div>
       )}
 
@@ -527,6 +546,15 @@ export function SolutionForm({ technologies, onSubmit, disabled, initial, submit
           value={form.solutionName ? form.techUsage['r1_angle'] || '' : ''}
           onChange={(e) => updateTech('r1_angle', e.target.value)}
           disabled={disabled}
+        />
+      ) : currentRound === 2 ? (
+        <Textarea
+          label="Novelty & Architecture (25 Pts) *"
+          placeholder="What makes your enhanced architecture original, innovative, and differentiated from legacy or competitor systems?"
+          value={form.mainAdvantage}
+          onChange={(e) => update('mainAdvantage', e.target.value)}
+          disabled={disabled}
+          required
         />
       ) : (
         <Textarea
@@ -539,15 +567,30 @@ export function SolutionForm({ technologies, onSubmit, disabled, initial, submit
         />
       )}
 
+      {currentRound === 2 && (
+        <Textarea
+          label="Elevator Pitch Delivery (10 Pts) *"
+          placeholder="Structure your compelling 60-second architecture walkthrough (15s Hook ➔ 30s 3-Card Tech Flow ➔ 15s Feasibility & Impact)."
+          value={form.techUsage['elevatorPitch'] ?? ''}
+          onChange={(e) => updateTech('elevatorPitch', e.target.value)}
+          disabled={disabled}
+          required
+        />
+      )}
+
       <Textarea
         label={
           currentRound === 1
             ? "Key Operational Risks & Anticipated Constraints *"
+            : currentRound === 2
+            ? "Judge Attack Defense (5 Pts) *"
             : "Main Limitation & Risk Mitigation *"
         }
         placeholder={
           currentRound === 1
             ? "What is the biggest operational risk, edge case, or constraint in this problem domain, and how will your team defend it during judge Q&A?"
+            : currentRound === 2
+            ? "What is the most vulnerable edge-case failure mode, and how will your architecture defend against it during judge attacks?"
             : "Be honest — what's the weakest point or key risk?"
         }
         value={form.mainLimitation}

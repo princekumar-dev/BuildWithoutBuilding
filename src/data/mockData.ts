@@ -265,9 +265,9 @@ export const ROUND_1_SCORING_CRITERIA = [
 ]
 
 export const ROUND_2_SCORING_CRITERIA = [
-  { key: 'technologyUsage', label: 'Enhanced 3-Card Tech Integration', max: 30, desc: 'Deep technical synthesis of all 3 surprise frontier tech cards' },
-  { key: 'creativity', label: 'Novelty & Enhanced Architecture', max: 25, desc: 'Originality, architectural enhancement, and differentiation' },
-  { key: 'technicalFeasibility', label: 'System Flow & Scaling Feasibility', max: 20, desc: 'Edge-to-cloud handshakes, failover resilience & BOM cost realism' },
+  { key: 'technologyUsage', label: '3-Card Tech Integration', max: 30, desc: 'Deep technical synthesis of all 3 surprise frontier tech cards' },
+  { key: 'creativity', label: 'Novelty & Architecture', max: 25, desc: 'Originality, architectural enhancement & differentiation' },
+  { key: 'technicalFeasibility', label: 'System Flow & Feasibility', max: 20, desc: 'Edge-to-cloud handshakes, failover resilience & BOM cost realism' },
   { key: 'problemUnderstanding', label: 'Problem-Solution Alignment', max: 10, desc: 'How precisely the enhanced system solves the verified problem' },
   { key: 'pitch', label: 'Elevator Pitch Delivery', max: 10, desc: 'Compelling 60-second architecture walkthrough' },
   { key: 'defense', label: 'Judge Attack Defense', max: 5, desc: 'Handling rigorous edge-case technical attacks' },

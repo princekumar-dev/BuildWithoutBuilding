@@ -10,6 +10,7 @@ import { Button } from './Button'
 import { toast } from './Toast'
 import { WhatsAppGroupCard } from './WhatsAppGroupCard'
 import { SoundFX } from '../../lib/soundEffects'
+import { useGameStore } from '../../store/gameStore'
 import type { Team } from '../../types'
 
 
@@ -53,6 +54,11 @@ export function CactusWaitingCard({
   gameCode,
   whatsappGroupUrl,
 }: CactusWaitingCardProps) {
+  const { game } = useGameStore()
+  const trackCount = (game?.activeProblems && game.activeProblems.length > 0)
+    ? game.activeProblems.length
+    : (game?.maxTeams === 8 ? 4 : 8)
+
   const [copied, setCopied] = useState(false)
   const [quoteIndex, setQuoteIndex] = useState(0)
   const [slideDirection, setSlideDirection] = useState<1 | -1>(1)
@@ -868,7 +874,7 @@ export function CactusWaitingCard({
                     </span>
                   </div>
                   <p className="text-[11px] text-bwb-muted mt-0.5 leading-relaxed">
-                    Select 1 of 8 problems, draft 3 frontier tech cards, and pitch your deep problem root causes and critique of existing solutions. 45-minute build sprint. Evaluated for 100 pts.
+                    Select 1 of {trackCount} problems, draft 3 frontier tech cards, and pitch your deep problem root causes and critique of existing solutions. 45-minute build sprint. Evaluated for 100 pts.
                   </p>
                 </div>
               </div>
@@ -882,11 +888,11 @@ export function CactusWaitingCard({
                   <div className="flex items-center gap-1.5 flex-wrap">
                     <p className="text-xs font-bold text-bwb-text">Round 2: Solution & Tech Architecture (100 Pts)</p>
                     <span className="text-[10px] font-mono font-bold px-1.5 py-0.2 rounded bg-bwb-accent/20 text-bwb-accent border border-bwb-accent/30">
-                      Top 8 Advance · 30m Build
+                      Top {trackCount} Advance · 30m Build
                     </span>
                   </div>
                   <p className="text-[11px] text-bwb-muted mt-0.5 leading-relaxed">
-                    Present your enhanced architecture and deep 3-card frontier tech synergy. 30-minute build sprint. Evaluated for 100 pts. Top 8 squads advance to Grand Finals!
+                    Present your enhanced architecture and deep 3-card frontier tech synergy. 30-minute build sprint. Evaluated for 100 pts. Top {trackCount} Problem Champions advance to Grand Finals!
                   </p>
                 </div>
               </div>
@@ -904,7 +910,7 @@ export function CactusWaitingCard({
                     </span>
                   </div>
                   <p className="text-[11px] text-bwb-muted mt-0.5 leading-relaxed">
-                    Top 8 Finalists polish master blueprints (30m) and defend live on stage against judge Q&A. Top 4 teams win honors: 🥇 1st Champion, 🥈 2nd Runner-Up, 🥉 Dual 3rd Bronze Winners.
+                    Top {trackCount} Finalists polish master blueprints (30m) and defend live on stage against judge Q&A. Top 4 teams win honors: 🥇 1st Champion, 🥈 2nd Runner-Up, 🥉 Dual 3rd Bronze Winners.
                   </p>
                 </div>
               </div>

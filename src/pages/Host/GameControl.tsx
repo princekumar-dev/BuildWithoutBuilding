@@ -19,21 +19,25 @@ import { useGameStore } from '../../store/gameStore'
 import { PHASE_LABELS } from '../../data/mockData'
 import type { GamePhase, Problem } from '../../types'
 import { api } from '../../lib/api'
+import { ConfirmModal } from '../../components/ui/ConfirmModal'
 import { WhatsAppIcon, OFFICIAL_WHATSAPP_GROUP_URL } from '../../components/ui/WhatsAppGroupCard'
 import { getPhaseDuration, setPhaseDuration, TIMER_CHANGE_EVENT } from '../../lib/phaseTimers'
 import { useRealtimeGame } from '../../hooks/useRealtimeGame'
 import { getProblemWinners } from '../../lib/tournament'
 
-const stagesForRound = (round: number, buildMin: number, pitchSec: number) => {
+const stagesForRound = (round: number, buildMin: number, pitchSec: number, maxTeams: number = 16) => {
   const buildLabel = buildMin >= 60 ? `${buildMin / 60}h` : `${buildMin}m`
   const pitchLabel = pitchSec >= 60 ? `${pitchSec / 60}m` : `${pitchSec}s`
+  const trackCount = maxTeams === 8 ? 4 : 8
+  const squadCount = maxTeams === 8 ? 8 : 16
+
   if (round === 1) return [
     { phase: 'LOBBY' as GamePhase, title: 'Lobby', desc: 'Squad check-in & readiness', icon: '🚪' },
-    { phase: 'PROBLEM_REVEAL' as GamePhase, title: 'Problem Reveal', desc: 'Teams select 1 of 8 challenges', icon: '💡' },
+    { phase: 'PROBLEM_REVEAL' as GamePhase, title: 'Problem Reveal', desc: `Teams select 1 of ${trackCount} challenges`, icon: '💡' },
     { phase: 'CARD_REVEAL' as GamePhase, title: 'Card Reveal', desc: 'Teams draft 3 surprise tech cards', icon: '🎴' },
     { phase: 'BUILDING' as GamePhase, title: 'Build Phase', desc: `${buildLabel} Problem Understanding (Zero Elimination)`, icon: '⚡' },
     { phase: 'PITCHING' as GamePhase, title: 'Pitching', desc: `${pitchLabel} Problem Understanding Checkpoint`, icon: '🎤' },
-    { phase: 'JUDGING' as GamePhase, title: 'Judging', desc: 'Qualifying check · All 16 squads advance to R2', icon: '⚖️' },
+    { phase: 'JUDGING' as GamePhase, title: 'Judging', desc: `Qualifying check · All ${squadCount} squads advance to R2`, icon: '⚖️' },
     { phase: 'LEADERBOARD' as GamePhase, title: 'Leaderboard', desc: 'Zero elimination · All advance to R2', icon: '🏆' },
   ]
   if (round === 2) return [
@@ -41,10 +45,10 @@ const stagesForRound = (round: number, buildMin: number, pitchSec: number) => {
     { phase: 'BUILDING' as GamePhase, title: 'Build Phase', desc: `${buildLabel} Solution Enhancement & 1v1 Showdown`, icon: '⚡' },
     { phase: 'PITCHING' as GamePhase, title: 'Pitching', desc: `${pitchLabel} Head-to-Head Architecture Pitch`, icon: '🎤' },
     { phase: 'JUDGING' as GamePhase, title: 'Judging', desc: '100-pt problem track evaluation', icon: '⚖️' },
-    { phase: 'LEADERBOARD' as GamePhase, title: 'Leaderboard', desc: '8 Problem Champions advance to Finals', icon: '🏆' },
+    { phase: 'LEADERBOARD' as GamePhase, title: 'Leaderboard', desc: `${trackCount} Problem Champions advance to Finals`, icon: '🏆' },
   ]
   return [
-    { phase: 'LOBBY' as GamePhase, title: 'Finals Lobby', desc: 'Top 8 Finalists Stage Prep', icon: '🚪' },
+    { phase: 'LOBBY' as GamePhase, title: 'Finals Lobby', desc: `Top ${trackCount} Finalists Stage Prep`, icon: '🚪' },
     { phase: 'BUILDING' as GamePhase, title: 'Master Polish', desc: `${buildLabel} Master Architecture Refinement`, icon: '⚡' },
     { phase: 'PITCHING' as GamePhase, title: 'Grand Pitch', desc: `${pitchLabel} Master Pitch & Live Q&A Defense`, icon: '🎤' },
     { phase: 'JUDGING' as GamePhase, title: 'Final Judging', desc: 'Podium rank evaluation', icon: '⚖️' },
@@ -77,6 +81,11 @@ export default function HostGameControlPage() {
   const [isEditingTimer, setIsEditingTimer] = useState(false)
   const [buildMinutes, setBuildMinutes] = useState(15)
   const [pitchSeconds, setPitchSeconds] = useState(180)
+
+  // Confirmation Modal states
+  const [deleteTeamTarget, setDeleteTeamTarget] = useState<{ id: string; name: string } | null>(null)
+  const [showAdvanceFinalsModal, setShowAdvanceFinalsModal] = useState(false)
+  const [actionLoading, setActionLoading] = useState(false)
 
   useRealtimeGame()
 
@@ -236,15 +245,21 @@ export default function HostGameControlPage() {
     setTimeout(() => setCopied(false), 2000)
   }
 
-  const handleDeleteTeam = async (teamId: string, teamName: string) => {
-    if (!game.id) return
-    const confirmed = window.confirm(`Are you sure you want to remove team "${teamName}" from the room?`)
-    if (!confirmed) return
+  const handleDeleteTeam = (teamId: string, teamName: string) => {
+    setDeleteTeamTarget({ id: teamId, name: teamName })
+  }
+
+  const confirmDeleteTeam = async () => {
+    if (!game.id || !deleteTeamTarget) return
+    setActionLoading(true)
     try {
-      setGame(await api.deleteTeam(game.id, teamId))
-      toast.success(`Team "${teamName}" removed from room.`)
+      setGame(await api.deleteTeam(game.id, deleteTeamTarget.id))
+      toast.success(`Squad "${deleteTeamTarget.name}" removed from the room.`)
+      setDeleteTeamTarget(null)
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Unable to remove team.')
+    } finally {
+      setActionLoading(false)
     }
   }
 
@@ -265,28 +280,43 @@ export default function HostGameControlPage() {
     }
   }
 
-  const handleAdvanceTop8ToFinals = async () => {
+  const handleAdvanceTop8ToFinals = () => {
     if (!game.id) return
     const finalistIds = getProblemWinners(game.teams, problems)
     if (finalistIds.length === 0) {
       toast.error('No teams available to advance.')
       return
     }
-    const confirmed = window.confirm(`Advance the ${finalistIds.length} Problem Champions (1 winner per unique problem statement) to Round 3 (Grand Finals)?`)
-    if (!confirmed) return
+    setShowAdvanceFinalsModal(true)
+  }
+
+  const confirmAdvanceTop8ToFinals = async () => {
+    if (!game.id) return
+    const finalistIds = getProblemWinners(game.teams, problems)
+    setActionLoading(true)
     try {
       await api.setFinalists(game.id, finalistIds)
       const updated = await api.setRound(game.id, 3, 'LOBBY')
       setGame(updated)
-      toast.success(`The 8 Problem Champions advanced to the Grand Finals lobby! Defeated squads left behind.`)
+      toast.success(`The ${finalistIds.length} Problem Champions advanced to the Grand Finals lobby! Defeated squads left behind.`)
+      setShowAdvanceFinalsModal(false)
     } catch (err: any) {
       toast.error(err.message || 'Unable to advance finalists.')
+    } finally {
+      setActionLoading(false)
     }
   }
 
-  const stages = stagesForRound(currentRound, buildMinutes, pitchSeconds)
+  const stages = stagesForRound(currentRound, buildMinutes, pitchSeconds, game.maxTeams || 16)
   const currentStageIndex = stages.findIndex((s) => s.phase === game.phase)
   const nextStage = currentStageIndex >= 0 && currentStageIndex < stages.length - 1 ? stages[currentStageIndex + 1] : null
+
+  const activeGameProblems = game.activeProblems && game.activeProblems.length > 0
+    ? game.activeProblems
+    : (game.activeProblemIds && game.activeProblemIds.length > 0
+      ? problems.filter((p) => game.activeProblemIds?.includes(p.id))
+      : (game.maxTeams === 8 ? problems.slice(0, 4) : problems))
+  const dynamicTrackCount = activeGameProblems.length || (game.maxTeams === 8 ? 4 : 8)
 
   useEffect(() => {
     if (game.id) {
@@ -1030,7 +1060,7 @@ export default function HostGameControlPage() {
                     </div>
 
                     <p className="text-xs text-bwb-text/90 leading-relaxed">
-                      Teams select 1 of 8 problem statements and draft 3 surprise frontier tech cards. In the build and pitch stages, squads must present <strong>how clearly they understand the problem root causes, market pain points, and existing solution limitations</strong>. Judges evaluate this for <strong>100 pts</strong>. All squads advance directly into Round 2.
+                      Teams select 1 of {dynamicTrackCount} problem statements and draft 3 surprise frontier tech cards. In the build and pitch stages, squads must present <strong>how clearly they understand the problem root causes, market pain points, and existing solution limitations</strong>. Judges evaluate this for <strong>100 pts</strong>. All squads advance directly into Round 2.
                     </p>
                   </div>
                 )}
@@ -1045,7 +1075,7 @@ export default function HostGameControlPage() {
                           <span>ROUND 2: SOLUTION ENHANCEMENT & ARCHITECTURE (100 PTS)</span>
                         </span>
                         <span className="text-[11px] font-mono text-amber-300 font-bold bg-amber-500/10 px-2 py-0.5 rounded-md border border-amber-500/20">
-                          ⚡ Top 8 Advance to Finals
+                          ⚡ Top {dynamicTrackCount} Advance to Finals
                         </span>
                       </div>
                       <span className="text-xs font-mono text-bwb-muted font-bold">
@@ -1054,7 +1084,7 @@ export default function HostGameControlPage() {
                     </div>
 
                     <p className="text-xs text-bwb-text/90 leading-relaxed">
-                      Squads present <strong>how they are going to enhance their solution, integrate their 3 surprise frontier tech cards, and deliver novel system architecture and ideation</strong>. Judges evaluate the enhanced architecture for <strong>100 pts</strong>. The <strong>Top 8 highest-scoring squads</strong> qualify for the Grand Finals (Round 3)!
+                      Squads present <strong>how they are going to enhance their solution, integrate their 3 surprise frontier tech cards, and deliver novel system architecture and ideation</strong>. Judges evaluate the enhanced architecture for <strong>100 pts</strong>. The <strong>Top {dynamicTrackCount} Problem Champions (1 winner per 1v1 duel)</strong> qualify for the Grand Finals (Round 3)!
                     </p>
                   </div>
                 )}
@@ -1073,26 +1103,26 @@ export default function HostGameControlPage() {
                         </span>
                       </div>
                       <span className="text-xs font-mono text-bwb-muted font-bold">
-                        Top 8 Finalists
+                        Top {dynamicTrackCount} Finalists
                       </span>
                     </div>
 
                     <p className="text-xs text-bwb-text/90 leading-relaxed">
-                      The Top 8 Finalist squads deliver their <strong>final refined master system pitch</strong> live on stage and defend their architecture against judge cross-examination. The <strong>Top 4 winning squads are crowned on the championship podium</strong>: 🥇 1st Place Champion, 🥈 2nd Place Runner-Up, and 🥉 Dual 3rd Place Bronze Winners (2 teams)!
+                      The Top {dynamicTrackCount} Finalist squads deliver their <strong>final refined master system pitch</strong> live on stage and defend their architecture against judge cross-examination. The <strong>Top 4 winning squads are crowned on the championship podium</strong>: 🥇 1st Place Champion, 🥈 2nd Place Runner-Up, and 🥉 Dual 3rd Place Bronze Winners (2 teams)!
                     </p>
                   </div>
                 )}
               </motion.div>
             </AnimatePresence>
 
-            {/* 8 Problem Statements Distribution Matrix (Visible in Round 2) */}
-            {currentRound === 2 && problems.length > 0 && (
+            {/* Problem Statements Distribution Matrix (Visible in Round 2) */}
+            {currentRound === 2 && activeGameProblems.length > 0 && (
               <div className="mt-4 pt-3 border-t border-white/5">
                 <p className="text-[10px] font-mono uppercase text-bwb-muted font-bold mb-2">
-                  8 Challenge Statement Capacity Matrix (Max 2 Teams per Problem):
+                  {dynamicTrackCount} Challenge Statement Capacity Matrix (Max 2 Teams per Problem):
                 </p>
-                <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2">
-                  {problems.map((prob) => {
+                <div className={`grid ${dynamicTrackCount <= 4 ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-2 sm:grid-cols-4 lg:grid-cols-8'} gap-2`}>
+                  {activeGameProblems.map((prob) => {
                     const count = game.problemTeamCounts?.[prob.id] ?? game.teams.filter((t) => t.selectedProblemId === prob.id).length
                     const isFull = count >= 2
                     return (
@@ -1472,6 +1502,36 @@ export default function HostGameControlPage() {
             {error}
           </div>
         )}
+
+        {/* Remove Team Confirmation Modal */}
+        <ConfirmModal
+          open={!!deleteTeamTarget}
+          onClose={() => setDeleteTeamTarget(null)}
+          onConfirm={confirmDeleteTeam}
+          title="Remove Squad from Tournament?"
+          message={
+            <span>
+              Are you sure you want to remove squad <strong className="text-bwb-text font-bold">&ldquo;{deleteTeamTarget?.name}&rdquo;</strong> from this room? Their registration and current progress will be deleted.
+            </span>
+          }
+          confirmText="Remove Squad"
+          cancelText="Keep Squad"
+          variant="danger"
+          loading={actionLoading}
+        />
+
+        {/* Advance Finals Confirmation Modal */}
+        <ConfirmModal
+          open={showAdvanceFinalsModal}
+          onClose={() => setShowAdvanceFinalsModal(false)}
+          onConfirm={confirmAdvanceTop8ToFinals}
+          title="Advance Champions to Grand Finals?"
+          message="Advance the 1v1 duel Problem Champions (top squad per challenge track) to Round 3 Grand Finals? Other squads will remain spectator status."
+          confirmText="Advance to Finals"
+          cancelText="Cancel"
+          variant="info"
+          loading={actionLoading}
+        />
       </PageTransition>
     </PageLayout>
   )

@@ -174,12 +174,14 @@ export default function ProblemSelectPage() {
           </p>
         </motion.div>
 
-        {/* 8-Problem Quick Jump Chips with Smooth Auto-Centering */}
+        {/* Problem Quick Jump Chips with Smooth Auto-Centering & Balanced Justification */}
         {problems.length > 0 && (
           <div className="relative mb-5">
             <div
               ref={pillContainerRef}
-              className="flex gap-2 overflow-x-auto pb-2 scroll-smooth scrollbar-none no-print px-1"
+              className={`flex gap-2.5 overflow-x-auto pb-2 scroll-smooth scrollbar-none no-print px-1 ${
+                problems.length <= 4 ? 'justify-start sm:justify-center' : 'justify-start'
+              }`}
             >
               {problems.map((p, idx) => {
                 const isCurrent = idx === activeIndex
@@ -197,7 +199,7 @@ export default function ProblemSelectPage() {
                       setDragDirection(idx > activeIndex ? 1 : -1)
                       setActiveIndex(idx)
                     }}
-                    className={`shrink-0 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 border shadow-sm ${
+                    className={`shrink-0 px-4 py-2.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 border shadow-sm cursor-pointer ${
                       isCurrent
                         ? 'bg-bwb-accent text-bwb-bg font-bold shadow-lg shadow-bwb-accent/25 border-bwb-accent scale-105 ring-2 ring-bwb-accent/30'
                         : isSelected
@@ -210,11 +212,19 @@ export default function ProblemSelectPage() {
                     <span className="text-sm">{theme?.icon ?? '💡'}</span>
                     <span>{p.category}</span>
                     {isSelected ? (
-                      <CheckCircle2 size={13} className="text-bwb-accent" />
+                      <CheckCircle2 size={13} className={isCurrent ? 'text-bwb-bg' : 'text-bwb-accent'} />
                     ) : isFull ? (
-                      <span className="text-[9px] font-mono px-1 rounded bg-red-500/20 text-red-300">2/2 FULL</span>
+                      <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded font-bold ${
+                        isCurrent ? 'bg-black/25 text-bwb-bg' : 'bg-red-500/20 text-red-300'
+                      }`}>
+                        2/2 FULL
+                      </span>
                     ) : (
-                      <span className="text-[9px] font-mono px-1 rounded bg-white/10 text-bwb-muted">{count}/2</span>
+                      <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded font-bold ${
+                        isCurrent ? 'bg-black/25 text-bwb-bg font-black' : 'bg-white/10 text-bwb-muted'
+                      }`}>
+                        {count}/2
+                      </span>
                     )}
                   </button>
                 )

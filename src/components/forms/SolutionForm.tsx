@@ -4,6 +4,7 @@ import type { Submission, Technology, SlideItem } from '../../types'
 import { Button } from '../ui/Button'
 import { Input } from '../ui/Input'
 import { Textarea } from '../ui/Textarea'
+import { toast } from '../ui/Toast'
 
 export function getPresentationEmbedUrl(url?: string): string | null {
   if (!url || typeof url !== 'string') return null
@@ -313,7 +314,7 @@ export function SolutionForm({ technologies, onSubmit, disabled, initial, submit
                   const file = e.target.files?.[0]
                   if (file) {
                     if (file.size > 25 * 1024 * 1024) {
-                      alert('File size exceeds 25MB. Please upload a smaller PDF or use Google Slides link.')
+                      toast.error('File size exceeds 25MB. Please upload a smaller PDF or use a Google Slides link.')
                       return
                     }
                     const reader = new FileReader()

@@ -5,6 +5,7 @@ import { PageLayout } from '../../components/layout/PageLayout'
 import { Button } from '../../components/ui/Button'
 import { Badge } from '../../components/ui/Badge'
 import { Modal } from '../../components/ui/Modal'
+import { ConfirmModal } from '../../components/ui/ConfirmModal'
 import { toast } from '../../components/ui/Toast'
 import { PageTransition, StaggerChildren, StaggerItem } from '../../components/ui/PageTransition'
 import { useCountUp } from '../../hooks/useCountUp'
@@ -47,6 +48,8 @@ export default function HostDashboardPage() {
   const [deleteConfirmInput, setDeleteConfirmInput] = useState('')
   const [deleting, setDeleting] = useState(false)
   const [copiedCodeId, setCopiedCodeId] = useState<string | null>(null)
+  const [permanentDeleteTarget, setPermanentDeleteTarget] = useState<{ id: string; name: string } | null>(null)
+  const [actionLoading, setActionLoading] = useState(false)
 
   const loadGames = () => {
     api.listGames().then(setGames).catch(() => setError('API server is unavailable. Start it with npm run server.'))
@@ -155,14 +158,22 @@ export default function HostDashboardPage() {
     }
   }
 
-  const handlePermanentDelete = async (gameId: string, gameName: string) => {
-    if (!window.confirm(`Are you sure you want to permanently delete "${gameName}"? This cannot be undone.`)) return
+  const handlePermanentDelete = (gameId: string, gameName: string) => {
+    setPermanentDeleteTarget({ id: gameId, name: gameName })
+  }
+
+  const confirmPermanentDelete = async () => {
+    if (!permanentDeleteTarget) return
+    setActionLoading(true)
     try {
-      await api.permanentDeleteGame(gameId)
-      setArchivedGames((prev) => prev.filter((g) => g.id !== gameId))
-      toast.success(`Room "${gameName}" permanently deleted.`)
+      await api.permanentDeleteGame(permanentDeleteTarget.id)
+      setArchivedGames((prev) => prev.filter((g) => g.id !== permanentDeleteTarget.id))
+      toast.success(`Room "${permanentDeleteTarget.name}" permanently deleted.`)
+      setPermanentDeleteTarget(null)
     } catch {
       toast.error('Unable to delete room permanently.')
+    } finally {
+      setActionLoading(false)
     }
   }
 
@@ -399,12 +410,18 @@ export default function HostDashboardPage() {
         </PageTransition>
       </div>
 
-      <Modal open={showCreateModal} onClose={() => setShowCreateModal(false)} title="Create New Tournament Game" maxWidth="max-w-lg">
-        <div className="space-y-3.5">
+      {/* Create Room Modal */}
+      <Modal
+        open={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        title="Create New Tournament Room"
+        maxWidth="max-w-xl"
+      >
+        <div className="space-y-4 pt-1">
           {/* Game Name */}
           <div>
             <label className="text-xs font-mono uppercase text-bwb-muted font-bold block mb-1">
-              Game / Tournament Name <span className="text-bwb-accent">*</span>
+              Tournament Name <span className="text-bwb-accent">*</span>
             </label>
             <input
               type="text"
@@ -416,73 +433,119 @@ export default function HostDashboardPage() {
             />
           </div>
 
-          {/* 2-Column Grid: Schedule & Capacity */}
-          <div className="grid sm:grid-cols-2 gap-3">
-            {/* Scheduled Date & Time */}
-            <div>
-              <label className="text-xs font-mono uppercase text-bwb-muted font-bold block mb-1 flex items-center gap-1.5">
-                <Clock size={13} className="text-bwb-accent" />
-                <span>Schedule (Optional)</span>
+          {/* Tournament Capacity (Strict 8 vs 16 Format) */}
+          <div>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="text-xs font-mono uppercase text-bwb-muted font-bold flex items-center gap-1.5">
+                <Users size={13} className="text-bwb-accent" />
+                <span>Tournament Capacity & 1v1 Format <span className="text-bwb-accent">*</span></span>
               </label>
-              <input
-                type="datetime-local"
-                value={newGameSchedule}
-                onChange={(e) => setNewGameSchedule(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl bg-bwb-surface-2 border border-white/10 text-bwb-text text-xs font-mono focus:border-bwb-accent outline-none"
-              />
+              <span className="text-[11px] font-mono font-bold text-bwb-accent bg-bwb-accent/15 px-2.5 py-0.5 rounded-md border border-bwb-accent/30">
+                {newGameMaxTeams} Squads ({newGameMaxTeams === 8 ? '4 Problem Tracks' : '8 Problem Tracks'})
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => setNewGameMaxTeams(8)}
+                className={`p-3.5 rounded-2xl text-left transition-all border cursor-pointer flex flex-col justify-between ${
+                  newGameMaxTeams === 8
+                    ? 'bg-bwb-accent/15 border-bwb-accent text-bwb-text shadow-lg shadow-bwb-accent/10 ring-1 ring-bwb-accent'
+                    : 'bg-bwb-surface-2 border-white/10 text-bwb-muted hover:text-bwb-text hover:border-white/20'
+                }`}
+              >
+                <div className="flex items-center justify-between mb-1.5">
+                  <div className="flex items-center gap-2">
+                    <div className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center ${
+                      newGameMaxTeams === 8 ? 'border-bwb-accent bg-bwb-accent' : 'border-white/30'
+                    }`}>
+                      {newGameMaxTeams === 8 && <div className="w-1.5 h-1.5 rounded-full bg-bwb-bg" />}
+                    </div>
+                    <span className="font-display font-black text-sm text-bwb-text">8 Squads</span>
+                  </div>
+                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-white/10 text-bwb-accent">
+                    4 Tracks · 4 Duels
+                  </span>
+                </div>
+                <p className="text-[11px] text-bwb-muted leading-relaxed">
+                  Random 4 problem tracks (2 squads per track · 4 1v1 head-to-head duels)
+                </p>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setNewGameMaxTeams(16)}
+                className={`p-3.5 rounded-2xl text-left transition-all border cursor-pointer flex flex-col justify-between ${
+                  newGameMaxTeams === 16
+                    ? 'bg-bwb-accent/15 border-bwb-accent text-bwb-text shadow-lg shadow-bwb-accent/10 ring-1 ring-bwb-accent'
+                    : 'bg-bwb-surface-2 border-white/10 text-bwb-muted hover:text-bwb-text hover:border-white/20'
+                }`}
+              >
+                <div className="flex items-center justify-between mb-1.5">
+                  <div className="flex items-center gap-2">
+                    <div className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center ${
+                      newGameMaxTeams === 16 ? 'border-bwb-accent bg-bwb-accent' : 'border-white/30'
+                    }`}>
+                      {newGameMaxTeams === 16 && <div className="w-1.5 h-1.5 rounded-full bg-bwb-bg" />}
+                    </div>
+                    <span className="font-display font-black text-sm text-bwb-text">16 Squads</span>
+                  </div>
+                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-white/10 text-bwb-accent">
+                    8 Tracks · 8 Duels
+                  </span>
+                </div>
+                <p className="text-[11px] text-bwb-muted leading-relaxed">
+                  All 8 problem tracks (2 squads per track · 8 1v1 head-to-head duels)
+                </p>
+              </button>
+            </div>
+          </div>
+
+          {/* 2-Column Row: Schedule & Registration Status */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+            {/* Scheduled Date & Time */}
+            <div className="flex flex-col justify-between">
+              <div>
+                <label className="text-xs font-mono uppercase text-bwb-muted font-bold block mb-1 flex items-center gap-1.5">
+                  <Clock size={13} className="text-bwb-accent" />
+                  <span>Schedule (Optional)</span>
+                </label>
+                <input
+                  type="datetime-local"
+                  value={newGameSchedule}
+                  onChange={(e) => setNewGameSchedule(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl bg-bwb-surface-2 border border-white/10 text-bwb-text text-xs font-mono focus:border-bwb-accent outline-none"
+                />
+              </div>
               <p className="text-[10px] text-bwb-muted mt-1 font-mono">
                 Live countdown clock for teams until start.
               </p>
             </div>
 
-            {/* Max Team Capacity (Strict 8 or 16 for 1v1 matchup balance) */}
-            <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <label className="text-xs font-mono uppercase text-bwb-muted font-bold flex items-center gap-1.5">
-                  <Users size={13} className="text-bwb-accent" />
-                  <span>Tournament Capacity <span className="text-bwb-accent">*</span></span>
-                </label>
-                <span className="text-[10px] font-mono font-bold text-bwb-accent bg-bwb-accent/15 px-2 py-0.5 rounded-md border border-bwb-accent/30">
-                  {newGameMaxTeams} Squads ({newGameMaxTeams === 8 ? '4 Tracks' : '8 Tracks'})
+            {/* Registration Status Toggle */}
+            <div className="p-3 rounded-2xl bg-bwb-surface-2 border border-white/10 flex flex-col justify-between">
+              <div className="flex items-center justify-between gap-2 mb-1.5">
+                <span className="text-xs font-mono font-bold text-bwb-text flex items-center gap-1.5">
+                  {newGameRegistrationOpen ? <Unlock size={13} className="text-emerald-400" /> : <Lock size={13} className="text-rose-400" />}
+                  <span>Registration Status</span>
                 </span>
-              </div>
-              <div className="grid grid-cols-2 gap-2">
                 <button
                   type="button"
-                  onClick={() => setNewGameMaxTeams(8)}
-                  className={`p-2.5 rounded-xl text-left transition-all border cursor-pointer flex flex-col justify-between ${
-                    newGameMaxTeams === 8
-                      ? 'bg-bwb-accent/20 border-bwb-accent text-bwb-accent shadow-md'
-                      : 'bg-bwb-surface-2 border-white/10 text-bwb-muted hover:text-bwb-text hover:border-white/20'
+                  onClick={() => setNewGameRegistrationOpen(!newGameRegistrationOpen)}
+                  className={`px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold border transition-all flex items-center gap-1 shrink-0 cursor-pointer shadow-sm ${
+                    newGameRegistrationOpen
+                      ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 hover:bg-emerald-500/30'
+                      : 'bg-rose-500/20 text-rose-300 border-rose-500/40 hover:bg-rose-500/30'
                   }`}
                 >
-                  <div className="flex items-center justify-between">
-                    <span className="font-display font-black text-sm">8 Squads</span>
-                    <span className="text-[10px] font-mono font-bold px-1.5 py-0.2 rounded bg-white/10">4 Tracks</span>
-                  </div>
-                  <p className="text-[10px] text-bwb-muted mt-1 leading-tight">
-                    Random 4 problem tracks (2 squads per track · 4 1v1 duels)
-                  </p>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setNewGameMaxTeams(16)}
-                  className={`p-2.5 rounded-xl text-left transition-all border cursor-pointer flex flex-col justify-between ${
-                    newGameMaxTeams === 16
-                      ? 'bg-bwb-accent/20 border-bwb-accent text-bwb-accent shadow-md'
-                      : 'bg-bwb-surface-2 border-white/10 text-bwb-muted hover:text-bwb-text hover:border-white/20'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="font-display font-black text-sm">16 Squads</span>
-                    <span className="text-[10px] font-mono font-bold px-1.5 py-0.2 rounded bg-white/10">8 Tracks</span>
-                  </div>
-                  <p className="text-[10px] text-bwb-muted mt-1 leading-tight">
-                    All 8 problem tracks (2 squads per track · 8 1v1 duels)
-                  </p>
+                  {newGameRegistrationOpen ? <Unlock size={11} /> : <Lock size={11} />}
+                  <span>{newGameRegistrationOpen ? 'OPEN' : 'CLOSED'}</span>
                 </button>
               </div>
+              <p className="text-[10px] text-bwb-muted font-mono leading-tight">
+                {newGameRegistrationOpen ? 'Teams can register immediately upon creation.' : 'Starts locked. You can open registration later.'}
+              </p>
             </div>
           </div>
 
@@ -497,43 +560,17 @@ export default function HostDashboardPage() {
               value={newGameWhatsappUrl}
               onChange={(e) => setNewGameWhatsappUrl(e.target.value)}
               placeholder="https://chat.whatsapp.com/..."
-              className="w-full px-3.5 py-2 rounded-xl bg-bwb-surface-2 border border-white/10 text-bwb-text text-xs font-mono focus:border-[#25D366] focus:ring-1 focus:ring-[#25D366]/40 outline-none"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-bwb-surface-2 border border-white/10 text-bwb-text text-xs font-mono focus:border-[#25D366] focus:ring-1 focus:ring-[#25D366]/40 outline-none"
             />
           </div>
 
-          {/* Registration Status Toggle */}
-          <div className="p-3 rounded-2xl bg-bwb-surface-2/80 border border-white/10 flex items-center justify-between gap-3">
-            <div>
-              <p className="text-xs font-mono font-bold text-bwb-text flex items-center gap-1.5">
-                {newGameRegistrationOpen ? <Unlock size={13} className="text-emerald-400" /> : <Lock size={13} className="text-rose-400" />}
-                <span>Registration Status</span>
-              </p>
-              <p className="text-[10px] text-bwb-muted mt-0.5 font-mono">
-                {newGameRegistrationOpen ? 'Open — Teams can register immediately upon room creation.' : 'Closed — Room starts in paused/locked state.'}
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={() => setNewGameRegistrationOpen(!newGameRegistrationOpen)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold border transition-all flex items-center gap-1.5 shrink-0 cursor-pointer shadow-sm ${
-                newGameRegistrationOpen
-                  ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 hover:bg-emerald-500/30'
-                  : 'bg-rose-500/20 text-rose-300 border-rose-500/40 hover:bg-rose-500/30'
-              }`}
-            >
-              {newGameRegistrationOpen ? <Unlock size={12} /> : <Lock size={12} />}
-              <span>{newGameRegistrationOpen ? 'OPEN' : 'CLOSED'}</span>
-            </button>
-          </div>
-
           {/* Action Footer */}
-          <div className="flex gap-3 justify-end pt-2 border-t border-white/10">
+          <div className="flex gap-3 justify-end pt-3 border-t border-white/10">
             <Button variant="ghost" size="sm" onClick={() => setShowCreateModal(false)}>Cancel</Button>
-            <Button size="sm" onClick={createGame} disabled={creating} className="bg-bwb-accent text-bwb-bg font-bold shadow-md">
-              {creating ? 'Creating...' : 'Create Game'}
+            <Button size="sm" onClick={createGame} disabled={creating} className="bg-bwb-accent text-bwb-bg font-bold shadow-md px-5">
+              {creating ? 'Creating...' : 'Create Tournament Room'}
             </Button>
           </div>
-
         </div>
       </Modal>
 
@@ -646,6 +683,23 @@ export default function HostDashboardPage() {
           </div>
         </div>
       </Modal>
+
+      {/* Styled Permanent Room Deletion Confirmation Modal */}
+      <ConfirmModal
+        open={!!permanentDeleteTarget}
+        onClose={() => setPermanentDeleteTarget(null)}
+        onConfirm={confirmPermanentDelete}
+        title="Permanently Delete Room?"
+        message={
+          <span>
+            Are you sure you want to permanently erase <strong className="text-bwb-text font-bold">&ldquo;{permanentDeleteTarget?.name}&rdquo;</strong> and all associated team submissions? This action cannot be reversed.
+          </span>
+        }
+        confirmText="Erase Permanently"
+        cancelText="Cancel"
+        variant="danger"
+        loading={actionLoading}
+      />
     </PageLayout>
   )
 }

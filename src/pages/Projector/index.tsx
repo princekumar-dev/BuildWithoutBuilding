@@ -251,7 +251,15 @@ export default function ProjectorPage() {
   const currentPhase: GamePhase = game.phase ?? 'LOBBY'
   const currentRound = game.currentRound || (game.isFinalRound ? 3 : 1)
   const isResults = currentPhase === 'RESULTS' || game.currentRound === 3
-  const activeProblem = catalog.problems[activeProblemIndex] ?? game.currentProblem ?? catalog.problems[0]
+  const activeProblemTracks = game.activeProblems && game.activeProblems.length > 0
+    ? game.activeProblems
+    : (game.activeProblemIds && game.activeProblemIds.length > 0
+      ? catalog.problems.filter((p) => game.activeProblemIds?.includes(p.id))
+      : (game.maxTeams === 8 ? catalog.problems.slice(0, 4) : catalog.problems))
+  const trackCount = activeProblemTracks.length || (game.maxTeams === 8 ? 4 : 8)
+  const squadLimit = game.maxTeams === 8 ? 8 : 16
+
+  const activeProblem = activeProblemTracks[activeProblemIndex] ?? game.currentProblem ?? activeProblemTracks[0]
   const activeProblemTheme = activeProblem ? categoryThemes[activeProblem.category] : null
   const pitchTeam = game.teams.find((t) => t.id === game.currentPitchTeamId) ?? null
   const pitchedTeamIds = game.pitchedTeamIds || []
@@ -689,7 +697,7 @@ export default function ProjectorPage() {
                     </div>
                     <h4 className="font-display font-bold text-sm text-bwb-text">Problem & Existing Landscape</h4>
                     <p className="text-xs text-bwb-muted leading-relaxed">
-                      Select 1 of 8 problems, draft 3 surprise tech cards, and pitch your deep problem understanding, root causes, and critique of existing solutions.
+                      Select 1 of {trackCount} problems, draft 3 surprise tech cards, and pitch your deep problem understanding, root causes, and critique of existing solutions.
                     </p>
                   </div>
 
@@ -697,11 +705,11 @@ export default function ProjectorPage() {
                   <div className="p-4 rounded-2xl bg-bwb-bg/80 border border-bwb-accent/30 space-y-1.5 shadow-sm">
                     <div className="flex items-center justify-between">
                       <span className="px-2 py-0.5 rounded-md bg-bwb-accent/20 text-bwb-accent font-mono text-[10px] font-bold">ROUND 2 · 100 PTS</span>
-                      <span className="text-[10px] font-mono text-bwb-accent font-bold">30m Build · Top 8</span>
+                      <span className="text-[10px] font-mono text-bwb-accent font-bold">30m Build · Top {trackCount}</span>
                     </div>
                     <h4 className="font-display font-bold text-sm text-bwb-text">Solution & Tech Architecture</h4>
                     <p className="text-xs text-bwb-muted leading-relaxed">
-                      Present how you enhance your solution, integrate all 3 surprise tech cards, and deliver novel ideation. Top 8 squads qualify for Grand Finals!
+                      Present how you enhance your solution, integrate all 3 surprise tech cards, and deliver novel ideation. Top {trackCount} squads qualify for Grand Finals!
                     </p>
                   </div>
 
@@ -713,7 +721,7 @@ export default function ProjectorPage() {
                     </div>
                     <h4 className="font-display font-bold text-sm text-bwb-text">Master Pitch & Defense</h4>
                     <p className="text-xs text-bwb-muted leading-relaxed">
-                      Top 8 Finalists pitch refined master architectures and defend against live judge Q&A. Top 4 squads are crowned on the championship podium!
+                      Top {trackCount} Finalists pitch refined master architectures and defend against live judge Q&A. Top 4 squads are crowned on the championship podium!
                     </p>
                   </div>
                 </div>
@@ -956,7 +964,7 @@ export default function ProjectorPage() {
                   {currentRound === 1
                     ? 'Round 1 · Open Qualifier (No Elimination)'
                     : currentRound === 2
-                    ? 'Round 2 · Problem Showdown (Top 8 Qualify)'
+                    ? `Round 2 · Problem Showdown (Top ${trackCount} Qualify)`
                     : 'Round 3 · Grand Finals (Top 4 Prized)'}
                 </span>
                 <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
@@ -969,12 +977,11 @@ export default function ProjectorPage() {
               </h1>
               <p className="text-bwb-muted mt-2">{game.name || 'Build Without Building Tournament'}</p>
               <p className="text-bwb-muted text-sm mt-1">
-                8 challenges revealed · Teams are currently selecting on their devices
+                {trackCount} challenges revealed · Teams are currently selecting on their devices
               </p>
             </div>
 
             <div className="w-full max-w-6xl mb-6 flex flex-wrap items-center justify-end gap-4">
-
               {/* Showcase Controls */}
               <div className="flex items-center gap-2">
                 <button
@@ -1083,9 +1090,9 @@ export default function ProjectorPage() {
               </div>
             )}
 
-            {/* 8 Problem Selector Thumbnails & Live Team Pick Tracker */}
-            <div className="w-full max-w-6xl grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2.5">
-              {catalog.problems.map((p, idx) => {
+            {/* Problem Selector Thumbnails & Live Team Pick Tracker */}
+            <div className={`w-full max-w-6xl grid ${trackCount <= 4 ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-2 sm:grid-cols-4 lg:grid-cols-8'} gap-2.5`}>
+              {activeProblemTracks.map((p, idx) => {
                 const isCurrent = idx === activeProblemIndex
                 const theme = categoryThemes[p.category]
                 const teamsSelectingThis = game.teams.filter((t) => t.selectedProblemId === p.id)
@@ -1921,11 +1928,11 @@ export default function ProjectorPage() {
             <div className="mt-6 rounded-2xl border border-purple-500/20 bg-gradient-to-r from-bwb-surface via-bwb-surface-2 to-bwb-surface p-4 text-center">
               {currentRound === 1 ? (
                 <p className="text-xs sm:text-sm text-bwb-text font-medium">
-                  ✨ <strong className="text-bwb-accent font-bold">Round 1 Open Qualifier (Zero Elimination)</strong>: All 16 registered squads advance directly to Round 2 to compete head-to-head across the 8 Problem Statements.
+                  ✨ <strong className="text-bwb-accent font-bold">Round 1 Open Qualifier (Zero Elimination)</strong>: All {squadLimit} registered squads advance directly to Round 2 to compete head-to-head across the {trackCount} Problem Statements.
                 </p>
               ) : currentRound === 2 ? (
                 <p className="text-xs sm:text-sm text-bwb-text font-medium">
-                  ⚡ <strong className="text-emerald-400 font-bold">Round 2 Problem Showdown</strong>: The <strong className="text-bwb-accent">8 Problem Track Champions</strong> (1 winner per unique problem statement duel) advance to the Grand Finals (Round 3). Defeated squads are left behind.
+                  ⚡ <strong className="text-emerald-400 font-bold">Round 2 Problem Showdown</strong>: The <strong className="text-bwb-accent">{trackCount} Problem Track Champions</strong> (1 winner per unique problem statement duel) advance to the Grand Finals (Round 3). Defeated squads are left behind.
                 </p>
               ) : (
                 <div className="flex flex-wrap items-center justify-center gap-4 text-xs font-mono font-bold text-bwb-text">

@@ -6,8 +6,10 @@ import { LeaderboardTable } from '../../components/leaderboard/LeaderboardTable'
 import { TournamentPodium } from '../../components/leaderboard/TournamentPodium'
 import { useGameStore } from '../../store/gameStore'
 import { useRealtimeGame } from '../../hooks/useRealtimeGame'
+import { usePhaseNavigation } from '../../hooks/usePhaseNavigation'
 
 export default function LeaderboardPage() {
+  usePhaseNavigation()
   useRealtimeGame()
   const { game, session, demoPhase } = useGameStore()
   const isResults = demoPhase === 'RESULTS' || game.phase === 'RESULTS'

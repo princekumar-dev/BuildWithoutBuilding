@@ -209,8 +209,8 @@ export default function HostGameControlPage() {
   const phaseChangeInFlight = useRef(false)
   const phaseTimer = game.phase === 'BUILDING'
     ? { label: 'Build Phase Timer', seconds: getPhaseDuration(game.id, game.currentRound, 'BUILDING', game.buildDurationMinutes) }
-    : game.phase === 'PITCHING'
-    ? { label: 'Pitch Phase Timer', seconds: getPhaseDuration(game.id, game.currentRound, 'PITCHING', game.buildDurationMinutes) }
+    : game.phase === 'PITCHING' && game.currentPitchTeamId
+    ? { label: 'Pitch Clock', seconds: getPhaseDuration(game.id, game.currentRound, 'PITCHING', game.buildDurationMinutes) }
     : null
 
   const changePhase = async (phase: GamePhase, problemId?: string) => {
@@ -416,8 +416,12 @@ export default function HostGameControlPage() {
                       size="sm"
                       showExpired={false}
                       onComplete={() => {
-                        toast.success(`${phaseTimer.label} finished. Moving to the next stage.`)
-                        void advanceStage()
+                        if (game.phase === 'BUILDING') {
+                          toast.success(`${phaseTimer.label} finished. Ready for Pitch Phase!`)
+                          void advanceStage()
+                        } else if (game.phase === 'PITCHING') {
+                          toast.info('Pitch time completed for current squad. Grade team or call next squad.')
+                        }
                       }}
                     />
                   ) : (

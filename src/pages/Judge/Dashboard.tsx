@@ -246,24 +246,32 @@ export default function JudgeDashboardPage() {
                     {/* Action */}
                     <div className="space-y-2">
                       {game.currentPitchTeamId === team.id ? (
-                        <div className="p-3 rounded-2xl bg-bwb-accent/15 border border-bwb-accent/40 text-center">
-                          <p className="text-xs font-mono font-bold text-bwb-accent flex items-center justify-center gap-1.5 mb-2">
-                            <Mic size={14} className="animate-pulse" /> NOW PITCHING
+                        <div className="p-3 rounded-2xl bg-bwb-accent/15 border border-bwb-accent/40 text-center space-y-2">
+                          <p className="text-xs font-mono font-bold text-bwb-accent flex items-center justify-center gap-1.5">
+                            <Mic size={14} className="animate-pulse" /> NOW PITCHING ON STAGE
                           </p>
                           <div className="flex items-center gap-2">
+                            <Link to={`/judge/score/${team.id}`} className="flex-1 block">
+                              <Button
+                                fullWidth
+                                size="sm"
+                                className="bg-purple-600 hover:bg-purple-500 text-white font-bold shadow-md shadow-purple-500/20"
+                              >
+                                <ClipboardList size={14} className="mr-1.5" /> Evaluate & Score
+                              </Button>
+                            </Link>
                             <Button
-                              fullWidth
                               size="sm"
                               onClick={() => handleMarkPitched(team.id, team.name)}
-                              className="bg-bwb-success hover:bg-bwb-success/80 text-bwb-bg font-bold"
+                              className="bg-bwb-success hover:bg-bwb-success/80 text-bwb-bg font-bold shrink-0"
                             >
-                              <Check size={14} className="mr-1" /> Mark as Pitched
+                              <Check size={14} className="mr-1" /> Done
                             </Button>
                             <Button
                               size="sm"
                               variant="ghost"
                               onClick={handleDismissPitch}
-                              className="text-bwb-muted"
+                              className="text-bwb-muted shrink-0 text-xs px-2"
                             >
                               Dismiss
                             </Button>

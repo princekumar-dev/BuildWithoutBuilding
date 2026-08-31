@@ -1136,15 +1136,27 @@ createServer(async (request, response) => {
     const currentRound = game.currentRound || (game.isFinalRound ? 3 : 1);
     
     if (currentRound === 1) {
-      team.round1Score = 0;
-      team.score = 0;
+      team.round1Score = total;
+      team.score = total;
     } else if (currentRound === 2) {
       team.round2Score = total;
-      team.score = total;
+      team.score = (team.round1Score || 0) + total;
     } else if (currentRound === 3) {
       team.round3Score = total;
       team.score = total;
     }
+
+    if (!game.pitchedTeamIds) game.pitchedTeamIds = [];
+    if (!game.pitchedTeamIds.includes(team.id)) {
+      game.pitchedTeamIds.push(team.id);
+    }
+    if (game.currentPitchTeamId === team.id) {
+      game.currentPitchTeamId = null;
+      game.pitchExpiresAt = null;
+      game.pitchStartedAt = null;
+      game.pitchDurationSeconds = null;
+    }
+
     save(database);
     const pGame = publicGame(game);
     broadcastToClients({ type: 'games-updated', game: pGame });

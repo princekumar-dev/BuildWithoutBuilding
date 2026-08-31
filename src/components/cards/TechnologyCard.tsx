@@ -149,7 +149,12 @@ export function TechnologyCard({
         {/* FRONT OF CARD: Tactical Mystery Slot */}
         <div
           onClick={clickable && !revealed ? onClick : undefined}
-          className={`absolute inset-0 backface-hidden rounded-3xl stereo-card border flex flex-col items-center justify-between p-6 text-center transition-all select-none ${
+          style={{
+            backfaceVisibility: 'hidden',
+            WebkitBackfaceVisibility: 'hidden',
+            transform: 'translateZ(1px)',
+          }}
+          className={`absolute inset-0 backface-hidden rounded-3xl stereo-card border flex flex-col items-center justify-between p-6 text-center transition-all select-none bg-bwb-surface ${
             clickable && !revealed
               ? 'cursor-pointer border-bwb-accent/60 hover:border-bwb-accent hover:shadow-2xl hover:shadow-bwb-accent/25 glow-pulse ring-1 ring-bwb-accent/20'
               : 'border-bwb-border'
@@ -199,8 +204,12 @@ export function TechnologyCard({
 
         {/* BACK OF CARD: Holographic Revealed Tech Card */}
         <div
-          style={{ transform: 'rotateY(180deg)' }}
-          className={`absolute inset-0 backface-hidden rounded-3xl border-2 ${categoryStyle.border} bg-gradient-to-br ${categoryStyle.gradient} stereo-card p-6 flex flex-col justify-between overflow-hidden shadow-2xl relative`}
+          style={{
+            transform: 'rotateY(180deg) translateZ(1px)',
+            backfaceVisibility: 'hidden',
+            WebkitBackfaceVisibility: 'hidden',
+          }}
+          className={`absolute inset-0 backface-hidden rounded-3xl border-2 ${categoryStyle.border} bg-gradient-to-br ${categoryStyle.gradient} stereo-card p-6 flex flex-col justify-between overflow-hidden shadow-2xl bg-bwb-surface`}
         >
           {/* Ambient Glow Background */}
           <div

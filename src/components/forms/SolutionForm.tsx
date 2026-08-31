@@ -45,7 +45,7 @@ export function generateNativeSlides(form: Partial<Submission>, technologies: Te
         id: 'slide-1',
         title: name,
         subtitle: 'Round 1 Pitch · Problem Understanding & Landscape (100 Pts)',
-        badge: 'SLIDE 1 · EXECUTIVE OVERVIEW',
+        badge: 'ROUND 1 · SLIDE 1 · EXECUTIVE OVERVIEW',
         icon: '🎯',
         content: whatItDoes,
         visualType: 'conclusion',
@@ -59,7 +59,7 @@ export function generateNativeSlides(form: Partial<Submission>, technologies: Te
         id: 'slide-2',
         title: 'Problem Understanding & Root Cause Analysis',
         subtitle: 'Target stakeholder pain points & deep ecosystem bottlenecks',
-        badge: 'SLIDE 2 · ROOT CAUSES',
+        badge: 'ROUND 1 · SLIDE 2 · ROOT CAUSES',
         icon: '🔍',
         content: whatItDoes,
         visualType: 'bullets',
@@ -73,7 +73,7 @@ export function generateNativeSlides(form: Partial<Submission>, technologies: Te
         id: 'slide-3',
         title: 'Critique of Existing Solutions & Market Gaps',
         subtitle: 'Why legacy alternatives fail & where the strategic opportunity lies',
-        badge: 'SLIDE 3 · GAP ANALYSIS',
+        badge: 'ROUND 1 · SLIDE 3 · GAP ANALYSIS',
         icon: '⚡',
         content: howItWorks,
         visualType: 'architecture',
@@ -87,7 +87,7 @@ export function generateNativeSlides(form: Partial<Submission>, technologies: Te
         id: 'slide-4',
         title: 'Proposed Initial Tech Stack & Tools',
         subtitle: 'Open architectural technologies, frameworks & data pipelines',
-        badge: 'SLIDE 4 · TECH FORMULATION',
+        badge: 'ROUND 1 · SLIDE 4 · TECH FORMULATION',
         icon: '🛠️',
         visualType: 'bullets',
         bulletPoints: [
@@ -100,7 +100,7 @@ export function generateNativeSlides(form: Partial<Submission>, technologies: Te
         id: 'slide-5',
         title: 'Key Constraints & Judge Defense Strategy',
         subtitle: 'Anticipated failure modes, risks & live Q&A defense',
-        badge: 'SLIDE 5 · RISK DEFENSE',
+        badge: 'ROUND 1 · SLIDE 5 · RISK DEFENSE',
         icon: '🛡️',
         visualType: 'comparison',
         bulletPoints: [
@@ -112,13 +112,88 @@ export function generateNativeSlides(form: Partial<Submission>, technologies: Te
     ]
   }
 
+  if (currentRound === 2) {
+    return [
+      {
+        id: 'slide-1',
+        title: name,
+        subtitle: 'Round 2 Pitch · 1v1 Problem Duel Showdown (Top 8 Qualify)',
+        badge: 'ROUND 2 · SLIDE 1 · ARCHITECTURE OVERVIEW',
+        icon: '⚡',
+        content: whatItDoes,
+        visualType: 'conclusion',
+        bulletPoints: [
+          `Core Purpose: ${whatItDoes.slice(0, 120)}...`,
+          `3-Card Frontier Stack: ${technologies.map((t) => t.name).join(' + ')}`,
+          `Cross-Tech Interoperability: ${form.techUsage?.['cross_synthesis'] || 'Unified edge telemetry and execution pipeline'}`,
+        ],
+      },
+      {
+        id: 'slide-2',
+        title: 'Problem-Solution Alignment & Purpose',
+        subtitle: 'How precisely this enhanced architecture eliminates verified user pain points',
+        badge: 'ROUND 2 · SLIDE 2 · PROBLEM ALIGNMENT',
+        icon: '🎯',
+        content: whatItDoes,
+        visualType: 'bullets',
+        bulletPoints: [
+          `Target Problem Fit: ${whatItDoes.slice(0, 130)}...`,
+          'Eliminates critical bottlenecks with autonomous coordination',
+          'Optimized for low-bandwidth, high-resilience field operation',
+        ],
+      },
+      {
+        id: 'slide-3',
+        title: 'System Architecture & Execution Logic',
+        subtitle: 'End-to-end engineering pipeline, edge-to-cloud handshakes & failover',
+        badge: 'ROUND 2 · SLIDE 3 · SYSTEM FLOW',
+        icon: '🔄',
+        content: howItWorks,
+        visualType: 'architecture',
+        bulletPoints: [
+          `System Pipeline: ${howItWorks.slice(0, 140)}...`,
+          'Edge Sensing ➔ Real-Time Inference ➔ Autonomous Dispatch',
+          'Zero Single Point of Failure with cryptographic handshake verification',
+        ],
+      },
+      {
+        id: 'slide-4',
+        title: '3 Frontier Tech Cards Synthesis',
+        subtitle: 'Deep technical integration and cross-technology communication',
+        badge: 'ROUND 2 · SLIDE 4 · TECH SYNTHESIS',
+        icon: '🔮',
+        visualType: 'tech-stack',
+        bulletPoints: [
+          ...technologies.map((t) => {
+            const usage = form.techUsage?.[t.id] || 'Synthesized into the system execution pipeline.'
+            return `${t.name}: ${usage}`
+          }),
+          ...(form.techUsage?.['cross_synthesis'] ? [`Synthesis: ${form.techUsage['cross_synthesis']}`] : []),
+        ],
+      },
+      {
+        id: 'slide-5',
+        title: 'Novelty & Judge Attack Defense',
+        subtitle: 'Architectural differentiation, edge failure mode mitigation & live Q&A',
+        badge: 'ROUND 2 · SLIDE 5 · NOVELTY & DEFENSE',
+        icon: '🛡️',
+        visualType: 'comparison',
+        bulletPoints: [
+          `Architectural Novelty: ${mainAdvantage}`,
+          `Vulnerable Failure Modes & Mitigation: ${mainLimitation}`,
+          'Prepared for rigorous edge-case attacks and technical scrutiny',
+        ],
+      },
+    ]
+  }
+
   return [
     {
       id: 'slide-1',
       title: name,
-      subtitle: currentRound === 3 ? 'Grand Finals Pitch Deck · Live Stage Defense' : 'Round 2 Pitch Deck · 1v1 Showdown',
-      badge: 'SLIDE 1 · EXECUTIVE OVERVIEW',
-      icon: currentRound === 3 ? '🏆' : '⚡',
+      subtitle: 'Grand Finals Pitch Deck · Live Championship Defense',
+      badge: 'GRAND FINALS · SLIDE 1 · EXECUTIVE OVERVIEW',
+      icon: '🏆',
       content: whatItDoes,
       visualType: 'conclusion',
       bulletPoints: [
@@ -131,7 +206,7 @@ export function generateNativeSlides(form: Partial<Submission>, technologies: Te
       id: 'slide-2',
       title: 'Problem Landscape & Root Causes',
       subtitle: 'Why current solutions fail & what makes this critical',
-      badge: 'SLIDE 2 · PROBLEM DEEP DIVE',
+      badge: 'GRAND FINALS · SLIDE 2 · PROBLEM DEEP DIVE',
       icon: '🎯',
       content: whatItDoes,
       visualType: 'bullets',
@@ -145,7 +220,7 @@ export function generateNativeSlides(form: Partial<Submission>, technologies: Te
       id: 'slide-3',
       title: 'System Architecture & Data Flow',
       subtitle: 'End-to-end engineering pipeline & execution logic',
-      badge: 'SLIDE 3 · ARCHITECTURE',
+      badge: 'GRAND FINALS · SLIDE 3 · ARCHITECTURE',
       icon: '⚡',
       content: howItWorks,
       visualType: 'architecture',
@@ -159,7 +234,7 @@ export function generateNativeSlides(form: Partial<Submission>, technologies: Te
       id: 'slide-4',
       title: '3 Frontier Technology Stack',
       subtitle: 'Deep integration of required technological components',
-      badge: 'SLIDE 4 · TECH INTEGRATION',
+      badge: 'GRAND FINALS · SLIDE 4 · TECH INTEGRATION',
       icon: '🔮',
       visualType: 'tech-stack',
       bulletPoints: technologies.map((t) => {
@@ -171,7 +246,7 @@ export function generateNativeSlides(form: Partial<Submission>, technologies: Te
       id: 'slide-5',
       title: 'Competitive Advantage vs Trade-offs',
       subtitle: 'Why this architecture wins in the real world',
-      badge: 'SLIDE 5 · STRATEGIC EDGE',
+      badge: 'GRAND FINALS · SLIDE 5 · STRATEGIC EDGE',
       icon: '🛡️',
       visualType: 'comparison',
       bulletPoints: [

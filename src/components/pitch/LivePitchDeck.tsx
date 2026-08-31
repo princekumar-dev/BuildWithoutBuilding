@@ -35,9 +35,15 @@ export function LivePitchDeck({
   const submission = team.submission
   const embedUrl = submission?.presentationEmbedUrl || (submission?.presentationUrl?.includes('embed') ? submission.presentationUrl : null)
 
-  // Construct slides from submission or fallback to smart generator
-  const slides: SlideItem[] = (submission?.slides && submission.slides.length > 0)
-    ? submission.slides
+  // Construct slides matching current round (or fallback to round-specific generator)
+  const isSubmissionMatchingCurrentRound = submission?.slides && submission.slides.length > 0 && (
+    (round === 1 && submission.slides[0]?.badge?.includes('ROUND 1')) ||
+    (round === 2 && submission.slides[0]?.badge?.includes('ROUND 2')) ||
+    (round === 3 && submission.slides[0]?.badge?.includes('GRAND FINALS'))
+  )
+
+  const slides: SlideItem[] = isSubmissionMatchingCurrentRound
+    ? submission!.slides!
     : generateNativeSlides(
         submission || {
           solutionName: round === 1 ? 'Problem & Landscape Formulation' : 'System Architecture Proposal',

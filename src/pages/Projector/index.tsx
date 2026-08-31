@@ -1541,63 +1541,63 @@ export default function ProjectorPage() {
             4. BUILDING PHASE: LIVE COUNTDOWN & AUTO-SWAPPING TEAMS MATRIX
             ============================================================ */}
         {currentPhase === 'BUILDING' && (
-          <div className="w-full max-w-7xl mx-auto flex flex-col items-center justify-between my-auto px-3 sm:px-6 py-2">
+          <div className="w-full max-w-7xl mx-auto flex-1 flex flex-col justify-center my-auto px-4 sm:px-8 py-3 select-none">
             {/* Top Round & Phase HUD */}
-            <div className="w-full text-center mb-2 sm:mb-3">
-              <div className="flex items-center justify-center gap-2 mb-1.5 flex-wrap">
-                <span className="px-3 py-0.5 rounded-full text-[11px] font-mono font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30">
+            <div className="w-full text-center mb-5">
+              <div className="flex items-center justify-center gap-2 mb-2 flex-wrap">
+                <span className="px-3.5 py-1 rounded-full text-xs font-mono font-bold bg-purple-500/20 text-purple-300 border border-purple-500/40 shadow-sm">
                   {currentRound === 1
                     ? 'Round 1 · Open Qualifier (No Elimination)'
                     : currentRound === 2
                     ? 'Round 2 · Problem Showdown (Top 8 Qualify)'
                     : 'Round 3 · Grand Finals (Top 4 Prized)'}
                 </span>
-                <span className="px-3 py-0.5 rounded-full text-[11px] font-mono font-bold bg-bwb-accent/20 text-bwb-accent border border-bwb-accent/30">
+                <span className="px-3.5 py-1 rounded-full text-xs font-mono font-bold bg-bwb-accent/20 text-bwb-accent border border-bwb-accent/40 shadow-sm">
                   Build Phase
                 </span>
-                <span className="px-2.5 py-0.5 rounded-lg text-[11px] font-mono text-bwb-muted bg-white/5 border border-white/10">
-                  {game.code}
+                <span className="px-3 py-1 rounded-xl text-xs font-mono font-bold text-bwb-muted bg-white/5 border border-white/10">
+                  Room: {game.code}
                 </span>
               </div>
-              <h1 className="font-display text-2xl sm:text-4xl font-black flex items-center justify-center gap-2 text-gradient">
-                <Zap className="text-amber-400" size={26} />
+              <h1 className="font-display text-3xl sm:text-5xl font-black flex items-center justify-center gap-3 text-gradient tracking-tight">
+                <Zap className="text-amber-400 animate-pulse" size={32} />
                 <span>Live Engineering Arena</span>
               </h1>
-              <p className="text-bwb-muted text-xs mt-0.5">{game.name || 'Build Without Building Tournament'}</p>
+              <p className="text-bwb-muted text-xs sm:text-sm font-mono mt-1">{game.name || 'Build Without Building Tournament'}</p>
             </div>
 
-            {/* Countdown Hero & Submissions Tracker in a Single Compact Bar */}
-            <div className="w-full max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 mb-3 p-3 px-5 rounded-2xl stereo-card border border-bwb-accent/40 bg-gradient-to-r from-bwb-surface-2/90 via-bwb-surface/90 to-bwb-surface-2/90 shadow-xl backdrop-blur-xl">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-bwb-accent/15 text-bwb-accent border border-bwb-accent/30 flex items-center justify-center shrink-0">
-                  <Clock size={18} className="animate-spin text-bwb-accent" />
+            {/* Countdown Hero & Submissions Tracker in a Single Balanced Stadium Widget */}
+            <div className="w-full max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 p-4 sm:p-5 rounded-3xl stereo-card border border-bwb-accent/40 bg-gradient-to-r from-bwb-surface-2/95 via-bwb-surface/90 to-bwb-surface-2/95 shadow-2xl backdrop-blur-2xl">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-bwb-accent/15 text-bwb-accent border border-bwb-accent/30 flex items-center justify-center shrink-0 shadow-inner">
+                  <Clock size={24} className="animate-spin text-bwb-accent" />
                 </div>
                 <div>
-                  <span className="text-[9px] font-mono font-bold text-bwb-muted uppercase tracking-wider block">
-                    BUILD PHASE REMAINING
+                  <span className="text-[10px] sm:text-[11px] font-mono font-black text-bwb-muted uppercase tracking-widest block mb-0.5">
+                    BUILD PHASE TIME REMAINING
                   </span>
                   <CountdownTimer
                     key={`proj-build-${currentRound}-${game.phaseExpiresAt}`}
                     targetTime={game.phaseExpiresAt}
                     initialSeconds={getPhaseDuration(game.id, currentRound, 'BUILDING', game.buildDurationMinutes)}
-                    size="md"
+                    size="lg"
                     showExpired={false}
                   />
                 </div>
               </div>
 
-              <div className="w-full sm:w-72 bg-bwb-bg/80 p-2 rounded-xl border border-white/5">
-                <div className="flex items-center justify-between text-xs font-mono mb-1">
-                  <span className="text-bwb-muted flex items-center gap-1 text-[11px]">
-                    <Activity className="text-bwb-accent animate-pulse" size={12} /> Submissions
+              <div className="w-full sm:w-80 bg-bwb-bg/90 p-3 rounded-2xl border border-white/10 shadow-inner">
+                <div className="flex items-center justify-between text-xs font-mono mb-1.5">
+                  <span className="text-bwb-muted flex items-center gap-1.5 font-bold">
+                    <Activity className="text-bwb-accent animate-pulse" size={14} /> Live Submissions
                   </span>
-                  <span className="text-bwb-accent font-bold text-[11px]">
+                  <span className="text-bwb-accent font-black text-xs">
                     {totalSubmissions} / {game.teams.length} ({game.teams.length > 0 ? Math.round((totalSubmissions / game.teams.length) * 100) : 0}%)
                   </span>
                 </div>
-                <div className="w-full bg-white/5 rounded-full h-1.5 overflow-hidden">
+                <div className="w-full bg-white/5 rounded-full h-2 overflow-hidden border border-white/5">
                   <div
-                    className="bg-gradient-to-r from-bwb-accent to-emerald-400 h-full transition-all duration-500 rounded-full"
+                    className="bg-gradient-to-r from-cyan-400 via-bwb-accent to-emerald-400 h-full transition-all duration-500 rounded-full shadow-lg"
                     style={{ width: `${game.teams.length > 0 ? (totalSubmissions / game.teams.length) * 100 : 0}%` }}
                   />
                 </div>
@@ -1610,24 +1610,26 @@ export default function ProjectorPage() {
               onMouseEnter={() => setIsBuildPagePaused(true)}
               onMouseLeave={() => setIsBuildPagePaused(false)}
             >
-              <div className="flex items-center justify-between mb-2.5 px-1">
-                <h3 className="font-display font-bold text-sm sm:text-base text-bwb-text flex items-center gap-2">
-                  <Users size={16} className="text-bwb-accent" />
+              <div className="flex items-center justify-between mb-3.5 px-1">
+                <h3 className="font-display font-bold text-base sm:text-lg text-bwb-text flex items-center gap-2.5">
+                  <Users size={20} className="text-bwb-accent" />
                   <span>Live Team Challenges & Architectures</span>
-                  <span className="text-xs font-mono text-bwb-muted font-normal">({game.teams.length} Competing Teams)</span>
+                  <span className="text-xs font-mono text-cyan-300 font-bold bg-cyan-500/10 px-2.5 py-0.5 rounded-lg border border-cyan-500/20">
+                    {game.teams.length} Competing Squads
+                  </span>
                 </h3>
 
                 {totalBuildPages > 1 && (
-                  <div className="flex items-center gap-2 bg-bwb-surface-2/95 border border-cyan-500/30 px-3 py-1 rounded-xl shadow-lg backdrop-blur-xl shrink-0">
-                    <div className="flex items-center gap-1.5">
+                  <div className="flex items-center gap-2.5 bg-bwb-surface-2/95 border border-cyan-500/40 px-3.5 py-1.5 rounded-2xl shadow-xl backdrop-blur-xl shrink-0">
+                    <div className="flex items-center gap-2">
                       <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
-                      <span className="text-xs font-mono font-black text-cyan-300">
+                      <span className="text-xs font-mono font-black text-cyan-300 tracking-wider">
                         PAGE {safeBuildPageIndex + 1}/{totalBuildPages}
                       </span>
                     </div>
 
                     {/* Progress Countdown Line */}
-                    <div className="w-14 sm:w-18 bg-white/10 h-1.5 rounded-full overflow-hidden relative" title="Time until next batch rotates">
+                    <div className="w-16 sm:w-20 bg-white/10 h-1.5 rounded-full overflow-hidden relative" title="Time until next batch rotates">
                       <motion.div
                         className="h-full bg-gradient-to-r from-cyan-400 to-amber-400 rounded-full"
                         style={{ width: `${buildPageSwapProgress}%` }}
@@ -1640,9 +1642,9 @@ export default function ProjectorPage() {
                         <button
                           key={pIdx}
                           onClick={() => setBuildPageIndex(pIdx)}
-                          className={`w-4 h-4 rounded-full text-[9px] font-mono font-bold flex items-center justify-center transition-all ${
+                          className={`w-5 h-5 rounded-full text-[10px] font-mono font-bold flex items-center justify-center transition-all ${
                             pIdx === safeBuildPageIndex
-                              ? 'bg-cyan-400 text-black font-black scale-110 shadow-[0_0_8px_rgba(0,229,199,0.5)]'
+                              ? 'bg-cyan-400 text-black font-black scale-110 shadow-[0_0_10px_rgba(0,229,199,0.5)]'
                               : 'bg-white/10 text-bwb-muted hover:bg-white/20 hover:text-white'
                           }`}
                           title={`View Page ${pIdx + 1}`}
@@ -1653,29 +1655,29 @@ export default function ProjectorPage() {
                     </div>
 
                     {/* Controls */}
-                    <div className="flex items-center gap-1 pl-1 border-l border-white/10">
+                    <div className="flex items-center gap-1 pl-1.5 border-l border-white/10">
                       <button
                         onClick={() => setBuildPageIndex((prev) => (prev - 1 + totalBuildPages) % totalBuildPages)}
-                        className="p-1 rounded-md bg-white/5 hover:bg-white/15 text-bwb-muted hover:text-white transition-colors"
+                        className="p-1 rounded-lg bg-white/5 hover:bg-white/15 text-bwb-muted hover:text-white transition-colors"
                         title="Previous Squads"
                       >
-                        <ChevronLeft size={12} />
+                        <ChevronLeft size={14} />
                       </button>
                       <button
                         onClick={() => setIsBuildPagePaused(!isBuildPagePaused)}
-                        className={`p-1 rounded-md transition-colors ${
+                        className={`p-1 rounded-lg transition-colors ${
                           isBuildPagePaused ? 'bg-amber-400/20 text-amber-300' : 'bg-white/5 hover:bg-white/15 text-bwb-muted hover:text-white'
                         }`}
                         title={isBuildPagePaused ? 'Resume Auto-Rotation' : 'Pause on these Squads'}
                       >
-                        {isBuildPagePaused ? <Play size={12} /> : <Pause size={12} />}
+                        {isBuildPagePaused ? <Play size={14} /> : <Pause size={14} />}
                       </button>
                       <button
                         onClick={() => setBuildPageIndex((prev) => (prev + 1) % totalBuildPages)}
-                        className="p-1 rounded-md bg-white/5 hover:bg-white/15 text-bwb-muted hover:text-white transition-colors"
+                        className="p-1 rounded-lg bg-white/5 hover:bg-white/15 text-bwb-muted hover:text-white transition-colors"
                         title="Next Squads"
                       >
-                        <ChevronRight size={12} />
+                        <ChevronRight size={14} />
                       </button>
                     </div>
                   </div>
@@ -1691,10 +1693,10 @@ export default function ProjectorPage() {
                   exit="exit"
                   variants={{
                     hidden: {},
-                    show: { transition: { staggerChildren: 0.045 } },
+                    show: { transition: { staggerChildren: 0.05 } },
                     exit: { transition: { staggerChildren: 0.025, staggerDirection: -1 } },
                   }}
-                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3"
+                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5"
                 >
                   {currentBuildBatchTeams.map((team, idx) => {
                     const teamAbsoluteIndex = safeBuildPageIndex * BUILD_TEAMS_PER_PAGE + idx + 1
@@ -1709,32 +1711,35 @@ export default function ProjectorPage() {
                       <motion.div
                         key={team.id}
                         variants={{
-                          hidden: { opacity: 0, scale: 0.92, y: 12 },
-                          show: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.32, ease: [0.16, 1, 0.3, 1] } },
-                          exit: { opacity: 0, scale: 0.92, y: -12, transition: { duration: 0.22, ease: 'easeIn' } },
+                          hidden: { opacity: 0, scale: 0.92, y: 15 },
+                          show: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.35, ease: [0.16, 1, 0.3, 1] } },
+                          exit: { opacity: 0, scale: 0.92, y: -15, transition: { duration: 0.22, ease: 'easeIn' } },
                         }}
-                        className="stereo-card rounded-2xl p-3.5 border border-bwb-border hover:border-cyan-400/40 relative overflow-hidden flex flex-col justify-between shadow-xl bg-bwb-surface-2/95 group transition-all"
+                        className="stereo-card rounded-3xl p-4 sm:p-5 border border-white/10 hover:border-cyan-400/50 relative overflow-hidden flex flex-col justify-between shadow-2xl bg-bwb-surface-2/95 group transition-all min-h-[220px]"
                       >
+                        {/* Atmospheric Card Header Line */}
+                        <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-cyan-400/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+
                         <div>
                           {/* Team Header */}
-                          <div className="flex items-center justify-between mb-2 pb-1.5 border-b border-white/5">
-                            <div className="flex items-center gap-1.5 min-w-0">
-                              <span className="font-mono text-[10px] text-bwb-accent font-bold px-1.5 py-0.5 rounded-md bg-bwb-accent/10 border border-bwb-accent/20 shrink-0">
+                          <div className="flex items-center justify-between mb-3 pb-2 border-b border-white/5">
+                            <div className="flex items-center gap-2 min-w-0">
+                              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-cyan-500/20 to-purple-500/20 border border-cyan-500/30 flex items-center justify-center font-display font-black text-xs text-cyan-300 shadow-inner shrink-0">
                                 #{teamAbsoluteIndex}
-                              </span>
-                              <h4 className="font-display font-bold text-sm text-bwb-text truncate group-hover:text-cyan-300 transition-colors">
+                              </div>
+                              <h4 className="font-display font-black text-base sm:text-lg text-bwb-text truncate group-hover:text-cyan-300 transition-colors">
                                 {team.name}
                               </h4>
                             </div>
 
-                            <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-lg flex items-center gap-1 border shrink-0 ${
+                            <span className={`text-[11px] font-mono font-bold px-2.5 py-0.5 rounded-xl flex items-center gap-1 border shrink-0 ${
                               isSubmitted
-                                ? 'bg-bwb-success/20 text-bwb-success border-bwb-success/30'
+                                ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30 shadow-sm'
                                 : 'bg-bwb-surface text-bwb-muted border-white/10'
                             }`}>
                               {isSubmitted ? (
                                 <>
-                                  <CheckCircle2 size={11} />
+                                  <CheckCircle2 size={12} className="text-emerald-400" />
                                   <span>Submitted</span>
                                 </>
                               ) : (
@@ -1745,17 +1750,17 @@ export default function ProjectorPage() {
 
                           {/* Problem Statement Card */}
                           {teamProblem && theme && (
-                            <div className={`p-2 rounded-xl bg-gradient-to-br ${theme.gradient} border ${theme.border} mb-2`}>
-                              <div className="flex items-center gap-1 mb-0.5">
-                                <span className={`px-1.5 py-0.5 rounded text-[8px] font-bold border ${theme.badge}`}>
+                            <div className={`p-3 rounded-2xl bg-gradient-to-br ${theme.gradient} border ${theme.border} mb-3 shadow-md`}>
+                              <div className="flex items-center gap-1.5 mb-1">
+                                <span className={`px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-wider border ${theme.badge}`}>
                                   {theme.icon} {teamProblem.category}
                                 </span>
                               </div>
-                              <h5 className="font-display font-bold text-xs text-bwb-text leading-snug line-clamp-2">
+                              <h5 className="font-display font-bold text-xs sm:text-sm text-bwb-text leading-snug line-clamp-2">
                                 {teamProblem.title}
                               </h5>
                               {teamProblem.twist && (
-                                <p className="text-[9px] text-bwb-warn mt-0.5 font-medium line-clamp-1">
+                                <p className="text-[10px] text-amber-300 mt-1 font-semibold line-clamp-1">
                                   ⚡ Twist: {teamProblem.twist}
                                 </p>
                               )}
@@ -1764,19 +1769,19 @@ export default function ProjectorPage() {
                         </div>
 
                         {/* 3 Assigned Frontier Tech Stack */}
-                        <div>
-                          <p className="text-[8px] uppercase font-mono text-bwb-muted font-bold mb-1">
-                            Assigned Tech Stack:
+                        <div className="pt-2 border-t border-white/5">
+                          <p className="text-[9px] uppercase font-mono text-cyan-300/80 font-black tracking-wider mb-1.5">
+                            Assigned Frontier Tech:
                           </p>
-                          <div className="grid grid-cols-3 gap-1">
+                          <div className="grid grid-cols-3 gap-1.5">
                             {teamTechs.map((tech) => (
                               <div
                                 key={tech.id}
-                                className="p-1 rounded-lg bg-bwb-surface border border-white/5 flex items-center gap-1 text-[9px] text-bwb-text truncate"
+                                className="p-1.5 rounded-xl bg-bwb-surface border border-white/10 flex items-center gap-1.5 text-xs text-bwb-text truncate hover:border-cyan-400/30 transition-colors"
                                 title={tech.name}
                               >
-                                <span className="text-xs shrink-0">{tech.icon}</span>
-                                <span className="truncate font-semibold text-[8px]">{tech.name}</span>
+                                <span className="text-sm shrink-0">{tech.icon}</span>
+                                <span className="truncate font-bold text-[10px] text-white">{tech.name}</span>
                               </div>
                             ))}
                           </div>

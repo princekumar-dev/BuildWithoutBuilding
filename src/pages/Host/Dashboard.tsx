@@ -39,7 +39,7 @@ export default function HostDashboardPage() {
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [newGameName, setNewGameName] = useState('')
   const [newGameSchedule, setNewGameSchedule] = useState('')
-  const [newGameMaxTeams, setNewGameMaxTeams] = useState<number>(32)
+  const [newGameMaxTeams, setNewGameMaxTeams] = useState<number>(16)
   const [newGameWhatsappUrl, setNewGameWhatsappUrl] = useState(OFFICIAL_WHATSAPP_GROUP_URL)
   const [newGameRegistrationOpen, setNewGameRegistrationOpen] = useState(true)
   const [creating, setCreating] = useState(false)
@@ -77,15 +77,15 @@ export default function HostDashboardPage() {
       const game = await api.createGame(
         newGameName.trim(),
         scheduleIso,
-        Number(newGameMaxTeams) || 32,
+        Number(newGameMaxTeams) === 8 ? 8 : 16,
         newGameWhatsappUrl.trim() || undefined,
         newGameRegistrationOpen
       )
-      toast.success(`Game "${game.name}" created with max ${game.maxTeams || 32} teams!`)
+      toast.success(`Game "${game.name}" created with max ${game.maxTeams || 16} squads!`)
       setShowCreateModal(false)
       setNewGameName('')
       setNewGameSchedule('')
-      setNewGameMaxTeams(32)
+      setNewGameMaxTeams(16)
       setNewGameWhatsappUrl(OFFICIAL_WHATSAPP_GROUP_URL)
       setNewGameRegistrationOpen(true)
       navigate(`/host/game/${game.id}`)
@@ -435,42 +435,54 @@ export default function HostDashboardPage() {
               </p>
             </div>
 
-            {/* Max Team Capacity */}
+            {/* Max Team Capacity (Strict 8 or 16 for 1v1 matchup balance) */}
             <div>
-              <div className="flex items-center justify-between mb-1">
+              <div className="flex items-center justify-between mb-1.5">
                 <label className="text-xs font-mono uppercase text-bwb-muted font-bold flex items-center gap-1.5">
                   <Users size={13} className="text-bwb-accent" />
-                  <span>Max Capacity <span className="text-bwb-accent">*</span></span>
+                  <span>Tournament Capacity <span className="text-bwb-accent">*</span></span>
                 </label>
                 <span className="text-[10px] font-mono font-bold text-bwb-accent bg-bwb-accent/15 px-2 py-0.5 rounded-md border border-bwb-accent/30">
-                  {newGameMaxTeams} Teams
+                  {newGameMaxTeams} Squads ({newGameMaxTeams === 8 ? '4 Tracks' : '8 Tracks'})
                 </span>
               </div>
-              <div className="grid grid-cols-4 gap-1 mb-1.5">
-                {[8, 16, 32, 64].map((count) => (
-                  <button
-                    key={count}
-                    type="button"
-                    onClick={() => setNewGameMaxTeams(count)}
-                    className={`py-1.5 rounded-lg text-[11px] font-mono font-bold transition-all border cursor-pointer ${
-                      newGameMaxTeams === count
-                        ? 'bg-bwb-accent text-bwb-bg border-bwb-accent shadow-sm'
-                        : 'bg-bwb-surface-2 border-white/10 text-bwb-muted hover:text-bwb-text'
-                    }`}
-                  >
-                    {count}
-                  </button>
-                ))}
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setNewGameMaxTeams(8)}
+                  className={`p-2.5 rounded-xl text-left transition-all border cursor-pointer flex flex-col justify-between ${
+                    newGameMaxTeams === 8
+                      ? 'bg-bwb-accent/20 border-bwb-accent text-bwb-accent shadow-md'
+                      : 'bg-bwb-surface-2 border-white/10 text-bwb-muted hover:text-bwb-text hover:border-white/20'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-display font-black text-sm">8 Squads</span>
+                    <span className="text-[10px] font-mono font-bold px-1.5 py-0.2 rounded bg-white/10">4 Tracks</span>
+                  </div>
+                  <p className="text-[10px] text-bwb-muted mt-1 leading-tight">
+                    Random 4 problem tracks (2 squads per track · 4 1v1 duels)
+                  </p>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setNewGameMaxTeams(16)}
+                  className={`p-2.5 rounded-xl text-left transition-all border cursor-pointer flex flex-col justify-between ${
+                    newGameMaxTeams === 16
+                      ? 'bg-bwb-accent/20 border-bwb-accent text-bwb-accent shadow-md'
+                      : 'bg-bwb-surface-2 border-white/10 text-bwb-muted hover:text-bwb-text hover:border-white/20'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-display font-black text-sm">16 Squads</span>
+                    <span className="text-[10px] font-mono font-bold px-1.5 py-0.2 rounded bg-white/10">8 Tracks</span>
+                  </div>
+                  <p className="text-[10px] text-bwb-muted mt-1 leading-tight">
+                    All 8 problem tracks (2 squads per track · 8 1v1 duels)
+                  </p>
+                </button>
               </div>
-              <input
-                type="number"
-                min={2}
-                max={128}
-                value={newGameMaxTeams}
-                onChange={(e) => setNewGameMaxTeams(Math.max(2, Math.min(128, Number(e.target.value) || 32)))}
-                className="w-full px-2.5 py-1.5 rounded-lg bg-bwb-surface-2 border border-white/10 text-bwb-text text-xs font-mono focus:border-bwb-accent outline-none"
-                placeholder="Custom (e.g. 24)"
-              />
             </div>
           </div>
 

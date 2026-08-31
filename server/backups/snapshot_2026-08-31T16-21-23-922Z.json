@@ -467,7 +467,7 @@
       "isRegistrationOpen": true,
       "isFinalRound": false,
       "createdAt": "2026-08-25T10:00:00.000Z",
-      "updatedAt": "2026-08-31T16:25:23.024Z",
+      "updatedAt": "2026-08-29T09:28:55.522Z",
       "totalTeams": 16,
       "phaseStartedAt": null,
       "phaseDurationSeconds": null,
@@ -480,36 +480,7 @@
       "phase": "LOBBY",
       "currentRound": 1,
       "finalistTeamIds": [],
-      "teams": [
-        {
-          "id": "team_f4726671-0072-42cf-8c9b-e7c207225437",
-          "name": "demo 1",
-          "passcode": "DEMO-791",
-          "gameCode": "BWB-170",
-          "gameId": "game_91fd6ebb-e95b-4eed-bab2-56f907670205",
-          "leaderName": "hhgg",
-          "email": "y899@gmail.com",
-          "phone": "86555",
-          "department": "ECE",
-          "year": "1st Year",
-          "section": "B",
-          "members": [
-            "hhgg",
-            "yy"
-          ],
-          "memberCount": 2,
-          "technologies": [],
-          "selectedProblemId": null,
-          "revealedCards": [],
-          "score": 0,
-          "round1Score": 0,
-          "round2Score": 0,
-          "round3Score": 0,
-          "rank": 1,
-          "registeredAt": "2026-08-31T16:22:55.966Z",
-          "isOnline": false
-        }
-      ],
+      "teams": [],
       "currentProblem": {
         "id": "p1",
         "title": "Emergency Response Without the Internet",
@@ -524,9 +495,7 @@
       "whatsappGroupUrl": "https://chat.whatsapp.com/DHke2VBDQnbKxVBiLcpN5t?s=cl&p=a&ilr=1",
       "isRegistrationOpen": true,
       "isFinalRound": false,
-      "createdAt": "2026-08-31T16:21:23.920Z",
-      "updatedAt": "2026-08-31T16:25:23.025Z",
-      "totalTeams": 1
+      "createdAt": "2026-08-31T16:21:23.920Z"
     }
   ]
 }

@@ -503,9 +503,31 @@ function assignTeamTechs(team) {
   if (!team.revealedCards) team.revealedCards = []
 }
 
+function ensureGameActiveProblems(game) {
+  const max = Number(game.maxTeams) === 8 ? 8 : 16;
+  game.maxTeams = max;
+  const targetCount = max === 8 ? 4 : 8;
+
+  if (!game.activeProblemIds || !Array.isArray(game.activeProblemIds) || game.activeProblemIds.length !== targetCount) {
+    if (targetCount === 4) {
+      // Randomly pick 4 distinct problems from catalog for 8-team 1v1 duels
+      const shuffled = [...catalog.problems].sort(() => Math.random() - 0.5);
+      game.activeProblemIds = shuffled.slice(0, 4).map((p) => p.id);
+    } else {
+      // All 8 problems for 16-team 1v1 duels
+      game.activeProblemIds = catalog.problems.map((p) => p.id);
+    }
+  }
+
+  game.activeProblems = catalog.problems.filter((p) => game.activeProblemIds.includes(p.id));
+}
+
 function calculateProblemTrackWinners(game) {
   const winners = [];
-  const problemIds = ['p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8'];
+  const targetFinalists = Number(game.maxTeams) === 8 ? 4 : 8;
+  const problemIds = game.activeProblemIds && game.activeProblemIds.length > 0
+    ? game.activeProblemIds
+    : (targetFinalists === 4 ? ['p1', 'p2', 'p3', 'p4'] : ['p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8']);
   
   problemIds.forEach((pid) => {
     const teamsForProblem = game.teams.filter((t) => t.selectedProblemId === pid);
@@ -520,13 +542,13 @@ function calculateProblemTrackWinners(game) {
     }
   });
 
-  // If fewer than 8 unique problem tracks have teams, backfill with top scoring teams
-  if (winners.length < 8) {
+  // If fewer than targetFinalists unique problem tracks have teams, backfill with top scoring teams
+  if (winners.length < targetFinalists) {
     const remainingTeams = [...game.teams]
       .filter((t) => !winners.includes(t.id))
       .sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
     
-    while (winners.length < 8 && remainingTeams.length > 0) {
+    while (winners.length < targetFinalists && remainingTeams.length > 0) {
       const next = remainingTeams.shift();
       if (next) winners.push(next.id);
     }
@@ -536,6 +558,7 @@ function calculateProblemTrackWinners(game) {
 }
 
 function publicGame(game) {
+  ensureGameActiveProblems(game);
   const counts = {};
   game.teams.forEach((team) => {
     assignTeamTechs(team);
@@ -560,7 +583,6 @@ function publicGame(game) {
   game.pitchedTeamIds = game.pitchedTeamIds || [];
   game.currentPitchTeamId = game.currentPitchTeamId || null;
   game.problemTeamCounts = counts;
-  game.maxTeams = Number(game.maxTeams) || 32;
   game.whatsappGroupUrl = game.whatsappGroupUrl || null;
   game.isRegistrationOpen = game.isRegistrationOpen !== false;
 
@@ -727,6 +749,7 @@ createServer(async (request, response) => {
     if (!requireHost(request, response)) return;
     const input = await body(request);
     if (!input.name?.trim()) return json(response, 400, { error: 'Game name is required.' });
+    const requestedMax = Number(input.maxTeams) === 8 ? 8 : 16;
     const game = {
       id: id('game'),
       code: code(database),
@@ -737,13 +760,14 @@ createServer(async (request, response) => {
       teams: [],
       currentProblem: catalog.problems[0],
       buildDurationMinutes: Number(input.buildDurationMinutes) || 15,
-      maxTeams: Math.max(2, Math.min(128, Number(input.maxTeams) || 32)),
+      maxTeams: requestedMax,
       scheduledStartTime: input.scheduledStartTime || null,
       whatsappGroupUrl: input.whatsappGroupUrl?.trim() || null,
       isRegistrationOpen: input.isRegistrationOpen !== false,
       isFinalRound: false,
       createdAt: new Date().toISOString()
     };
+    ensureGameActiveProblems(game);
     database.games.push(game);
     save(database);
     return json(response, 201, publicGame(game));
@@ -971,7 +995,13 @@ createServer(async (request, response) => {
       game.scheduledStartTime = input.scheduledStartTime;
     }
     if (input.maxTeams !== undefined) {
-      game.maxTeams = Math.max(2, Math.min(128, Number(input.maxTeams) || 32));
+      const newMax = Number(input.maxTeams) === 8 ? 8 : 16;
+      if (game.maxTeams !== newMax) {
+        game.maxTeams = newMax;
+        delete game.activeProblemIds;
+        delete game.activeProblems;
+        ensureGameActiveProblems(game);
+      }
     }
     if (input.name && typeof input.name === 'string' && input.name.trim()) {
       game.name = input.name.trim();
@@ -1001,6 +1031,11 @@ createServer(async (request, response) => {
     const team = game.teams.find((item) => item.id === input.teamId); 
     if (!team || !input.problemId) return json(response, 400, { error: 'Team and problemId are required.' }); 
     
+    // Validate that the problem is active for this game
+    if (game.activeProblemIds && game.activeProblemIds.length > 0 && !game.activeProblemIds.includes(input.problemId)) {
+      return json(response, 400, { error: 'This challenge is not part of the active problem tracks for this game.' });
+    }
+
     // Validate maximum 2 teams per problem statement
     const otherTeamsWithProblem = game.teams.filter((t) => t.id !== input.teamId && t.selectedProblemId === input.problemId);
     if (otherTeamsWithProblem.length >= PROBLEM_MAX_TEAMS) {

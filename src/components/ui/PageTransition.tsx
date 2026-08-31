@@ -14,7 +14,6 @@ export function PageTransition({ children, className = '', delay = 0 }: PageTran
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2, ease: 'easeOut', delay: Math.min(delay, 0.1) }}
-      style={{ willChange: 'opacity, transform', transform: 'translateZ(0)' }}
     >
       {children}
     </motion.div>

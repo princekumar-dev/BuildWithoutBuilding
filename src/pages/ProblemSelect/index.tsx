@@ -36,8 +36,20 @@ export default function ProblemSelectPage() {
   const pillContainerRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
-    api.getCatalog().then((c) => setProblems(c.problems)).catch(() => {})
-  }, [])
+    if (game?.activeProblems && game.activeProblems.length > 0) {
+      setProblems(game.activeProblems)
+    } else {
+      api.getCatalog().then((c) => {
+        if (game?.activeProblemIds && game.activeProblemIds.length > 0) {
+          setProblems(c.problems.filter((p) => game.activeProblemIds?.includes(p.id)))
+        } else if (game?.maxTeams === 8) {
+          setProblems(c.problems.slice(0, 4))
+        } else {
+          setProblems(c.problems)
+        }
+      }).catch(() => {})
+    }
+  }, [game?.activeProblems, game?.activeProblemIds, game?.maxTeams])
 
   useEffect(() => {
     const myTeam = game.teams.find((t) => t.id === session?.teamId)
@@ -75,9 +87,9 @@ export default function ProblemSelectPage() {
       setGame(updated)
       setSelected(problem.id)
       setSelectedProblem(problem)
-      toast.success(`Challenge locked: ${problem.title}`)
-    } catch (err: any) {
-      toast.error(err.message || 'Unable to select problem statement.')
+      toast.success(`Challenge track locked: "${problem.category}" (2/2 Squads Max)`)
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : 'Unable to select challenge')
     } finally {
       setConfirming(false)
     }
@@ -102,8 +114,20 @@ export default function ProblemSelectPage() {
     }
   }
 
-  const currentProblem = problems[activeIndex]
-  const currentTheme = currentProblem ? categoryThemes[currentProblem.category] ?? { bg: 'from-bwb-surface-2 to-bwb-surface', border: 'border-bwb-border', badge: 'bg-bwb-surface text-bwb-text', icon: '💡' } : null
+  const currentProblem = problems[activeIndex] || problems[0]
+  const currentTheme = currentProblem ? (categoryThemes[currentProblem.category] || {
+    bg: 'from-purple-950/40 via-purple-900/20 to-bwb-surface',
+    border: 'border-purple-500/40',
+    badge: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
+    icon: '⚡',
+  }) : {
+    bg: 'from-purple-950/40 via-purple-900/20 to-bwb-surface',
+    border: 'border-purple-500/40',
+    badge: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
+    icon: '⚡',
+  }
+
+  const trackCount = problems.length || (game?.maxTeams === 8 ? 4 : 8)
 
   // Capacity calculation for current problem
   const currentProblemTeamCount = currentProblem
@@ -114,20 +138,24 @@ export default function ProblemSelectPage() {
 
   return (
     <PageLayout>
-      <div className="max-w-3xl mx-auto px-2 sm:px-4">
-        {/* Header HUD */}
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+      <div className="max-w-4xl mx-auto px-2 sm:px-4 py-4 sm:py-6">
+        {/* Header Navigation & Phase Badge */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
           <div>
             <div className="flex items-center gap-2 mb-1">
               <span className="px-2.5 py-0.5 rounded-lg text-xs font-mono font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30">
                 Round 2 · Challenge Selection
               </span>
-              <Badge variant="accent">{game.code}</Badge>
+              {selected && (
+                <span className="px-2.5 py-0.5 rounded-lg text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
+                  <CheckCircle2 size={12} />
+                  <span>Track Locked</span>
+                </span>
+              )}
             </div>
-            <h1 className="font-display text-2xl sm:text-3xl font-bold">{game.name}</h1>
-            <p className="text-bwb-muted text-sm mt-0.5">
-              Team: <span className="text-bwb-text font-semibold">{session?.teamName ?? 'Your Team'}</span>
-            </p>
+            <h1 className="font-display text-2xl sm:text-3xl font-black text-gradient">
+              Choose Your Problem Statement
+            </h1>
           </div>
           <PhaseIndicator phase={game.phase} />
         </div>
@@ -140,10 +168,10 @@ export default function ProblemSelectPage() {
         >
           <div className="flex items-center justify-center gap-2 mb-1">
             <Zap className="text-bwb-accent" size={20} />
-            <h2 className="font-display text-lg sm:text-xl font-bold">8 Challenges · 1v1 Head-to-Head Duels (2 Squads / Track)</h2>
+            <h2 className="font-display text-lg sm:text-xl font-bold">{trackCount} Challenges · 1v1 Head-to-Head Duels (2 Squads / Track)</h2>
           </div>
           <p className="text-bwb-muted text-xs sm:text-sm max-w-lg mx-auto">
-            Select your challenge track below. Exactly <strong className="text-bwb-accent">2 squads</strong> share each problem statement to duel head-to-head in Round 2. The winner of each 1v1 duel advances to the Grand Finals (8 Problem Champions total).
+            Select your challenge track below. Exactly <strong className="text-bwb-accent">2 squads</strong> share each problem statement to duel head-to-head in Round 2. The winner of each 1v1 duel advances to the Grand Finals ({trackCount} Problem Champions total).
           </p>
         </motion.div>
 

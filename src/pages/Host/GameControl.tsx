@@ -559,7 +559,7 @@ export default function HostGameControlPage() {
                     <p className="text-[10px] font-mono uppercase text-bwb-muted font-bold tracking-wider">
                       Team Registration Capacity Quota
                     </p>
-                    {game.teams.length >= (game.maxTeams || 32) && (
+                    {game.teams.length >= (game.maxTeams || 16) && (
                       <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/40 animate-pulse">
                         ROOM FULL
                       </span>
@@ -567,12 +567,12 @@ export default function HostGameControlPage() {
                   </div>
                   <p className="text-xs font-mono font-bold text-bwb-text mt-0.5">
                     Registered:{' '}
-                    <span className={game.teams.length >= (game.maxTeams || 32) ? 'text-rose-400' : 'text-bwb-accent'}>
+                    <span className={game.teams.length >= (game.maxTeams || 16) ? 'text-rose-400' : 'text-bwb-accent'}>
                       {game.teams.length}
                     </span>{' '}
-                    / <span className="text-bwb-text font-black">{game.maxTeams || 32} Teams Max</span>
+                    / <span className="text-bwb-text font-black">{game.maxTeams || 16} Squads ({game.maxTeams === 8 ? '4 Tracks' : '8 Tracks'})</span>
                     <span className="text-bwb-muted font-normal ml-2">
-                      ({Math.max(0, (game.maxTeams || 32) - game.teams.length)} slots remaining)
+                      ({Math.max(0, (game.maxTeams || 16) - game.teams.length)} slots remaining)
                     </span>
                   </p>
                 </div>
@@ -603,50 +603,56 @@ export default function HostGameControlPage() {
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
                       <label className="text-xs font-mono uppercase text-cyan-300 font-bold flex items-center gap-1.5">
-                        <Users size={13} /> Select Maximum Allowed Teams
+                        <Users size={13} /> Tournament Format & Squad Quota
                       </label>
                       <span className="text-xs font-mono font-bold text-cyan-300 bg-cyan-400/10 px-2.5 py-0.5 rounded-full border border-cyan-400/30">
-                        {maxTeamsInput} Teams Max
+                        {maxTeamsInput} Squads ({maxTeamsInput === 8 ? '4 Problem Tracks' : '8 Problem Tracks'})
                       </span>
                     </div>
 
-                    {/* Presets */}
-                    <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
-                      {[8, 16, 24, 32, 48, 64].map((count) => (
-                        <button
-                          key={count}
-                          type="button"
-                          onClick={() => setMaxTeamsInput(count)}
-                          className={`py-2 rounded-xl text-xs font-mono font-bold transition-all border ${
-                            maxTeamsInput === count
-                              ? 'bg-cyan-400 text-bwb-bg border-cyan-400 shadow-md scale-[1.02]'
-                              : 'bg-bwb-surface border-white/10 text-bwb-muted hover:text-bwb-text hover:border-white/20'
-                          }`}
-                        >
-                          {count}
-                        </button>
-                      ))}
-                    </div>
-
-                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 pt-1">
-                      <input
-                        type="number"
-                        min={2}
-                        max={128}
-                        value={maxTeamsInput}
-                        onChange={(e) => setMaxTeamsInput(Math.max(2, Math.min(128, Number(e.target.value) || 32)))}
-                        className="flex-1 px-4 py-2.5 rounded-xl bg-bwb-surface border border-bwb-border text-bwb-text text-sm font-mono focus:border-cyan-400 outline-none"
-                        placeholder="Custom max teams (e.g. 20)"
-                      />
-
-                      <Button
-                        size="md"
-                        onClick={() => handleSaveMaxTeams(maxTeamsInput)}
-                        className="text-xs font-bold bg-cyan-400 text-bwb-bg hover:bg-cyan-300 shadow-md shrink-0 justify-center"
+                    {/* Strict 8 or 16 Format Buttons */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setMaxTeamsInput(8)
+                          handleSaveMaxTeams(8)
+                        }}
+                        className={`p-3 rounded-xl text-left transition-all border cursor-pointer flex flex-col justify-between ${
+                          maxTeamsInput === 8
+                            ? 'bg-cyan-400/20 text-cyan-300 border-cyan-400 shadow-md ring-1 ring-cyan-400/50'
+                            : 'bg-bwb-surface border-white/10 text-bwb-muted hover:text-bwb-text hover:border-white/20'
+                        }`}
                       >
-                        <CheckCircle2 size={14} className="mr-1" />
-                        Save Team Limit
-                      </Button>
+                        <div className="flex items-center justify-between">
+                          <span className="font-display font-black text-sm">8 Squads</span>
+                          <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-white/10 text-bwb-text">4 Tracks</span>
+                        </div>
+                        <p className="text-[11px] text-bwb-muted mt-1 leading-tight">
+                          Random 4 problem tracks (2 squads per track · 4 1v1 duels)
+                        </p>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setMaxTeamsInput(16)
+                          handleSaveMaxTeams(16)
+                        }}
+                        className={`p-3 rounded-xl text-left transition-all border cursor-pointer flex flex-col justify-between ${
+                          maxTeamsInput === 16
+                            ? 'bg-cyan-400/20 text-cyan-300 border-cyan-400 shadow-md ring-1 ring-cyan-400/50'
+                            : 'bg-bwb-surface border-white/10 text-bwb-muted hover:text-bwb-text hover:border-white/20'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="font-display font-black text-sm">16 Squads</span>
+                          <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-white/10 text-bwb-text">8 Tracks</span>
+                        </div>
+                        <p className="text-[11px] text-bwb-muted mt-1 leading-tight">
+                          All 8 problem tracks (2 squads per track · 8 1v1 duels)
+                        </p>
+                      </button>
                     </div>
 
                     <p className="text-[11px] text-bwb-muted">
@@ -1206,7 +1212,7 @@ export default function HostGameControlPage() {
           </div>
 
         {/* Live Teams, Selection & Submission Status Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 sm:gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 sm:gap-6 items-start">
           <div className="lg:col-span-2 space-y-5 sm:space-y-6">
             <Card padding="md" className="sm:p-6">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
@@ -1251,118 +1257,127 @@ export default function HostGameControlPage() {
                       return (
                         <div
                           key={team.id}
-                          className="p-3.5 sm:p-4 rounded-2xl stereo-card border border-bwb-border/80 flex flex-col gap-3 transition-colors"
+                          className="p-4 sm:p-4.5 rounded-2xl stereo-card border border-bwb-border/80 bg-bwb-surface/60 hover:border-bwb-accent/30 transition-all duration-200 shadow-sm hover:shadow-md flex flex-col gap-3"
                         >
-                          {/* Row 1: Team Index, Name, Online Status & Delete Action */}
-                          <div className="flex items-start justify-between gap-2">
+                          {/* Top Header: Team Index, Name, Online Badge & Top Actions */}
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-2.5 border-b border-white/5">
                             <div className="flex items-center gap-2.5 min-w-0">
-                              <div className="w-8 h-8 rounded-xl bg-bwb-surface-2 border border-white/5 flex items-center justify-center font-mono font-bold text-xs text-bwb-accent shrink-0">
+                              <div className="w-8 h-8 rounded-xl bg-bwb-surface-2 border border-white/10 flex items-center justify-center font-mono font-bold text-xs text-bwb-accent shrink-0 shadow-inner">
                                 #{idx + 1}
                               </div>
-                              <div className="min-w-0">
-                                <div className="flex items-center gap-2 flex-wrap">
-                                  <h4 className="font-display font-black text-base text-bwb-text break-words">
-                                    {team.name}
-                                  </h4>
-                                  {team.isOnline ? (
-                                    <span className="px-2 py-0.5 rounded-lg text-[10px] font-mono font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5 shadow-sm">
-                                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                                      <span>LIVE IN ROOM</span>
-                                    </span>
-                                  ) : (
-                                    <span className="px-2 py-0.5 rounded-lg text-[10px] font-mono font-semibold bg-white/5 text-bwb-muted border border-white/10 flex items-center gap-1.5">
-                                      <span className="w-1.5 h-1.5 rounded-full bg-gray-500" />
-                                      <span>OFFLINE</span>
-                                    </span>
-                                  )}
-                                </div>
+                              <div className="flex items-center gap-2 flex-wrap min-w-0">
+                                <h4 className="font-display font-black text-base text-bwb-text truncate max-w-[220px] sm:max-w-xs">
+                                  {team.name}
+                                </h4>
+                                {team.isOnline ? (
+                                  <span className="px-2 py-0.5 rounded-lg text-[10px] font-mono font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5 shadow-sm">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                                    <span>LIVE</span>
+                                  </span>
+                                ) : (
+                                  <span className="px-2 py-0.5 rounded-lg text-[10px] font-mono font-semibold bg-white/5 text-bwb-muted border border-white/10 flex items-center gap-1.5">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-gray-500" />
+                                    <span>OFFLINE</span>
+                                  </span>
+                                )}
                               </div>
                             </div>
 
-                            {/* Delete Team Button */}
-                            <button
-                              type="button"
-                              onClick={() => handleDeleteTeam(team.id, team.name)}
-                              title="Remove team from room"
-                              className="p-2 rounded-xl text-bwb-muted hover:text-bwb-danger hover:bg-bwb-danger/10 border border-transparent hover:border-bwb-danger/20 transition-colors shrink-0"
-                            >
-                              <Trash2 size={15} />
-                            </button>
+                            {/* Passcode Copy & Delete Action */}
+                            <div className="flex items-center gap-2 shrink-0">
+                              <button
+                                type="button"
+                                onClick={() => handleCopyTeamPasscode(teamPasscode, team.name)}
+                                title="Click to copy team entry passcode"
+                                className="px-2.5 py-1 rounded-xl text-xs font-mono font-bold bg-amber-400/10 text-amber-300 border border-amber-400/30 flex items-center gap-1.5 hover:bg-amber-400/20 active:scale-95 transition-all shadow-sm"
+                              >
+                                <Key size={12} className="text-amber-400" />
+                                <span>{teamPasscode}</span>
+                                <Copy size={11} className="text-amber-400/70" />
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteTeam(team.id, team.name)}
+                                title="Remove team from room"
+                                className="p-1.5 rounded-xl text-bwb-muted hover:text-bwb-danger hover:bg-bwb-danger/10 border border-transparent hover:border-bwb-danger/20 transition-colors"
+                              >
+                                <Trash2 size={15} />
+                              </button>
+                            </div>
                           </div>
 
-                          {/* Row 2: Passcode & Challenge Track */}
-                          <div className="flex flex-wrap items-center gap-2">
-                            <button
-                              type="button"
-                              onClick={() => handleCopyTeamPasscode(teamPasscode, team.name)}
-                              title="Click to copy team entry passcode"
-                              className="px-2.5 py-1 rounded-xl text-xs font-mono font-bold bg-amber-400/10 text-amber-300 border border-amber-400/30 flex items-center gap-1.5 hover:bg-amber-400/20 transition-colors shadow-sm"
-                            >
-                              <Key size={12} className="text-amber-400" />
-                              <span>{teamPasscode}</span>
-                              <Copy size={11} className="text-amber-400/70" />
-                            </button>
-
-                            {selectedProblem && team.selectedProblemId ? (
-                              <span className="px-2.5 py-1 rounded-xl text-xs font-bold bg-bwb-accent/15 text-bwb-accent border border-bwb-accent/30 flex items-center gap-1">
-                                <CheckCircle2 size={12} />
-                                <span>{selectedProblem.category}</span>
-                              </span>
-                            ) : (
-                              <span className="px-2.5 py-1 rounded-xl text-xs font-medium bg-bwb-surface-2 text-bwb-muted border border-white/5 flex items-center gap-1.5">
-                                <span className="w-1.5 h-1.5 rounded-full bg-amber-400/60 animate-pulse" />
-                                <span>Pending Problem Selection...</span>
-                              </span>
-                            )}
-                          </div>
-
-                          {/* Row 3: Cards Drafted & Submission Status & Academic info */}
-                          <div className="flex flex-wrap items-center gap-2">
-                            <span className="px-2.5 py-1 rounded-xl text-xs font-mono bg-bwb-surface-2 text-bwb-text border border-white/5">
-                              🎴 {revealedCardsCount}/3 Cards
-                            </span>
-
-                            <span className={`px-2.5 py-1 rounded-xl text-xs font-semibold border flex items-center gap-1 ${
-                              isSubmitted
-                                ? 'bg-bwb-success/15 text-bwb-success border-bwb-success/30'
-                                : 'bg-bwb-surface-2 text-bwb-muted border-bwb-border'
-                            }`}>
-                              {isSubmitted ? (
-                                <>
-                                  <CheckCircle2 size={12} />
-                                  <span>Submitted</span>
-                                </>
+                          {/* Middle Row: Strategy & Academic Info Badges */}
+                          <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+                            {/* Left Group: Problem Track + Cards + Submission */}
+                            <div className="flex flex-wrap items-center gap-2">
+                              {selectedProblem && team.selectedProblemId ? (
+                                <span className="px-2.5 py-1 rounded-xl text-xs font-bold bg-bwb-accent/15 text-bwb-accent border border-bwb-accent/30 flex items-center gap-1.5 shadow-sm">
+                                  <CheckCircle2 size={13} className="text-bwb-accent" />
+                                  <span>{selectedProblem.category}</span>
+                                </span>
                               ) : (
-                                <span>Building...</span>
+                                <span className="px-2.5 py-1 rounded-xl text-xs font-medium bg-bwb-surface-2 text-bwb-muted border border-white/5 flex items-center gap-1.5">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400/60 animate-pulse" />
+                                  <span>Pending Track Selection</span>
+                                </span>
                               )}
-                            </span>
 
-                            {(team.department || team.year || team.section) && (
-                              <span className="px-2.5 py-1 rounded-xl text-[10px] font-mono font-semibold bg-purple-500/15 text-purple-300 border border-purple-500/30">
-                                {[team.department, team.year, team.section].filter(Boolean).join(' · ')}
+                              <span className="px-2.5 py-1 rounded-xl text-xs font-mono font-medium bg-bwb-surface-2 text-bwb-text border border-white/5 flex items-center gap-1">
+                                <span>🎴</span> <span>{revealedCardsCount}/3 Cards</span>
                               </span>
-                            )}
 
-                            {(team.email || team.phone) && (
-                              <span className="text-[10px] text-bwb-muted font-mono">
-                                {[team.email, team.phone].filter(Boolean).join(' | ')}
+                              <span className={`px-2.5 py-1 rounded-xl text-xs font-semibold border flex items-center gap-1 ${
+                                isSubmitted
+                                  ? 'bg-bwb-success/15 text-bwb-success border-bwb-success/30'
+                                  : 'bg-bwb-surface-2 text-bwb-muted border-white/5'
+                              }`}>
+                                {isSubmitted ? (
+                                  <>
+                                    <CheckCircle2 size={12} />
+                                    <span>Submitted</span>
+                                  </>
+                                ) : (
+                                  <span>Building...</span>
+                                )}
                               </span>
-                            )}
+                            </div>
+
+                            {/* Right Group: Academic dept & contact */}
+                            <div className="flex flex-wrap items-center gap-2 text-[11px]">
+                              {(team.department || team.year || team.section) && (
+                                <span className="px-2.5 py-0.5 rounded-lg font-mono font-semibold bg-purple-500/15 text-purple-300 border border-purple-500/30">
+                                  {[team.department, team.year, team.section].filter(Boolean).join(' · ')}
+                                </span>
+                              )}
+
+                              {(team.email || team.phone) && (
+                                <span className="text-bwb-muted font-mono text-[10px] px-2 py-0.5 bg-bwb-surface-2 rounded-lg border border-white/5">
+                                  {[team.email, team.phone].filter(Boolean).join(' · ')}
+                                </span>
+                              )}
+                            </div>
                           </div>
 
-                          {/* Row 4: Member Roster List */}
+                          {/* Bottom Row: Member Roster */}
                           {team.members && team.members.length > 0 && (
                             <div className="pt-2 border-t border-white/5 flex flex-wrap items-center gap-1.5">
-                              <span className="text-[10px] font-mono uppercase text-bwb-muted font-bold mr-1">
+                              <span className="text-[10px] font-mono uppercase text-bwb-muted font-bold mr-1 flex items-center gap-1">
+                                <Users size={11} />
                                 Roster ({team.members.length}):
                               </span>
                               {team.members.map((m, mIdx) => (
                                 <span
                                   key={mIdx}
-                                  className="px-2 py-0.5 rounded-lg text-[11px] font-semibold bg-bwb-surface-2 border border-white/10 text-bwb-text flex items-center gap-1"
+                                  className={`px-2.5 py-0.5 rounded-lg text-xs font-medium border flex items-center gap-1.5 ${
+                                    mIdx === 0
+                                      ? 'bg-amber-400/10 text-amber-300 border-amber-400/30 font-semibold'
+                                      : 'bg-bwb-surface-2 border-white/5 text-bwb-text'
+                                  }`}
                                 >
-                                  {mIdx === 0 ? <Crown size={11} className="text-amber-400" /> : <UserCheck size={11} className="text-bwb-accent" />}
-                                  {m} {mIdx === 0 && <span className="text-[9px] text-amber-400 font-mono font-bold">(Lead)</span>}
+                                  {mIdx === 0 ? <Crown size={11} className="text-amber-400 shrink-0" /> : <UserCheck size={11} className="text-bwb-accent shrink-0" />}
+                                  <span>{m}</span>
+                                  {mIdx === 0 && <span className="text-[9px] text-amber-400 font-mono font-bold uppercase">(Lead)</span>}
                                 </span>
                               ))}
                             </div>
@@ -1375,39 +1390,76 @@ export default function HostGameControlPage() {
             </Card>
           </div>
 
-          {/* Right Sidebar: Quick Actions & Operations */}
-          <div className="space-y-5 sm:space-y-6">
-            <Card padding="md" className="sm:p-6">
-                <h2 className="font-display font-semibold mb-3.5 flex items-center gap-2 text-base">
-                  <Zap size={18} className="text-bwb-accent" /> Round Operations
-                </h2>
+          {/* Right Sidebar: Quick Actions & Operations (Sticky on Desktop) */}
+          <div className="space-y-5 sm:space-y-6 lg:sticky lg:top-20">
+            {/* Quick Room Stats Card */}
+            <Card padding="md" className="sm:p-5 stereo-card border border-bwb-border/80 bg-bwb-surface/60 shadow-sm">
+                <div className="flex items-center justify-between mb-3 pb-2 border-b border-white/5">
+                  <h3 className="font-display font-bold flex items-center gap-2 text-xs uppercase tracking-wider text-bwb-muted">
+                    <Timer size={14} className="text-bwb-accent" /> Room Overview
+                  </h3>
+                  <span className="font-mono text-xs font-bold text-bwb-accent">
+                    PIN: {game.code}
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-center">
+                  <div className="p-2.5 rounded-xl bg-bwb-surface-2 border border-white/5">
+                    <p className="text-[10px] text-bwb-muted font-mono uppercase">Connected</p>
+                    <p className="text-lg font-display font-black text-emerald-400 mt-0.5">
+                      {game.teams.filter((t) => t.isOnline).length} <span className="text-xs text-bwb-muted font-normal">/ {game.teams.length}</span>
+                    </p>
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-bwb-surface-2 border border-white/5">
+                    <p className="text-[10px] text-bwb-muted font-mono uppercase">Submitted</p>
+                    <p className="text-lg font-display font-black text-bwb-accent mt-0.5">
+                      {submittedCount} <span className="text-xs text-bwb-muted font-normal">/ {game.teams.length}</span>
+                    </p>
+                  </div>
+                </div>
+            </Card>
+
+            <Card padding="md" className="sm:p-6 stereo-card border border-bwb-border/80 bg-bwb-surface/60 shadow-sm">
+                <div className="flex items-center justify-between mb-4 pb-2.5 border-b border-white/5">
+                  <h2 className="font-display font-bold flex items-center gap-2 text-base text-bwb-text">
+                    <Zap size={18} className="text-bwb-accent" /> Round Operations
+                  </h2>
+                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-bwb-accent/15 text-bwb-accent border border-bwb-accent/30">
+                    HOST CONTROL
+                  </span>
+                </div>
+
                 <div className="space-y-2.5">
-                  <Button variant="secondary" fullWidth size="sm" onClick={() => changePhase('BUILDING')} className="justify-center">
-                    <Play size={14} className="text-bwb-accent mr-1" /> Start Build Timer (15 min)
+                  <Button variant="secondary" fullWidth size="sm" onClick={() => changePhase('BUILDING')} className="justify-center shadow-sm font-semibold">
+                    <Play size={14} className="text-bwb-accent mr-1.5" /> Start Build Timer (15 min)
                   </Button>
-                  <Button variant="secondary" fullWidth size="sm" onClick={() => changePhase('SUBMISSION_LOCKED')} className="justify-center">
-                    <Lock size={14} className="text-bwb-warn mr-1" /> Lock All Submissions
+                  <Button variant="secondary" fullWidth size="sm" onClick={() => changePhase('SUBMISSION_LOCKED')} className="justify-center shadow-sm font-semibold">
+                    <Lock size={14} className="text-bwb-warn mr-1.5" /> Lock All Submissions
                   </Button>
-                  <Button variant="secondary" fullWidth size="sm" onClick={() => changePhase('PITCHING')} className="justify-center">
-                    <SkipForward size={14} className="mr-1" /> Start Pitch Phase
+                  <Button variant="secondary" fullWidth size="sm" onClick={() => changePhase('PITCHING')} className="justify-center shadow-sm font-semibold">
+                    <SkipForward size={14} className="mr-1.5 text-purple-400" /> Start Pitch Phase
                   </Button>
                   <Link to="/host/leaderboard" className="block">
-                    <Button variant="secondary" fullWidth size="sm" className="justify-center">
-                      <Trophy size={14} className="text-bwb-gold mr-1" /> Leaderboard & Results
+                    <Button variant="secondary" fullWidth size="sm" className="justify-center shadow-sm font-semibold">
+                      <Trophy size={14} className="text-bwb-gold mr-1.5" /> Leaderboard & Results
                     </Button>
                   </Link>
                 </div>
             </Card>
 
-            <Card padding="md" className="sm:p-6 border-bwb-danger/20">
-                <h2 className="font-display font-semibold mb-2.5 flex items-center gap-2 text-bwb-danger text-base">
-                  <AlertTriangle size={16} /> Deck Management
-                </h2>
-                <p className="text-xs text-bwb-muted mb-3.5">
-                  Re-roll 3 random tech cards for all connected teams if you want to reset drafting.
+            <Card padding="md" className="sm:p-6 stereo-card border border-bwb-danger/30 bg-bwb-surface/60 shadow-sm">
+                <div className="flex items-center justify-between mb-2.5">
+                  <h2 className="font-display font-bold flex items-center gap-2 text-bwb-danger text-base">
+                    <AlertTriangle size={16} /> Deck Management
+                  </h2>
+                  <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-red-500/20 text-red-400 border border-red-500/30">
+                    RESET
+                  </span>
+                </div>
+                <p className="text-xs text-bwb-muted mb-4 leading-relaxed">
+                  Re-roll 3 random frontier tech cards for all connected squads if you wish to reset drafting.
                 </p>
-                <Button variant="danger" fullWidth size="sm" onClick={assignCards} className="justify-center">
-                  <Shield size={14} className="mr-1" /> Reassign Tech Cards to All
+                <Button variant="danger" fullWidth size="sm" onClick={assignCards} className="justify-center font-semibold shadow-sm">
+                  <Shield size={14} className="mr-1.5" /> Reassign Tech Cards to All
                 </Button>
             </Card>
           </div>

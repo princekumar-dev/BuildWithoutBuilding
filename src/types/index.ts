@@ -116,6 +116,8 @@ export interface Game {
   problemTeamCounts?: Record<string, number>
   scheduledStartTime?: string
   maxTeams?: number
+  activeProblemIds?: string[]
+  activeProblems?: Problem[]
   whatsappGroupUrl?: string
   isRegistrationOpen?: boolean
   phaseStartedAt?: string | null

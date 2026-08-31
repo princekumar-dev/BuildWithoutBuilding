@@ -467,7 +467,7 @@
       "isRegistrationOpen": true,
       "isFinalRound": false,
       "createdAt": "2026-08-25T10:00:00.000Z",
-      "updatedAt": "2026-08-31T16:25:23.024Z",
+      "updatedAt": "2026-08-31T16:22:55.968Z",
       "totalTeams": 16,
       "phaseStartedAt": null,
       "phaseDurationSeconds": null,
@@ -507,7 +507,7 @@
           "round3Score": 0,
           "rank": 1,
           "registeredAt": "2026-08-31T16:22:55.966Z",
-          "isOnline": false
+          "isOnline": true
         }
       ],
       "currentProblem": {
@@ -525,7 +525,7 @@
       "isRegistrationOpen": true,
       "isFinalRound": false,
       "createdAt": "2026-08-31T16:21:23.920Z",
-      "updatedAt": "2026-08-31T16:25:23.025Z",
+      "updatedAt": "2026-08-31T16:22:55.969Z",
       "totalTeams": 1
     }
   ]

@@ -259,7 +259,7 @@ export default function ProjectorPage() {
   const totalParticipants = game.teams.reduce((acc, t) => acc + (t.members?.length ?? 0), 0)
   const totalCardsRevealed = game.teams.reduce((acc, t) => acc + (t.revealedCards?.length ?? 0), 0)
   const totalSubmissions = game.teams.filter((t) => !!t.submission).length
-  const isRoomFull = game.teams.length >= (game.maxTeams || 32)
+  const isRoomFull = game.teams.length >= (game.maxTeams || 16)
   const lobbyTeams = game.currentRound === 3 && (game.finalistTeamIds?.length ?? 0) > 0
     ? game.teams.filter((team) => game.finalistTeamIds?.includes(team.id))
     : game.teams
@@ -607,7 +607,7 @@ export default function ProjectorPage() {
                       <Users size={13} className="text-bwb-accent" /> Capacity:
                     </span>
                     <span className={`font-bold ${isRoomFull ? 'text-rose-400' : 'text-bwb-text'}`}>
-                      {game.teams.length} / {game.maxTeams || 32} Squads {isRoomFull ? '(Full)' : `(${(game.maxTeams || 32) - game.teams.length} slots left)`}
+                      {game.teams.length} / {game.maxTeams || 16} Squads {isRoomFull ? '(Full)' : `(${(game.maxTeams || 16) - game.teams.length} slots left)`}
                     </span>
                   </div>
                 </div>

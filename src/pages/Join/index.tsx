@@ -73,7 +73,7 @@ export default function JoinPage() {
   const openGames = activeGames.filter((g) => g.phase !== 'RESULTS' && g.isRegistrationOpen !== false)
   const currentTargetGame = openGames.find((g) => g.code === code)
     || (openGames.length > 0 ? openGames[openGames.length - 1] : (activeGames.find((g) => g.code === code) || (activeGames.length > 0 ? activeGames[activeGames.length - 1] : null)))
-  const roomMaxTeams = currentTargetGame ? (currentTargetGame.maxTeams || 32) : 32
+  const roomMaxTeams = currentTargetGame ? (currentTargetGame.maxTeams || 16) : 16
   const roomRegisteredCount = currentTargetGame ? currentTargetGame.teams.length : 0
   const isRoomFull = currentTargetGame ? roomRegisteredCount >= roomMaxTeams : false
   const isRegistrationClosedByHost = currentTargetGame ? currentTargetGame.isRegistrationOpen === false : (openGames.length === 0)
@@ -361,10 +361,10 @@ export default function JoinPage() {
                         className="w-full pl-3 pr-8 py-2 rounded-xl bg-bwb-surface border border-emerald-500/30 text-bwb-text text-xs sm:text-sm font-semibold focus:border-bwb-accent outline-none appearance-none cursor-pointer"
                       >
                         {openGames.map((g) => {
-                          const openCount = Math.max(0, (g.maxTeams || 32) - g.teams.length)
+                          const openCount = Math.max(0, (g.maxTeams || 16) - g.teams.length)
                           return (
                             <option key={g.code} value={g.code} className="bg-bwb-bg text-bwb-text">
-                              {g.name} ({g.code}) — {g.teams.length}/{g.maxTeams || 32} Squads ({openCount} slots open)
+                              {g.name} ({g.code}) — {g.teams.length}/{g.maxTeams || 16} Squads ({openCount} slots open)
                             </option>
                           )
                         })}

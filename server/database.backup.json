@@ -467,7 +467,7 @@
       "isRegistrationOpen": true,
       "isFinalRound": false,
       "createdAt": "2026-08-25T10:00:00.000Z",
-      "updatedAt": "2026-08-31T23:46:15.204Z",
+      "updatedAt": "2026-08-31T23:53:45.013Z",
       "totalTeams": 16,
       "phaseStartedAt": null,
       "phaseDurationSeconds": null,
@@ -477,7 +477,7 @@
       "id": "game_91fd6ebb-e95b-4eed-bab2-56f907670205",
       "code": "BWB-170",
       "name": "trail 001",
-      "phase": "JUDGING",
+      "phase": "LEADERBOARD",
       "currentRound": 2,
       "finalistTeamIds": [],
       "teams": [
@@ -740,20 +740,20 @@
             1,
             2
           ],
-          "score": 58,
+          "score": 158,
           "round1Score": 58,
-          "round2Score": 0,
+          "round2Score": 100,
           "round3Score": 0,
           "rank": 8,
           "registeredAt": "2026-08-31T16:32:02.590Z",
-          "isOnline": true,
+          "isOnline": false,
           "scoreBreakdown": {
-            "problemUnderstanding": 11,
-            "creativity": 0,
-            "technologyUsage": 20,
-            "technicalFeasibility": 11,
+            "problemUnderstanding": 10,
+            "creativity": 25,
+            "technologyUsage": 30,
+            "technicalFeasibility": 20,
             "realWorldImpact": 0,
-            "pitch": 11,
+            "pitch": 10,
             "defense": 5
           },
           "currentSlideIndex": 0
@@ -802,23 +802,25 @@
       "isRegistrationOpen": true,
       "isFinalRound": false,
       "createdAt": "2026-08-31T16:21:23.920Z",
-      "updatedAt": "2026-08-31T23:46:15.204Z",
+      "updatedAt": "2026-08-31T23:53:45.014Z",
       "totalTeams": 8,
       "phaseStartedAt": null,
       "phaseDurationSeconds": null,
       "phaseExpiresAt": null,
-      "currentPitchTeamId": "team_45ab5c8e-2d10-42f1-ada5-ce089d032bf9",
-      "pitchStartedAt": "2026-08-31T23:37:48.007Z",
-      "pitchDurationSeconds": 180,
-      "pitchExpiresAt": "2026-08-31T23:40:48.007Z",
+      "currentPitchTeamId": null,
+      "pitchStartedAt": null,
+      "pitchDurationSeconds": null,
+      "pitchExpiresAt": null,
       "currentSlideIndex": 0,
       "pitchedTeamIds": [
-        "team_f4726671-0072-42cf-8c9b-e7c207225437"
+        "team_f4726671-0072-42cf-8c9b-e7c207225437",
+        "team_45ab5c8e-2d10-42f1-ada5-ce089d032bf9"
       ],
       "pitchedTeamIdsByRound": {
         "1": [],
         "2": [
-          "team_f4726671-0072-42cf-8c9b-e7c207225437"
+          "team_f4726671-0072-42cf-8c9b-e7c207225437",
+          "team_45ab5c8e-2d10-42f1-ada5-ce089d032bf9"
         ],
         "3": []
       }

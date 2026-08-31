@@ -1,5 +1,6 @@
-import React, { useState } from 'react'
-import { Swords, Layers, ChevronDown, ChevronUp, BarChart3, Sparkles, Target } from 'lucide-react'
+import React, { useState, useEffect } from 'react'
+import { Swords, Layers, ChevronDown, ChevronUp, BarChart3, Sparkles, Target, Crown, Play, Pause, Trophy } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 import type { Team } from '../../types'
 import { getScoringCriteriaForRound } from '../../data/mockData'
 
@@ -33,11 +34,28 @@ export function LeaderboardTable({
 }: LeaderboardTableProps) {
   const [viewMode, setViewMode] = useState<'ranks' | 'duels'>(round === 2 ? 'duels' : 'ranks')
   const [expandedTeamId, setExpandedTeamId] = useState<string | null>(highlightTeamId || null)
+  const [duelPage, setDuelPage] = useState<0 | 1 | 2>(0) // 0: Tracks 1-4, 1: Tracks 5-8, 2: All 8
+  const [isDuelAutoSwap, setIsDuelAutoSwap] = useState(true)
+
   const sorted = [...teams].sort((a, b) => (a.rank ?? 99) - (b.rank ?? 99))
   const criteria = getScoringCriteriaForRound(round)
 
   // Group teams by problem statement for Round 2 Duels View
   const problemKeys = ['p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8']
+
+  // Auto-swap between Tracks 1-4 and Tracks 5-8 for single-frame projector view
+  useEffect(() => {
+    if (!isDuelAutoSwap || round !== 2 || viewMode !== 'duels' || compact || duelPage === 2) return
+
+    const timer = setInterval(() => {
+      setDuelPage((prev) => (prev === 0 ? 1 : 0))
+    }, 7500)
+
+    return () => clearInterval(timer)
+  }, [isDuelAutoSwap, round, viewMode, compact, duelPage])
+
+  const displayedProblemKeys =
+    duelPage === 0 ? problemKeys.slice(0, 4) : duelPage === 1 ? problemKeys.slice(4, 8) : problemKeys
 
   const toggleExpand = (teamId: string) => {
     setExpandedTeamId((prev) => (prev === teamId ? null : teamId))
@@ -45,10 +63,10 @@ export function LeaderboardTable({
 
   return (
     <div className="space-y-4">
-      {/* View Switcher for Round 2 */}
+      {/* View Switcher & Carousel Controls for Round 2 */}
       {round === 2 && !compact && (
-        <div className="flex items-center justify-between bg-bwb-surface-2/80 p-1.5 rounded-2xl border border-white/10">
-          <div className="flex items-center gap-1.5">
+        <div className="flex flex-wrap items-center justify-between bg-bwb-surface-2/80 p-2 rounded-2xl border border-white/10 gap-2">
+          <div className="flex items-center gap-1.5 flex-wrap">
             <button
               type="button"
               onClick={() => setViewMode('duels')}
@@ -74,138 +92,228 @@ export function LeaderboardTable({
               <span>All Teams Standings</span>
             </button>
           </div>
-          <span className="text-[11px] font-mono text-bwb-accent font-bold px-2.5 hidden sm:inline">
-            1 Winner Per Problem Advances to Grand Finals
-          </span>
+
+          {/* Carousel & Paging Controls */}
+          {viewMode === 'duels' && (
+            <div className="flex items-center gap-1.5">
+              <div className="flex items-center bg-black/40 p-1 rounded-xl border border-white/10 text-xs font-mono">
+                <button
+                  onClick={() => { setDuelPage(0); setIsDuelAutoSwap(false); }}
+                  className={`px-2.5 py-1 rounded-lg font-bold transition-all ${
+                    duelPage === 0 ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40' : 'text-bwb-muted hover:text-white'
+                  }`}
+                >
+                  Tracks 1–4
+                </button>
+                <button
+                  onClick={() => { setDuelPage(1); setIsDuelAutoSwap(false); }}
+                  className={`px-2.5 py-1 rounded-lg font-bold transition-all ${
+                    duelPage === 1 ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40' : 'text-bwb-muted hover:text-white'
+                  }`}
+                >
+                  Tracks 5–8
+                </button>
+                <button
+                  onClick={() => { setDuelPage(2); setIsDuelAutoSwap(false); }}
+                  className={`px-2.5 py-1 rounded-lg font-bold transition-all ${
+                    duelPage === 2 ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40' : 'text-bwb-muted hover:text-white'
+                  }`}
+                >
+                  All 8
+                </button>
+              </div>
+
+              <button
+                onClick={() => setIsDuelAutoSwap(!isDuelAutoSwap)}
+                className={`px-2.5 py-1.5 rounded-xl border text-xs font-mono font-bold flex items-center gap-1.5 transition-all ${
+                  isDuelAutoSwap
+                    ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
+                    : 'bg-white/5 text-bwb-muted border-white/10'
+                }`}
+                title={isDuelAutoSwap ? 'Auto-Cycle Tracks (Every 7.5s)' : 'Auto-Cycle Paused'}
+              >
+                {isDuelAutoSwap ? <Pause size={12} /> : <Play size={12} />}
+                <span className="hidden sm:inline">{isDuelAutoSwap ? 'Auto-Swap' : 'Swap Paused'}</span>
+              </button>
+            </div>
+          )}
         </div>
       )}
 
       {/* ROUND 2 1V1 DUELS VIEW */}
       {round === 2 && viewMode === 'duels' && !compact ? (
-        <div className="grid md:grid-cols-2 gap-4">
-          {problemKeys.map((pKey, idx) => {
-            const pMeta = PROBLEM_NAMES[pKey] || { title: `Problem Track ${idx + 1}`, category: 'Challenge', icon: '⚡' }
-            const teamsInProblem = teams.filter((t) => t.selectedProblemId === pKey)
-            const sortedProblemTeams = [...teamsInProblem].sort((a, b) => {
-              const scoreA = a.round2Score ?? a.score ?? 0
-              const scoreB = b.round2Score ?? b.score ?? 0
-              return scoreB - scoreA
-            })
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={`duel-page-${duelPage}`}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.25 }}
+            className="grid md:grid-cols-2 gap-4"
+          >
+            {displayedProblemKeys.map((pKey) => {
+              const originalIdx = problemKeys.indexOf(pKey)
+              const pMeta = PROBLEM_NAMES[pKey] || { title: `Problem Track ${originalIdx + 1}`, category: 'Challenge', icon: '⚡' }
+              const teamsInProblem = teams.filter((t) => t.selectedProblemId === pKey)
+              const sortedProblemTeams = [...teamsInProblem].sort((a, b) => {
+                const scoreA = a.round2Score ?? a.score ?? 0
+                const scoreB = b.round2Score ?? b.score ?? 0
+                return scoreB - scoreA
+              })
 
-            const leader = sortedProblemTeams[0] || null
-            const challenger = sortedProblemTeams[1] || null
-            const leaderScore = leader?.round2Score ?? leader?.score ?? 0
-            const challengerScore = challenger?.round2Score ?? challenger?.score ?? 0
+              const leader = sortedProblemTeams[0] || null
+              const challenger = sortedProblemTeams[1] || null
+              const leaderScore = leader?.round2Score ?? leader?.score ?? 0
+              const challengerScore = challenger?.round2Score ?? challenger?.score ?? 0
+              const isDuelResolved = leader && leaderScore > 0
 
-            return (
-              <div
-                key={pKey}
-                className={`p-4 sm:p-5 rounded-2xl stereo-card border transition-all ${
-                  leader && (leader.id === highlightTeamId || challenger?.id === highlightTeamId)
-                    ? 'border-bwb-accent ring-1 ring-bwb-accent/30 bg-bwb-surface-2'
-                    : 'border-white/10 bg-bwb-surface'
-                }`}
-              >
-                {/* Header */}
-                <div className="flex items-center justify-between gap-2 mb-3 pb-2 border-b border-white/5">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xl">{pMeta.icon}</span>
-                    <div>
-                      <span className="text-[10px] font-mono font-bold text-bwb-accent uppercase">
-                        Track 0{idx + 1} · {pMeta.category}
+              return (
+                <div
+                  key={pKey}
+                  className={`p-4 sm:p-5 rounded-2xl stereo-card border transition-all ${
+                    isDuelResolved
+                      ? 'border-emerald-500/50 bg-gradient-to-br from-emerald-950/20 via-bwb-surface to-bwb-surface shadow-lg shadow-emerald-500/10'
+                      : 'border-white/10 bg-bwb-surface'
+                  }`}
+                >
+                  {/* Header */}
+                  <div className="flex items-center justify-between gap-2 mb-3 pb-2 border-b border-white/5">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xl">{pMeta.icon}</span>
+                      <div>
+                        <span className="text-[10px] font-mono font-bold text-bwb-accent uppercase">
+                          Track 0{originalIdx + 1} · {pMeta.category}
+                        </span>
+                        <h4 className="font-display font-bold text-xs sm:text-sm text-bwb-text truncate max-w-[240px]">
+                          {pMeta.title}
+                        </h4>
+                      </div>
+                    </div>
+                    <span className="px-2 py-0.5 rounded-md text-[9px] font-mono font-bold bg-white/5 text-bwb-muted border border-white/10">
+                      {teamsInProblem.length}/2 Teams
+                    </span>
+                  </div>
+
+                  {/* 1v1 Matchup Arena */}
+                  <div className="space-y-2.5">
+                    {/* Leader / Advance Finalist */}
+                    {leader ? (
+                      <div
+                        className={`p-3 rounded-xl border flex items-center justify-between gap-3 transition-all ${
+                          leaderScore > 0
+                            ? 'bg-gradient-to-r from-emerald-500/20 via-emerald-500/10 to-teal-500/15 border-emerald-400 shadow-md ring-1 ring-emerald-400/40'
+                            : 'bg-white/5 border-white/10'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <span
+                            className={`w-6 h-6 rounded-full text-[11px] font-black flex items-center justify-center shrink-0 ${
+                              leaderScore > 0
+                                ? 'bg-gradient-to-br from-emerald-400 to-teal-500 text-black shadow-md'
+                                : 'bg-white/10 text-bwb-muted'
+                            }`}
+                          >
+                            {leaderScore > 0 ? <Crown size={13} className="text-black" /> : '1'}
+                          </span>
+                          <div className="min-w-0">
+                            <p className="font-display font-black text-xs sm:text-sm text-bwb-text truncate flex items-center gap-1.5">
+                              <span>{leader.name}</span>
+                              {leaderScore > 0 && (
+                                <span className="text-[9px] px-2 py-0.5 rounded-full bg-emerald-500 text-black font-mono font-black animate-pulse flex items-center gap-1">
+                                  <Trophy size={10} /> ADVANCING TO FINALS
+                                </span>
+                              )}
+                            </p>
+                            <p className="text-[10px] text-bwb-muted font-mono">{leader.department || 'Squad'}</p>
+                          </div>
+                        </div>
+                        <div className="text-right shrink-0">
+                          <span
+                            className={`font-display font-black text-sm sm:text-lg ${
+                              leaderScore > 0 ? 'text-emerald-300 drop-shadow' : 'text-bwb-muted'
+                            }`}
+                          >
+                            {leaderScore > 0 ? leaderScore : '—'}
+                          </span>
+                          <span className="text-[9px] text-bwb-muted font-mono block">pts</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="p-3 rounded-xl bg-white/5 border border-dashed border-white/10 text-center text-xs text-bwb-muted font-mono">
+                        No team assigned
+                      </div>
+                    )}
+
+                    {/* VS Divider */}
+                    <div className="flex items-center justify-center gap-2 my-0.5">
+                      <div className="h-px flex-1 bg-white/10" />
+                      <span className="text-[9px] font-mono font-black text-bwb-muted uppercase tracking-widest px-1">
+                        VS
                       </span>
-                      <h4 className="font-display font-bold text-xs sm:text-sm text-bwb-text truncate max-w-[240px]">
-                        {pMeta.title}
-                      </h4>
+                      <div className="h-px flex-1 bg-white/10" />
                     </div>
-                  </div>
-                  <span className="px-2 py-0.5 rounded-md text-[9px] font-mono font-bold bg-white/5 text-bwb-muted border border-white/10">
-                    {teamsInProblem.length}/2 Teams
-                  </span>
-                </div>
 
-                {/* 1v1 Matchup Arena */}
-                <div className="space-y-2.5">
-                  {/* Leader / Finalist */}
-                  {leader ? (
-                    <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-between gap-3">
-                      <div className="flex items-center gap-2 min-w-0">
-                        <span className="w-5 h-5 rounded-full bg-emerald-500 text-bwb-bg text-[10px] font-black flex items-center justify-center shrink-0">
-                          1
-                        </span>
-                        <div className="min-w-0">
-                          <p className="font-display font-bold text-xs sm:text-sm text-bwb-text truncate flex items-center gap-1.5">
-                            <span>{leader.name}</span>
-                            <span className="text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 font-mono">
-                              FINALS SPOT
-                            </span>
-                          </p>
-                          <p className="text-[10px] text-bwb-muted font-mono">{leader.department || 'Squad'}</p>
+                    {/* Challenger */}
+                    {challenger ? (
+                      <div
+                        className={`p-3 rounded-xl border flex items-center justify-between gap-3 ${
+                          challengerScore > 0 && leaderScore > 0
+                            ? 'bg-rose-500/5 border-rose-500/20 opacity-75'
+                            : 'bg-bwb-surface-2/60 border-white/10'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className="w-5 h-5 rounded-full bg-white/10 text-bwb-muted text-[10px] font-black flex items-center justify-center shrink-0">
+                            2
+                          </span>
+                          <div className="min-w-0">
+                            <p className="font-display font-bold text-xs sm:text-sm text-bwb-text truncate flex items-center gap-1.5">
+                              <span>{challenger.name}</span>
+                              {challengerScore > 0 && leaderScore > 0 && (
+                                <span className="text-[9px] px-1.5 py-0.2 rounded bg-rose-500/20 text-rose-300 font-mono">
+                                  ELIMINATED
+                                </span>
+                              )}
+                            </p>
+                            <p className="text-[10px] text-bwb-muted font-mono">{challenger.department || 'Squad'}</p>
+                          </div>
+                        </div>
+                        <div className="text-right shrink-0">
+                          <span className="font-display font-black text-sm sm:text-base text-bwb-muted">
+                            {challengerScore > 0 ? challengerScore : '—'}
+                          </span>
+                          <span className="text-[9px] text-bwb-muted font-mono block">pts</span>
                         </div>
                       </div>
-                      <div className="text-right shrink-0">
-                        <span className="font-display font-black text-sm sm:text-base text-emerald-400">
-                          {leaderScore}
-                        </span>
-                        <span className="text-[9px] text-bwb-muted font-mono block">pts</span>
+                    ) : (
+                      <div className="p-3 rounded-xl bg-white/5 border border-dashed border-white/10 text-center text-xs text-bwb-muted font-mono">
+                        Waiting for 2nd squad...
                       </div>
-                    </div>
-                  ) : (
-                    <div className="p-3 rounded-xl bg-white/5 border border-dashed border-white/10 text-center text-xs text-bwb-muted font-mono">
-                      No team assigned
-                    </div>
-                  )}
-
-                  {/* VS Divider */}
-                  <div className="flex items-center justify-center gap-2 my-1">
-                    <div className="h-px flex-1 bg-white/10" />
-                    <span className="text-[9px] font-mono font-black text-bwb-muted uppercase tracking-widest px-1">
-                      VS
-                    </span>
-                    <div className="h-px flex-1 bg-white/10" />
+                    )}
                   </div>
 
-                  {/* Challenger */}
-                  {challenger ? (
-                    <div className="p-3 rounded-xl bg-bwb-surface-2/60 border border-white/10 flex items-center justify-between gap-3">
-                      <div className="flex items-center gap-2 min-w-0">
-                        <span className="w-5 h-5 rounded-full bg-white/10 text-bwb-muted text-[10px] font-black flex items-center justify-center shrink-0">
-                          2
-                        </span>
-                        <div className="min-w-0">
-                          <p className="font-display font-bold text-xs sm:text-sm text-bwb-text truncate">
-                            {challenger.name}
-                          </p>
-                          <p className="text-[10px] text-bwb-muted font-mono">{challenger.department || 'Squad'}</p>
-                        </div>
-                      </div>
-                      <div className="text-right shrink-0">
-                        <span className="font-display font-black text-sm sm:text-base text-bwb-muted">
-                          {challengerScore}
-                        </span>
-                        <span className="text-[9px] text-bwb-muted font-mono block">pts</span>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="p-3 rounded-xl bg-white/5 border border-dashed border-white/10 text-center text-xs text-bwb-muted font-mono">
-                      Waiting for 2nd squad...
-                    </div>
-                  )}
-                </div>
+                  {/* Match Outcome Subtext */}
+                  <div className="mt-3 pt-2 text-[10px] font-mono text-bwb-muted flex items-center justify-between border-t border-white/5">
+                    {leaderScore > 0 ? (
+                      <span className="text-emerald-400 font-bold flex items-center gap-1">
+                        <Sparkles size={11} className="text-emerald-400" />
+                        Qualified: {leader?.name} (Finalist Spot)
+                      </span>
+                    ) : (
+                      <span>Winner advances to Grand Finals (R3)</span>
+                    )}
 
-                {/* Match Outcome Subtext */}
-                <div className="mt-3 pt-2 text-[10px] font-mono text-bwb-muted flex items-center justify-between border-t border-white/5">
-                  <span>Winner advances to Grand Finals (R3)</span>
-                  {leader && challenger && (
-                    <span className="text-amber-400 font-bold">
-                      Diff: {Math.abs(leaderScore - challengerScore)} pts
-                    </span>
-                  )}
+                    {leader && challenger && leaderScore > 0 && challengerScore > 0 && (
+                      <span className="text-amber-400 font-bold">
+                        Lead: +{leaderScore - challengerScore} pts
+                      </span>
+                    )}
+                  </div>
                 </div>
-              </div>
-            )
-          })}
-        </div>
+              )
+            })}
+          </motion.div>
+        </AnimatePresence>
       ) : (
         /* STANDARD / OVERALL RANKS TABLE */
         <div className="rounded-2xl border border-bwb-border bg-bwb-surface shadow-xl overflow-hidden">

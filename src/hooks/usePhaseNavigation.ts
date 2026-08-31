@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { useGameStore } from '../store/gameStore'
 import type { GamePhase } from '../types'
 
-const PHASE_ROUTES: Partial<Record<GamePhase, string>> = {
+const PHASE_ROUTES: Record<GamePhase, string> = {
   LOBBY: '/lobby',
   PROBLEM_REVEAL: '/problem-select',
   CARD_REVEAL: '/card-reveal',
@@ -16,6 +16,16 @@ const PHASE_ROUTES: Partial<Record<GamePhase, string>> = {
   FINAL_ROUND: '/leaderboard',
   RESULTS: '/leaderboard',
 }
+
+const IN_GAME_ROUTES = [
+  '/lobby',
+  '/problem-select',
+  '/card-reveal',
+  '/game',
+  '/pitch',
+  '/judging',
+  '/leaderboard',
+]
 
 const EXCLUDED_PREFIXES = ['/host', '/judge', '/projector', '/how-to-play']
 
@@ -40,8 +50,8 @@ export function usePhaseNavigation() {
   })()
 
   useEffect(() => {
-    // Only auto-navigate active team players
-    if (!effectiveSession?.teamId || !game?.id) return
+    // Only navigate if game is loaded
+    if (!game?.id || !phase) return
 
     const currentPath = location.pathname
     // Do not redirect hosts, judges, projector, landing, or how-to-play
@@ -53,11 +63,17 @@ export function usePhaseNavigation() {
       return
     }
 
+    // Only apply in-game auto navigation when user is on an in-game participant route
+    const isInGamePath = IN_GAME_ROUTES.some((p) => currentPath.startsWith(p))
+    if (!isInGamePath && !effectiveSession?.teamId) return
+
     const isEliminatedFinalist =
       currentRound === 3 &&
       (game.finalistTeamIds?.length ?? 0) > 0 &&
+      effectiveSession?.teamId &&
       !game.finalistTeamIds?.includes(effectiveSession.teamId)
-    const target = isEliminatedFinalist ? '/leaderboard' : PHASE_ROUTES[phase]
+
+    const target = isEliminatedFinalist ? '/leaderboard' : PHASE_ROUTES[phase] || '/lobby'
     if (!target || currentPath === target) return
 
     navigate(target, { replace: true })

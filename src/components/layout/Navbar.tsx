@@ -26,7 +26,9 @@ export function Navbar() {
     return null
   })()
 
-  const currentTeamName = session?.teamName || storedSession?.teamName
+  const teamId = session?.teamId || storedSession?.teamId
+  const currentTeam = teamId ? game.teams.find((t) => t.id === teamId) : null
+  const currentTeamName = session?.teamName || storedSession?.teamName || currentTeam?.name
   const currentRoomCode = game.code || (() => {
     try {
       const raw = localStorage.getItem('bwb_game_storage')

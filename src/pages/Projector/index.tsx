@@ -1700,11 +1700,13 @@ export default function ProjectorPage() {
                 >
                   {currentBuildBatchTeams.map((team, idx) => {
                     const teamAbsoluteIndex = safeBuildPageIndex * BUILD_TEAMS_PER_PAGE + idx + 1
-                    const teamProblem = catalog.problems.find((p) => p.id === team.selectedProblemId) ?? catalog.problems[0]
+                    const teamProblem = team.selectedProblemId
+                      ? (catalog.problems.find((p) => p.id === team.selectedProblemId) || (game.activeProblems || []).find((p) => p.id === team.selectedProblemId))
+                      : null
                     const theme = teamProblem ? categoryThemes[teamProblem.category] : null
                     const teamTechs = (team.technologies && team.technologies.length >= 3)
                       ? team.technologies
-                      : (team.selectedProblemId ? drawProblemCards(team.selectedProblemId) : (catalog.technologies.length >= 3 ? catalog.technologies.slice(0, 3) : []))
+                      : (team.selectedProblemId ? drawProblemCards(team.selectedProblemId) : null)
                     const isSubmitted = !!team.submission
 
                     return (
@@ -1749,7 +1751,7 @@ export default function ProjectorPage() {
                           </div>
 
                           {/* Problem Statement Card */}
-                          {teamProblem && theme && (
+                          {teamProblem && theme ? (
                             <div className={`p-3 rounded-2xl bg-gradient-to-br ${theme.gradient} border ${theme.border} mb-3 shadow-md`}>
                               <div className="flex items-center gap-1.5 mb-1">
                                 <span className={`px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-wider border ${theme.badge}`}>
@@ -1765,6 +1767,15 @@ export default function ProjectorPage() {
                                 </p>
                               )}
                             </div>
+                          ) : (
+                            <div className="p-3 rounded-2xl bg-bwb-bg/60 border border-dashed border-white/15 mb-3 text-center flex flex-col items-center justify-center min-h-[82px]">
+                              <span className="text-[10px] font-mono font-bold text-amber-300/90 uppercase tracking-wider mb-0.5">
+                                ⏳ Challenge Selection Pending
+                              </span>
+                              <p className="text-[11px] text-bwb-muted">
+                                Squad is selecting track on device...
+                              </p>
+                            </div>
                           )}
                         </div>
 
@@ -1773,18 +1784,31 @@ export default function ProjectorPage() {
                           <p className="text-[9px] uppercase font-mono text-cyan-300/80 font-black tracking-wider mb-1.5">
                             Assigned Frontier Tech:
                           </p>
-                          <div className="grid grid-cols-3 gap-1.5">
-                            {teamTechs.map((tech) => (
-                              <div
-                                key={tech.id}
-                                className="p-1.5 rounded-xl bg-bwb-surface border border-white/10 flex items-center gap-1.5 text-xs text-bwb-text truncate hover:border-cyan-400/30 transition-colors"
-                                title={tech.name}
-                              >
-                                <span className="text-sm shrink-0">{tech.icon}</span>
-                                <span className="truncate font-bold text-[10px] text-white">{tech.name}</span>
-                              </div>
-                            ))}
-                          </div>
+                          {teamTechs && teamTechs.length >= 3 ? (
+                            <div className="grid grid-cols-3 gap-1.5">
+                              {teamTechs.map((tech) => (
+                                <div
+                                  key={tech.id}
+                                  className="p-1.5 rounded-xl bg-bwb-surface border border-white/10 flex items-center gap-1.5 text-xs text-bwb-text truncate hover:border-cyan-400/30 transition-colors"
+                                  title={tech.name}
+                                >
+                                  <span className="text-sm shrink-0">{tech.icon}</span>
+                                  <span className="truncate font-bold text-[10px] text-white">{tech.name}</span>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <div className="grid grid-cols-3 gap-1.5">
+                              {[1, 2, 3].map((slot) => (
+                                <div
+                                  key={slot}
+                                  className="p-1.5 rounded-xl bg-bwb-bg/40 border border-dashed border-white/10 flex items-center justify-center gap-1 text-[10px] font-mono text-bwb-muted/60"
+                                >
+                                  <span>Slot #{slot}</span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
                         </div>
                       </motion.div>
                     )

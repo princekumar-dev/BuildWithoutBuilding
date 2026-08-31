@@ -245,9 +245,11 @@ export default function GamePage() {
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-display text-xs uppercase tracking-wider text-bwb-muted font-bold flex items-center gap-1.5">
                   <Layers size={13} className="text-bwb-accent" />
-                  Your Assigned Tech Stack (3)
+                  {game.currentRound === 1 ? 'Drawn Tech Stack (Preview)' : 'Your Assigned Tech Stack (3)'}
                 </h3>
-                <span className="text-[11px] text-bwb-accent font-mono">Must Incorporate</span>
+                <span className={`text-[11px] font-mono font-bold ${game.currentRound === 1 ? 'text-purple-400 bg-purple-500/15 px-2 py-0.5 rounded-md' : 'text-bwb-accent'}`}>
+                  {game.currentRound === 1 ? 'Active in Round 2' : 'Must Incorporate'}
+                </span>
               </div>
               <div className="space-y-2.5">
                 {myTechs.map((tech, i) => (

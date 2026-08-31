@@ -382,7 +382,7 @@ export function SolutionForm({ technologies, onSubmit, disabled, initial, submit
       <Textarea
         label={
           currentRound === 1
-            ? "Problem Understanding & Root Cause Analysis [35 Pts] *"
+            ? "Problem Understanding & Root Cause Analysis *"
             : "What does your solution do? *"
         }
         placeholder={
@@ -399,7 +399,7 @@ export function SolutionForm({ technologies, onSubmit, disabled, initial, submit
       <Textarea
         label={
           currentRound === 1
-            ? "Critique of Existing Solutions & Market Gaps [25 Pts] *"
+            ? "Critique of Existing Solutions & Market Gaps *"
             : "How does your solution work & System Flow? *"
         }
         placeholder={
@@ -413,55 +413,68 @@ export function SolutionForm({ technologies, onSubmit, disabled, initial, submit
         required
       />
 
-      <div className="space-y-3">
-        <p className="text-sm font-medium text-bwb-text">
-          {currentRound === 1
-            ? "Initial Tech Stack Formulation & Strategic Relevance [20 Pts] *"
-            : "3 Frontier Tech Cards Integration *"}
-        </p>
-        {technologies.map((tech) => (
-          <Textarea
-            key={tech.id}
-            label={`${tech.icon} ${tech.name}`}
-            placeholder={
-              currentRound === 1
-                ? `How will your squad leverage ${tech.name} to address this challenge?`
-                : `How does ${tech.name} fit into your architecture?`
-            }
-            value={form.techUsage[tech.id] ?? ''}
-            onChange={(e) => updateTech(tech.id, e.target.value)}
-            disabled={disabled}
-            required
-          />
-        ))}
-      </div>
+      {/* TECH STACK SECTION: Open Formulation in Round 1 vs 3 Surprise Cards in Round 2/3 */}
+      {currentRound === 1 ? (
+        <Textarea
+          label="Initial Proposed Tech Stack & Architectural Tools *"
+          placeholder="List and describe the core technologies, tools, protocols, and data pipelines your squad proposes to build this solution (e.g. Edge ML, WebSocket gateways, MQTT, time-series DB, offline caching...)."
+          value={form.mainAdvantage}
+          onChange={(e) => update('mainAdvantage', e.target.value)}
+          disabled={disabled}
+          required
+        />
+      ) : (
+        <div className="space-y-3">
+          <div>
+            <p className="text-sm font-medium text-bwb-text">
+              3 Frontier Tech Cards Integration *
+            </p>
+            <p className="text-[11px] text-bwb-muted mt-0.5">
+              Explain how your architecture synthesizes and deeply integrates all 3 drawn constraint cards:
+            </p>
+          </div>
+          {technologies.map((tech) => (
+            <Textarea
+              key={tech.id}
+              label={`${tech.icon} ${tech.name}`}
+              placeholder={`How does ${tech.name} fit into your architecture?`}
+              value={form.techUsage[tech.id] ?? ''}
+              onChange={(e) => updateTech(tech.id, e.target.value)}
+              disabled={disabled}
+              required
+            />
+          ))}
+        </div>
+      )}
+
+      {currentRound === 1 ? (
+        <Textarea
+          label="Core Strategic Approach & Unique Angle *"
+          placeholder="What is the most critical insight or structured angle your squad brings to this problem that other solutions miss?"
+          value={form.solutionName ? form.techUsage['r1_angle'] || '' : ''}
+          onChange={(e) => updateTech('r1_angle', e.target.value)}
+          disabled={disabled}
+        />
+      ) : (
+        <Textarea
+          label="Main Advantage *"
+          placeholder="What's the biggest strength of your approach compared to existing solutions?"
+          value={form.mainAdvantage}
+          onChange={(e) => update('mainAdvantage', e.target.value)}
+          disabled={disabled}
+          required
+        />
+      )}
 
       <Textarea
         label={
           currentRound === 1
-            ? "Clarity of Approach & Strategic Focus [15 Pts] *"
-            : "Main Advantage *"
-        }
-        placeholder={
-          currentRound === 1
-            ? "What is the most critical insight or structured angle your squad brings to this problem?"
-            : "What's the biggest strength of your approach compared to existing solutions?"
-        }
-        value={form.mainAdvantage}
-        onChange={(e) => update('mainAdvantage', e.target.value)}
-        disabled={disabled}
-        required
-      />
-
-      <Textarea
-        label={
-          currentRound === 1
-            ? "Anticipated Constraints & Judge Defense Preparation [5 Pts] *"
+            ? "Key Operational Risks & Anticipated Constraints *"
             : "Main Limitation & Risk Mitigation *"
         }
         placeholder={
           currentRound === 1
-            ? "What is the biggest operational risk, edge case, or constraint in this problem domain, and how will you defend it during judge Q&A?"
+            ? "What is the biggest operational risk, edge case, or constraint in this problem domain, and how will your team defend it during judge Q&A?"
             : "Be honest — what's the weakest point or key risk?"
         }
         value={form.mainLimitation}
@@ -475,10 +488,10 @@ export function SolutionForm({ technologies, onSubmit, disabled, initial, submit
           <FileText size={16} className="mr-1.5" />
           {submitLabel ?? (
             currentRound === 1
-              ? 'Submit Problem Understanding & Analysis (100 Pts)'
+              ? 'Submit Problem Understanding & Analysis'
               : isRound3
-              ? 'Submit Final Pitch Architecture & Slides (100 Pts)'
-              : 'Submit Round 2 Solution Architecture (100 Pts)'
+              ? 'Submit Final Pitch Architecture & Slides'
+              : 'Submit Round 2 Solution Architecture'
           )}
         </Button>
       )}

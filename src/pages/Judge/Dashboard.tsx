@@ -10,11 +10,13 @@ import { PhaseIndicator } from '../../components/ui/PhaseIndicator'
 import { LeaderboardTable } from '../../components/leaderboard/LeaderboardTable'
 import { useGameStore } from '../../store/gameStore'
 import { toast } from '../../components/ui/Toast'
-import { TECHNOLOGIES } from '../../data/mockData'
+import { TECHNOLOGIES, drawProblemCards } from '../../data/mockData'
 import { api } from '../../lib/api'
 import type { Problem } from '../../types'
+import { useRealtimeGame } from '../../hooks/useRealtimeGame'
 
 export default function JudgeDashboardPage() {
+  useRealtimeGame()
   const { game, setGame } = useGameStore()
   const [catalog, setCatalog] = useState<{ problems: Problem[] }>({ problems: [] })
 
@@ -149,10 +151,12 @@ export default function JudgeDashboardPage() {
             <div className="grid md:grid-cols-2 gap-5">
               {game.teams.map((team, idx) => {
                 const isScored = (team.score ?? 0) > 0
-                const selectedProblem = catalog.problems.find((p) => p.id === team.selectedProblemId)
+                const selectedProblem =
+                  (game.activeProblems || []).find((p) => p.id === team.selectedProblemId) ||
+                  (catalog.problems || []).find((p) => p.id === team.selectedProblemId)
                 const teamTechs = (team.technologies && team.technologies.length >= 3)
                   ? team.technologies
-                  : [TECHNOLOGIES[0], TECHNOLOGIES[1], TECHNOLOGIES[2]]
+                  : (team.selectedProblemId ? drawProblemCards(team.selectedProblemId) : [TECHNOLOGIES[0], TECHNOLOGIES[1], TECHNOLOGIES[2]])
                 const submission = team.submission
 
                 return (
@@ -199,7 +203,7 @@ export default function JudgeDashboardPage() {
                           Challenge Solved:
                         </p>
                         <p className="text-xs font-bold text-bwb-text leading-snug">
-                          {selectedProblem ? `${selectedProblem.title} (${selectedProblem.category})` : 'Assigned Challenge'}
+                          {selectedProblem ? `${selectedProblem.title} (${selectedProblem.category})` : team.selectedProblemId ? `Track ${team.selectedProblemId}` : 'Assigned Challenge'}
                         </p>
                       </div>
 

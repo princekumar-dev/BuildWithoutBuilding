@@ -16,6 +16,7 @@ import { useGameStore } from '../../store/gameStore'
 import { useRealtimeGame } from '../../hooks/useRealtimeGame'
 import { api } from '../../lib/api'
 import { getPhaseDuration } from '../../lib/phaseTimers'
+import { drawProblemCards } from '../../data/mockData'
 import type { Game, GamePhase, Problem, Technology } from '../../types'
 
 const STADIUM_ANNOUNCEMENTS = [
@@ -1690,7 +1691,10 @@ export default function ProjectorPage() {
                   <div className="grid md:grid-cols-2 gap-4 mb-5">
                     {/* Problem Domain */}
                     {(() => {
-                      const teamProblem = catalog.problems.find((p) => p.id === pitchTeam.selectedProblemId) ?? catalog.problems[0]
+                      const teamProblem =
+                        ((game.activeProblems || []).find((p) => p.id === pitchTeam.selectedProblemId)) ||
+                        (catalog.problems.find((p) => p.id === pitchTeam.selectedProblemId)) ||
+                        catalog.problems[0]
                       const theme = teamProblem ? categoryThemes[teamProblem.category] : null
                       return (
                         <div className={`p-4 rounded-2xl bg-gradient-to-br ${theme?.gradient ?? 'from-bwb-surface to-bwb-surface-2'} border ${theme?.border ?? 'border-white/10'} text-left space-y-1.5`}>
@@ -1716,7 +1720,10 @@ export default function ProjectorPage() {
                         <span>Assigned Frontier Tech:</span>
                       </p>
                       <div className="grid grid-cols-3 gap-2">
-                        {((pitchTeam.technologies && pitchTeam.technologies.length >= 3) ? pitchTeam.technologies : catalog.technologies.slice(0, 3)).map((tech) => (
+                        {((pitchTeam.technologies && pitchTeam.technologies.length >= 3)
+                          ? pitchTeam.technologies
+                          : (pitchTeam.selectedProblemId ? drawProblemCards(pitchTeam.selectedProblemId) : catalog.technologies.slice(0, 3))
+                        ).map((tech: Technology) => (
                           <div key={tech.id} className="p-2 rounded-xl bg-bwb-surface-2 border border-white/5 text-center">
                             <span className="text-2xl block mb-0.5">{tech.icon}</span>
                             <span className="text-xs font-bold text-bwb-text truncate block">{tech.name}</span>

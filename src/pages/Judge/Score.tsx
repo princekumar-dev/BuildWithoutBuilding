@@ -8,9 +8,11 @@ import { useGameStore } from '../../store/gameStore'
 import { toast } from '../../components/ui/Toast'
 import { api } from '../../lib/api'
 import type { Problem, ScoreBreakdown } from '../../types'
-import { TECHNOLOGIES } from '../../data/mockData'
+import { TECHNOLOGIES, drawProblemCards } from '../../data/mockData'
+import { useRealtimeGame } from '../../hooks/useRealtimeGame'
 
 export default function JudgeScorePage() {
+  useRealtimeGame()
   const { teamId } = useParams()
   const navigate = useNavigate()
   const { game, setGame } = useGameStore()
@@ -39,10 +41,12 @@ export default function JudgeScorePage() {
     )
   }
 
-  const selectedProblem = catalog.problems.find((p) => p.id === team.selectedProblemId)
+  const selectedProblem =
+    (game.activeProblems || []).find((p) => p.id === team.selectedProblemId) ||
+    (catalog.problems || []).find((p) => p.id === team.selectedProblemId)
   const teamTechs = (team.technologies && team.technologies.length >= 3)
     ? team.technologies
-    : [TECHNOLOGIES[0], TECHNOLOGIES[1], TECHNOLOGIES[2]]
+    : (team.selectedProblemId ? drawProblemCards(team.selectedProblemId) : [TECHNOLOGIES[0], TECHNOLOGIES[1], TECHNOLOGIES[2]])
   const submission = team.submission
 
   const handleScoreSubmit = async (scores: ScoreBreakdown) => {

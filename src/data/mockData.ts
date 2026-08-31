@@ -259,7 +259,7 @@ export const SCORING_CRITERIA = [
 export const ROUND_1_SCORING_CRITERIA = [
   { key: 'problemUnderstanding', label: 'Problem & Root Cause Understanding', max: 35, desc: 'Depth of understanding, target audience needs, and ecosystem pain points' },
   { key: 'technicalFeasibility', label: 'Critique of Existing Solutions & Gaps', max: 25, desc: 'Identification of why current methods fail and where the opportunity lies' },
-  { key: 'technologyUsage', label: 'Initial Tech Stack Formulation', max: 20, desc: 'Relevance of the 3 frontier technologies to the core challenge' },
+  { key: 'technologyUsage', label: 'Initial Tech Stack Formulation', max: 20, desc: 'Feasibility, relevance, and strategic choice of proposed technologies and tools' },
   { key: 'pitch', label: 'Clarity & Structure of Pitch', max: 15, desc: 'Structure, focus, and effectiveness of problem articulation' },
   { key: 'defense', label: 'Judge Q&A Defense', max: 5, desc: 'Response to initial judge queries and problem nuances' },
 ]

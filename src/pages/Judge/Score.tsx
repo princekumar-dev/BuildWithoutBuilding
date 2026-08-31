@@ -203,12 +203,12 @@ export default function JudgeScorePage() {
                 )}
               </div>
 
-              {/* Novelty & Architecture and Elevator Pitch Delivery */}
+              {/* Novelty & Main Advantage and Main Limitation */}
               <div className="grid sm:grid-cols-2 gap-3">
                 <div className="p-3 rounded-2xl bg-bwb-surface-2 border border-white/5">
                   <p className="text-[10px] uppercase font-bold tracking-wider text-bwb-success mb-1 flex items-center justify-between">
-                    <span>{game.currentRound === 2 ? 'Novelty & Architecture (25 Pts)' : 'Core Advantage / Novelty'}</span>
-                    {game.currentRound === 2 && <span className="font-mono text-emerald-400">Max 25 Pts</span>}
+                    <span>{game.currentRound === 2 ? 'Main Advantage & Novelty' : 'Core Advantage'}</span>
+                    {game.currentRound === 2 && <span className="font-mono text-emerald-400">Rubric #2</span>}
                   </p>
                   <p className="text-bwb-text/90 leading-relaxed">
                     {submission.mainAdvantage || '—'}
@@ -216,26 +216,22 @@ export default function JudgeScorePage() {
                 </div>
 
                 <div className="p-3 rounded-2xl bg-bwb-surface-2 border border-white/5">
-                  <p className="text-[10px] uppercase font-bold tracking-wider text-amber-400 mb-1 flex items-center justify-between">
-                    <span>{game.currentRound === 2 ? 'Elevator Pitch Delivery (10 Pts)' : 'Pitch Structure'}</span>
-                    {game.currentRound === 2 && <span className="font-mono text-amber-400">Max 10 Pts</span>}
+                  <p className="text-[10px] uppercase font-bold tracking-wider text-rose-400 mb-1 flex items-center justify-between">
+                    <span>{game.currentRound === 2 ? 'Main Limitation & Risk Mitigation' : 'Risk Mitigation & Defense'}</span>
+                    {game.currentRound === 2 && <span className="font-mono text-rose-400">Rubric #6</span>}
                   </p>
                   <p className="text-bwb-text/90 leading-relaxed">
-                    {submission.techUsage?.['elevatorPitch'] || '60-second architecture pitch delivered live'}
+                    {submission.mainLimitation || '—'}
                   </p>
                 </div>
               </div>
 
-              {/* Judge Attack Defense & Failure Modes */}
-              <div className="p-3.5 rounded-2xl bg-bwb-surface-2 border border-white/5">
-                <p className="text-[10px] uppercase font-bold tracking-wider text-rose-400 mb-1 flex items-center justify-between">
-                  <span>{game.currentRound === 2 ? 'Judge Attack Defense & Failure Modes (5 Pts)' : 'Risk Mitigation & Defense'}</span>
-                  {game.currentRound === 2 && <span className="font-mono text-rose-400">Max 5 Pts</span>}
-                </p>
-                <p className="text-bwb-text/90 leading-relaxed">
-                  {submission.mainLimitation || '—'}
-                </p>
-              </div>
+              {game.currentRound === 2 && (
+                <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-200/90 flex items-center gap-2">
+                  <span>🎙️</span>
+                  <span><strong>Live Stage Rubric:</strong> Elevator Pitch Delivery (10 Pts) & Judge Attack Defense (5 Pts) are graded during their live stage pitch & Q&A.</span>
+                </div>
+              )}
             </div>
           </Card>
         )}

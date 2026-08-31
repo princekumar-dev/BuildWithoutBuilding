@@ -287,17 +287,50 @@ export default function JudgeDashboardPage() {
                             </Button>
                           </div>
                         </div>
+                      ) : isScored ? (
+                        <div className="flex items-center gap-2">
+                          <Link to={`/judge/score/${team.id}`} className="flex-1 block">
+                            <Button
+                              fullWidth
+                              size="sm"
+                              variant="secondary"
+                              className="border-purple-500/40 text-purple-200 hover:text-white"
+                            >
+                              <ClipboardList size={15} className="mr-1.5" />
+                              Edit Score ({currentRoundScore}/100)
+                              <ArrowRight size={14} className="ml-1.5" />
+                            </Button>
+                          </Link>
+                          {isPitched && (
+                            <span className="px-2.5 py-1.5 rounded-xl text-[10px] font-mono font-bold bg-bwb-success/15 text-bwb-success border border-bwb-success/30 flex items-center gap-1 whitespace-nowrap">
+                              <CheckCircle2 size={11} /> Pitched
+                            </span>
+                          )}
+                        </div>
+                      ) : game.phase === 'JUDGING' ? (
+                        <div className="flex items-center gap-2">
+                          <Link to={`/judge/score/${team.id}`} className="flex-1 block">
+                            <Button
+                              fullWidth
+                              size="sm"
+                              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-black shadow-lg shadow-purple-500/20"
+                            >
+                              <ClipboardList size={15} className="mr-1.5" />
+                              Evaluate & Submit Score
+                              <ArrowRight size={14} className="ml-1.5" />
+                            </Button>
+                          </Link>
+                        </div>
                       ) : isPitched ? (
                         <div className="flex items-center gap-2">
                           <Link to={`/judge/score/${team.id}`} className="flex-1 block">
                             <Button
                               fullWidth
                               size="sm"
-                              variant={isScored ? 'secondary' : 'primary'}
-                              className={!isScored ? 'bg-purple-600 hover:bg-purple-500 shadow-lg shadow-purple-500/20' : ''}
+                              className="bg-purple-600 hover:bg-purple-500 text-white font-bold shadow-lg shadow-purple-500/20"
                             >
                               <ClipboardList size={15} className="mr-1.5" />
-                              {isScored ? 'Edit Score' : 'Score Team'}
+                              Score Team
                               <ArrowRight size={14} className="ml-1.5" />
                             </Button>
                           </Link>
@@ -318,15 +351,15 @@ export default function JudgeDashboardPage() {
                             </Button>
                           )}
                           {game.phase !== 'PITCHING' && (
-                            <span className="text-xs text-bwb-muted font-mono">Waiting for Pitching Phase</span>
+                            <span className="text-xs text-bwb-muted font-mono flex-1">Awaiting Evaluation</span>
                           )}
                           <Link to={`/judge/score/${team.id}`} className="block">
                             <Button
                               size="sm"
                               variant="secondary"
-                              className={!isScored ? 'border-purple-500/40 text-purple-300' : ''}
+                              className="border-purple-500/40 text-purple-300"
                             >
-                              <ClipboardList size={14} />
+                              <ClipboardList size={14} className="mr-1" /> Score
                             </Button>
                           </Link>
                         </div>

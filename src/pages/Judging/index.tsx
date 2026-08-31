@@ -1,8 +1,11 @@
+import { useEffect } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Sparkles, Award, CheckCircle2, Shield, Brain, Cpu, Lightbulb, Compass, Zap, Target } from 'lucide-react'
 import { PageLayout } from '../../components/layout/PageLayout'
 import { Card } from '../../components/ui/Card'
 import { Badge } from '../../components/ui/Badge'
+import { Button } from '../../components/ui/Button'
 import { PhaseIndicator } from '../../components/ui/PhaseIndicator'
 import { useGameStore } from '../../store/gameStore'
 import { usePhaseNavigation } from '../../hooks/usePhaseNavigation'
@@ -22,11 +25,24 @@ const ICON_MAP: Record<string, typeof Brain> = {
 export default function JudgingPage() {
   usePhaseNavigation()
   useRealtimeGame()
+  const navigate = useNavigate()
   const { game, session } = useGameStore()
+
+  // Auto-redirect authenticated judges to the Judge Dashboard
+  useEffect(() => {
+    if (localStorage.getItem('judge_token')) {
+      navigate('/judge/dashboard')
+    }
+  }, [navigate])
 
   const myTeam = game.teams.find((t) => t.id === session?.teamId)
   const currentRound = game.currentRound ?? 1
-  const scoredCount = game.teams.filter((t) => (t.score ?? 0) > 0).length
+  const scoredCount = game.teams.filter((t) => {
+    if (currentRound === 1) return (t.round1Score ?? t.score ?? 0) > 0
+    if (currentRound === 2) return (t.round2Score ?? 0) > 0
+    if (currentRound === 3) return (t.round3Score ?? 0) > 0
+    return false
+  }).length
   const totalTeams = game.teams.length || 1
   const progressPercent = Math.round((scoredCount / totalTeams) * 100)
   const currentCriteria = getScoringCriteriaForRound(currentRound)
@@ -54,6 +70,19 @@ export default function JudgingPage() {
             </p>
           </div>
           <PhaseIndicator phase={game.phase} />
+        </div>
+
+        {/* Judge Access Quick-Link Banner */}
+        <div className="mb-6 p-4 rounded-2xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-between flex-wrap gap-3 shadow-lg">
+          <div className="flex items-center gap-2.5 text-purple-200 text-xs font-mono font-bold">
+            <Shield size={18} className="text-purple-400 shrink-0" />
+            <span>Judge Panel Member? Access live squad portfolios & submit/edit scores</span>
+          </div>
+          <Link to="/judge/dashboard">
+            <Button size="sm" className="bg-purple-600 hover:bg-purple-500 text-white font-bold shadow-md">
+              Open Judge Scoring Sheet ➔
+            </Button>
+          </Link>
         </div>
 
         {/* Stadium Deliberation Hero */}

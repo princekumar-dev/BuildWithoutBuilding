@@ -1074,10 +1074,12 @@ createServer(async (request, response) => {
     if (!requireHost(request, response)) return; 
     game.teams.forEach((team) => { 
       team.technologies = drawProblemCards(team.selectedProblemId || 'p1');
-      team.revealedCards = [] 
+      team.revealedCards = [];
     }); 
     save(database); 
-    return json(response, 200, publicGame(game)) 
+    const pGame = publicGame(game);
+    broadcastToClients({ type: 'games-updated', game: pGame });
+    return json(response, 200, pGame);
   }
 
   if (request.method === 'POST' && action === 'select-problem') { 
@@ -1099,7 +1101,9 @@ createServer(async (request, response) => {
     team.technologies = drawProblemCards(input.problemId);
     team.revealedCards = []; 
     save(database); 
-    return json(response, 200, publicGame(game)) 
+    const pGame = publicGame(game);
+    broadcastToClients({ type: 'games-updated', game: pGame });
+    return json(response, 200, pGame);
   }
 
   if (request.method === 'POST' && action === 'reveal-card') { 
@@ -1109,7 +1113,9 @@ createServer(async (request, response) => {
     if (!team.revealedCards) team.revealedCards = []; 
     if (!team.revealedCards.includes(input.slotIndex)) team.revealedCards.push(input.slotIndex); 
     save(database); 
-    return json(response, 200, publicGame(game)) 
+    const pGame = publicGame(game);
+    broadcastToClients({ type: 'games-updated', game: pGame });
+    return json(response, 200, pGame);
   }
 
   if (request.method === 'POST' && action === 'submissions') {
@@ -1117,7 +1123,9 @@ createServer(async (request, response) => {
     if (!team || !input.submission) return json(response, 400, { error: 'Team and submission are required.' });
     team.submission = { ...input.submission, submittedAt: new Date().toISOString() };
     save(database);
-    return json(response, 200, publicGame(game));
+    const pGame = publicGame(game);
+    broadcastToClients({ type: 'games-updated', game: pGame });
+    return json(response, 200, pGame);
   }
 
   if (request.method === 'POST' && action === 'scores') {

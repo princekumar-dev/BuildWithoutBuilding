@@ -1286,8 +1286,10 @@ export default function HostGameControlPage() {
                 ) : (
                   <div className="space-y-3">
                     {game.teams.map((team, idx) => {
-                      const selectedProblem = problems.find((p) => p.id === team.selectedProblemId)
-                      const revealedCardsCount = team.revealedCards?.length ?? 0
+                      const selectedProblem =
+                        (game.activeProblems || []).find((p) => p.id === team.selectedProblemId) ||
+                        (problems || []).find((p) => p.id === team.selectedProblemId)
+                      const revealedCardsCount = team.revealedCards?.length ?? (team.technologies?.length ? 3 : 0)
                       const isSubmitted = !!team.submission
                       const teamPasscode = team.passcode || team.id
 
@@ -1348,10 +1350,10 @@ export default function HostGameControlPage() {
                           <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
                             {/* Left Group: Problem Track + Cards + Submission */}
                             <div className="flex flex-wrap items-center gap-2">
-                              {selectedProblem && team.selectedProblemId ? (
+                              {team.selectedProblemId ? (
                                 <span className="px-2.5 py-1 rounded-xl text-xs font-bold bg-bwb-accent/15 text-bwb-accent border border-bwb-accent/30 flex items-center gap-1.5 shadow-sm">
                                   <CheckCircle2 size={13} className="text-bwb-accent" />
-                                  <span>{selectedProblem.category}</span>
+                                  <span>{selectedProblem?.category || selectedProblem?.title || `Track ${team.selectedProblemId}`}</span>
                                 </span>
                               ) : (
                                 <span className="px-2.5 py-1 rounded-xl text-xs font-medium bg-bwb-surface-2 text-bwb-muted border border-white/5 flex items-center gap-1.5">

@@ -46,7 +46,11 @@ export default function JudgingPage() {
             </div>
             <h1 className="font-display text-3xl sm:text-4xl font-black text-bwb-text">{game.name || 'Tournament Arena'}</h1>
             <p className="text-bwb-muted text-xs sm:text-sm mt-0.5">
-              Judges are evaluating solution proposals, grading technical rubrics, and computing final standings.
+              {currentRound === 1
+                ? 'Judges are reviewing problem understanding, root cause analyses, and initial technical landscape proposals.'
+                : currentRound === 2
+                ? 'Judges are evaluating enhanced solution architectures, 3 frontier tech integrations, and 1v1 duel outcomes.'
+                : 'Judges are grading master system blueprints, live stage defense, and crowning tournament champions.'}
             </p>
           </div>
           <PhaseIndicator phase={game.phase} />
@@ -67,7 +71,7 @@ export default function JudgingPage() {
             </div>
 
             <span className="px-3.5 py-1 rounded-full text-xs font-mono font-bold bg-purple-500/30 text-purple-200 border border-purple-400/40 uppercase tracking-widest mb-2">
-              ⚖️ Official Judging Deliberation
+              ⚖️ Official Judging Deliberation · Round {currentRound}
             </span>
 
             <h2 className="font-display font-black text-2xl sm:text-4xl text-bwb-text mb-3">
@@ -75,7 +79,11 @@ export default function JudgingPage() {
             </h2>
 
             <p className="text-xs sm:text-sm text-bwb-muted max-w-md mx-auto mb-6">
-              The jury panel is reviewing your architecture diagrams, feasibility constraints, and oral defense. Stand by for the live leaderboard reveal!
+              {currentRound === 1
+                ? 'The jury panel is reviewing your problem root causes, existing solution critique, and technical landscape formulation. Stand by for the live reveal!'
+                : currentRound === 2
+                ? 'The jury panel is reviewing your enhanced architecture diagrams, 3 frontier tech cards, and 1v1 showdown defense. Stand by for the live reveal!'
+                : 'The jury panel is finalizing Grand Finals scores and podium placements. Stand by for the championship reveal!'}
             </p>
 
             {/* Deliberation Progress Bar */}
@@ -101,14 +109,14 @@ export default function JudgingPage() {
           </div>
         </motion.div>
 
-        {/* 5 Scoring Rubric Dimensions Cards */}
+        {/* Scoring Rubric Dimensions Cards */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-display font-bold text-base text-bwb-text flex items-center gap-2">
               <CheckCircle2 size={18} className="text-bwb-accent" />
-              Jury Evaluation Rubric Dimensions (100 Points Total)
+              Round {currentRound} Evaluation Rubric Dimensions (100 Points Total)
             </h3>
-            <span className="text-xs font-mono text-bwb-muted">7 Evaluation Criteria</span>
+            <span className="text-xs font-mono text-purple-300 font-bold">{currentCriteria.length} Evaluation Criteria</span>
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
@@ -149,17 +157,17 @@ export default function JudgingPage() {
           <Card padding="lg" className="border-white/10 bg-bwb-surface-2/70">
             <div className="flex items-center justify-between mb-3 pb-2 border-b border-white/5">
               <span className="text-xs font-mono font-bold text-bwb-accent uppercase tracking-wider">
-                Submitted Strategy: {myTeam.name}
+                {currentRound === 1 ? 'Submitted Problem Analysis' : 'Submitted Architecture Strategy'}: {myTeam.name}
               </span>
               <span className="text-xs font-mono text-emerald-400 font-bold flex items-center gap-1">
                 <CheckCircle2 size={13} /> Under Review
               </span>
             </div>
             <p className="font-display font-bold text-lg text-bwb-text mb-1">
-              {myTeam.submission?.solutionName || 'Architecture Formulation'}
+              {myTeam.submission?.solutionName || (currentRound === 1 ? 'Problem Understanding & Analysis' : 'Architecture Formulation')}
             </p>
             <p className="text-xs text-bwb-muted leading-relaxed">
-              {myTeam.submission?.whatItDoes || myTeam.submission?.howItWorks || 'Solution architecture sealed for jury evaluation.'}
+              {myTeam.submission?.whatItDoes || myTeam.submission?.howItWorks || (currentRound === 1 ? 'Problem understanding and root cause analysis sealed for jury evaluation.' : 'Solution architecture sealed for jury evaluation.')}
             </p>
           </Card>
         )}

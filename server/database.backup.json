@@ -467,7 +467,7 @@
       "isRegistrationOpen": true,
       "isFinalRound": false,
       "createdAt": "2026-08-25T10:00:00.000Z",
-      "updatedAt": "2026-08-31T18:20:13.143Z",
+      "updatedAt": "2026-08-31T18:26:23.988Z",
       "totalTeams": 16,
       "phaseStartedAt": null,
       "phaseDurationSeconds": null,
@@ -477,7 +477,7 @@
       "id": "game_91fd6ebb-e95b-4eed-bab2-56f907670205",
       "code": "BWB-170",
       "name": "trail 001",
-      "phase": "PITCHING",
+      "phase": "LEADERBOARD",
       "currentRound": 1,
       "finalistTeamIds": [],
       "teams": [
@@ -527,14 +527,23 @@
             1,
             2
           ],
-          "score": 0,
-          "round1Score": 0,
+          "score": 86,
+          "round1Score": 86,
           "round2Score": 0,
           "round3Score": 0,
           "rank": 1,
           "registeredAt": "2026-08-31T16:22:55.966Z",
           "isOnline": true,
-          "currentSlideIndex": 3
+          "currentSlideIndex": 3,
+          "scoreBreakdown": {
+            "problemUnderstanding": 35,
+            "creativity": 0,
+            "technologyUsage": 20,
+            "technicalFeasibility": 11,
+            "realWorldImpact": 0,
+            "pitch": 15,
+            "defense": 5
+          }
         },
         {
           "id": "team_4eeac8f0-8907-49d4-a926-e0e6e7668013",
@@ -556,13 +565,22 @@
           "technologies": [],
           "selectedProblemId": null,
           "revealedCards": [],
-          "score": 0,
-          "round1Score": 0,
+          "score": 100,
+          "round1Score": 100,
           "round2Score": 0,
           "round3Score": 0,
           "rank": 2,
           "registeredAt": "2026-08-31T16:27:27.170Z",
-          "isOnline": false
+          "isOnline": false,
+          "scoreBreakdown": {
+            "problemUnderstanding": 35,
+            "creativity": 0,
+            "technologyUsage": 20,
+            "technicalFeasibility": 25,
+            "realWorldImpact": 0,
+            "pitch": 15,
+            "defense": 5
+          }
         },
         {
           "id": "team_158f35ad-4a7c-4424-9d6d-ce72706a5438",
@@ -783,18 +801,22 @@
       "isRegistrationOpen": true,
       "isFinalRound": false,
       "createdAt": "2026-08-31T16:21:23.920Z",
-      "updatedAt": "2026-08-31T18:20:13.143Z",
+      "updatedAt": "2026-08-31T18:26:23.988Z",
       "totalTeams": 8,
-      "phaseStartedAt": "2026-08-31T18:20:13.139Z",
-      "phaseDurationSeconds": 180,
-      "phaseExpiresAt": "2026-08-31T18:23:13.139Z",
+      "phaseStartedAt": null,
+      "phaseDurationSeconds": null,
+      "phaseExpiresAt": null,
       "currentPitchTeamId": null,
-      "pitchStartedAt": null,
-      "pitchDurationSeconds": null,
-      "pitchExpiresAt": null,
+      "pitchStartedAt": "2026-08-31T18:26:02.345Z",
+      "pitchDurationSeconds": 180,
+      "pitchExpiresAt": "2026-08-31T18:29:02.345Z",
       "currentSlideIndex": 3,
       "pitchedTeamIds": [
-        "team_45ab5c8e-2d10-42f1-ada5-ce089d032bf9"
+        "team_45ab5c8e-2d10-42f1-ada5-ce089d032bf9",
+        "team_f4726671-0072-42cf-8c9b-e7c207225437",
+        "team_4eeac8f0-8907-49d4-a926-e0e6e7668013",
+        "team_158f35ad-4a7c-4424-9d6d-ce72706a5438",
+        "team_dfa5e420-ae65-4b14-bea6-d9665b8f01cb"
       ]
     }
   ]

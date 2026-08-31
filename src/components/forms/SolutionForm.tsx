@@ -237,145 +237,147 @@ export function SolutionForm({ technologies, onSubmit, disabled, initial, submit
         required
       />
 
-      {/* Presentation Deck / PPT Section */}
-      <div className="p-4 sm:p-5 rounded-2xl bg-bwb-surface-2 border border-bwb-accent/30 space-y-3.5 text-left">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <div>
-            <span className="text-xs font-mono font-bold text-bwb-accent uppercase flex items-center gap-1.5">
-              <Presentation size={15} className="text-bwb-accent" />
-              Pitch Deck & Slides {isRound3 ? '(Required for Finals)' : '(Optional)'}
-            </span>
-            <p className="text-[11px] text-bwb-muted mt-0.5">
-              This presentation will appear on the Stadium Projector and be controlled live from your phone/laptop.
-            </p>
+      {/* Presentation Deck / PPT Section - SHOWN ONLY IN ROUND 3 (GRAND FINALS) */}
+      {isRound3 && (
+        <div className="p-4 sm:p-5 rounded-2xl bg-bwb-surface-2 border border-bwb-accent/30 space-y-3.5 text-left">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <span className="text-xs font-mono font-bold text-bwb-accent uppercase flex items-center gap-1.5">
+                <Presentation size={15} className="text-bwb-accent" />
+                Grand Finals Pitch Deck & Slides (Required)
+              </span>
+              <p className="text-[11px] text-bwb-muted mt-0.5">
+                This presentation will appear on the Stadium Projector and be controlled live from your phone/laptop.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-1.5 bg-bwb-bg p-1 rounded-xl border border-white/10 shrink-0 flex-wrap">
+              <button
+                type="button"
+                onClick={() => setSlideMode('url')}
+                className={`px-2.5 py-1 rounded-lg text-[11px] font-mono font-bold transition-all flex items-center gap-1 ${
+                  slideMode === 'url' ? 'bg-bwb-accent text-bwb-bg shadow' : 'text-bwb-muted hover:text-white'
+                }`}
+              >
+                <LinkIcon size={12} /> Google Slides / URL
+              </button>
+              <button
+                type="button"
+                onClick={() => setSlideMode('upload')}
+                className={`px-2.5 py-1 rounded-lg text-[11px] font-mono font-bold transition-all flex items-center gap-1 ${
+                  slideMode === 'upload' ? 'bg-bwb-accent text-bwb-bg shadow' : 'text-bwb-muted hover:text-white'
+                }`}
+              >
+                <FileText size={12} /> Upload PDF / Slides
+              </button>
+              <button
+                type="button"
+                onClick={() => setSlideMode('smart')}
+                className={`px-2.5 py-1 rounded-lg text-[11px] font-mono font-bold transition-all flex items-center gap-1 ${
+                  slideMode === 'smart' ? 'bg-bwb-accent text-bwb-bg shadow' : 'text-bwb-muted hover:text-white'
+                }`}
+              >
+                <Layers size={12} /> Smart Deck (Auto)
+              </button>
+            </div>
           </div>
 
-          <div className="flex items-center gap-1.5 bg-bwb-bg p-1 rounded-xl border border-white/10 shrink-0 flex-wrap">
-            <button
-              type="button"
-              onClick={() => setSlideMode('url')}
-              className={`px-2.5 py-1 rounded-lg text-[11px] font-mono font-bold transition-all flex items-center gap-1 ${
-                slideMode === 'url' ? 'bg-bwb-accent text-bwb-bg shadow' : 'text-bwb-muted hover:text-white'
-              }`}
-            >
-              <LinkIcon size={12} /> Google Slides / URL
-            </button>
-            <button
-              type="button"
-              onClick={() => setSlideMode('upload')}
-              className={`px-2.5 py-1 rounded-lg text-[11px] font-mono font-bold transition-all flex items-center gap-1 ${
-                slideMode === 'upload' ? 'bg-bwb-accent text-bwb-bg shadow' : 'text-bwb-muted hover:text-white'
-              }`}
-            >
-              <FileText size={12} /> Upload PDF / Slides
-            </button>
-            <button
-              type="button"
-              onClick={() => setSlideMode('smart')}
-              className={`px-2.5 py-1 rounded-lg text-[11px] font-mono font-bold transition-all flex items-center gap-1 ${
-                slideMode === 'smart' ? 'bg-bwb-accent text-bwb-bg shadow' : 'text-bwb-muted hover:text-white'
-              }`}
-            >
-              <Layers size={12} /> Smart Deck (Auto)
-            </button>
-          </div>
-        </div>
-
-        {slideMode === 'url' ? (
-          <div className="space-y-2">
-            <Input
-              label="Google Slides / Canva / PPT Share Link"
-              placeholder="https://docs.google.com/presentation/d/... or https://canva.com/design/..."
-              value={form.presentationUrl && !form.presentationUrl.startsWith('data:') ? form.presentationUrl : ''}
-              onChange={(e) => update('presentationUrl', e.target.value)}
-              disabled={disabled}
-            />
-            <p className="text-[11px] text-bwb-muted font-mono">
-              Paste your public Google Slides, Canva, Pitch, Gamma, or PDF view link. The projector will embed and sync your slides.
-            </p>
-            {form.presentationUrl && !form.presentationUrl.startsWith('data:') && getPresentationEmbedUrl(form.presentationUrl) && (
-              <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center gap-2 text-[11px] text-emerald-300 font-mono">
-                <CheckCircle2 size={13} className="text-emerald-400 shrink-0" />
-                <span>Valid presentation link detected. Projector live sync ready!</span>
-              </div>
-            )}
-          </div>
-        ) : slideMode === 'upload' ? (
-          <div className="space-y-2.5">
-            <label className="block text-xs font-mono font-bold text-bwb-text uppercase">
-              Upload PDF Presentation / Exported Slides (.pdf, .png, .jpg)
-            </label>
-            <div className="border-2 border-dashed border-cyan-500/40 hover:border-cyan-400 rounded-2xl p-4 sm:p-6 text-center bg-bwb-bg/60 transition-all cursor-pointer relative group">
-              <input
-                type="file"
-                accept=".pdf,image/png,image/jpeg"
+          {slideMode === 'url' ? (
+            <div className="space-y-2">
+              <Input
+                label="Google Slides / Canva / PPT Share Link"
+                placeholder="https://docs.google.com/presentation/d/... or https://canva.com/design/..."
+                value={form.presentationUrl && !form.presentationUrl.startsWith('data:') ? form.presentationUrl : ''}
+                onChange={(e) => update('presentationUrl', e.target.value)}
                 disabled={disabled}
-                onChange={(e) => {
-                  const file = e.target.files?.[0]
-                  if (file) {
-                    if (file.size > 25 * 1024 * 1024) {
-                      toast.error('File size exceeds 25MB. Please upload a smaller PDF or use a Google Slides link.')
-                      return
-                    }
-                    const reader = new FileReader()
-                    reader.onload = (event) => {
-                      const dataUrl = event.target?.result as string
-                      update('presentationUrl', dataUrl)
-                    }
-                    reader.readAsDataURL(file)
-                  }
-                }}
-                className="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10"
               />
-              <div className="flex flex-col items-center justify-center space-y-2 pointer-events-none">
-                <div className="w-12 h-12 rounded-2xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <Presentation size={24} />
+              <p className="text-[11px] text-bwb-muted font-mono">
+                Paste your public Google Slides, Canva, Pitch, Gamma, or PDF view link. The projector will embed and sync your slides.
+              </p>
+              {form.presentationUrl && !form.presentationUrl.startsWith('data:') && getPresentationEmbedUrl(form.presentationUrl) && (
+                <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center gap-2 text-[11px] text-emerald-300 font-mono">
+                  <CheckCircle2 size={13} className="text-emerald-400 shrink-0" />
+                  <span>Valid presentation link detected. Projector live sync ready!</span>
                 </div>
-                <div>
-                  <p className="text-xs font-bold text-bwb-text">
-                    {form.presentationUrl?.startsWith('data:') ? '✅ File Uploaded & Ready' : 'Click or Drag & Drop PDF / Slide Deck'}
-                  </p>
-                  <p className="text-[10px] text-bwb-muted font-mono mt-0.5">
-                    Supports PowerPoint exported as PDF or Slide Image Deck (Up to 25MB)
-                  </p>
+              )}
+            </div>
+          ) : slideMode === 'upload' ? (
+            <div className="space-y-2.5">
+              <label className="block text-xs font-mono font-bold text-bwb-text uppercase">
+                Upload PDF Presentation / Exported Slides (.pdf, .png, .jpg)
+              </label>
+              <div className="border-2 border-dashed border-cyan-500/40 hover:border-cyan-400 rounded-2xl p-4 sm:p-6 text-center bg-bwb-bg/60 transition-all cursor-pointer relative group">
+                <input
+                  type="file"
+                  accept=".pdf,image/png,image/jpeg"
+                  disabled={disabled}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0]
+                    if (file) {
+                      if (file.size > 25 * 1024 * 1024) {
+                        toast.error('File size exceeds 25MB. Please upload a smaller PDF or use a Google Slides link.')
+                        return
+                      }
+                      const reader = new FileReader()
+                      reader.onload = (event) => {
+                        const dataUrl = event.target?.result as string
+                        update('presentationUrl', dataUrl)
+                      }
+                      reader.readAsDataURL(file)
+                    }
+                  }}
+                  className="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10"
+                />
+                <div className="flex flex-col items-center justify-center space-y-2 pointer-events-none">
+                  <div className="w-12 h-12 rounded-2xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <Presentation size={24} />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-bwb-text">
+                      {form.presentationUrl?.startsWith('data:') ? '✅ File Uploaded & Ready' : 'Click or Drag & Drop PDF / Slide Deck'}
+                    </p>
+                    <p className="text-[10px] text-bwb-muted font-mono mt-0.5">
+                      Supports PowerPoint exported as PDF or Slide Image Deck (Up to 25MB)
+                    </p>
+                  </div>
                 </div>
               </div>
+              {form.presentationUrl?.startsWith('data:') && (
+                <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-between text-[11px] text-emerald-300 font-mono">
+                  <span className="flex items-center gap-1.5">
+                    <CheckCircle2 size={13} className="text-emerald-400" />
+                    <span>Document loaded. Synced to Stadium Projector.</span>
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => update('presentationUrl', '')}
+                    className="text-red-400 hover:underline font-bold"
+                  >
+                    Remove
+                  </button>
+                </div>
+              )}
             </div>
-            {form.presentationUrl?.startsWith('data:') && (
-              <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-between text-[11px] text-emerald-300 font-mono">
-                <span className="flex items-center gap-1.5">
-                  <CheckCircle2 size={13} className="text-emerald-400" />
-                  <span>Document loaded. Synced to Stadium Projector.</span>
-                </span>
-                <button
-                  type="button"
-                  onClick={() => update('presentationUrl', '')}
-                  className="text-red-400 hover:underline font-bold"
-                >
-                  Remove
-                </button>
+          ) : (
+            <div className="p-3.5 rounded-xl bg-bwb-bg/70 border border-white/10 space-y-2 text-xs">
+              <div className="flex items-center gap-2 text-cyan-300 font-mono font-bold">
+                <Sparkles size={14} className="text-cyan-400" />
+                <span>Smart Holographic Pitch Deck Generator Active</span>
               </div>
-            )}
-          </div>
-        ) : (
-          <div className="p-3.5 rounded-xl bg-bwb-bg/70 border border-white/10 space-y-2 text-xs">
-            <div className="flex items-center gap-2 text-cyan-300 font-mono font-bold">
-              <Sparkles size={14} className="text-cyan-400" />
-              <span>Smart Holographic Pitch Deck Generator Active</span>
+              <p className="text-bwb-muted text-[11px] leading-relaxed">
+                We will automatically construct a 5-slide interactive holographic presentation for the Stadium Projector from your solution details, tech cards, and system architecture below.
+              </p>
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-1.5 pt-1 text-[10px] font-mono text-center">
+                <span className="p-1.5 rounded-lg bg-white/5 border border-white/5 text-bwb-text">1. Overview</span>
+                <span className="p-1.5 rounded-lg bg-white/5 border border-white/5 text-bwb-text">2. Problem</span>
+                <span className="p-1.5 rounded-lg bg-white/5 border border-white/5 text-bwb-text">3. Architecture</span>
+                <span className="p-1.5 rounded-lg bg-white/5 border border-white/5 text-bwb-text">4. 3 Tech Stack</span>
+                <span className="p-1.5 rounded-lg bg-white/5 border border-white/5 text-bwb-text">5. Advantage</span>
+              </div>
             </div>
-            <p className="text-bwb-muted text-[11px] leading-relaxed">
-              We will automatically construct a 5-slide interactive holographic presentation for the Stadium Projector from your solution details, tech cards, and system architecture below.
-            </p>
-            <div className="grid grid-cols-2 sm:grid-cols-5 gap-1.5 pt-1 text-[10px] font-mono text-center">
-              <span className="p-1.5 rounded-lg bg-white/5 border border-white/5 text-bwb-text">1. Overview</span>
-              <span className="p-1.5 rounded-lg bg-white/5 border border-white/5 text-bwb-text">2. Problem</span>
-              <span className="p-1.5 rounded-lg bg-white/5 border border-white/5 text-bwb-text">3. Architecture</span>
-              <span className="p-1.5 rounded-lg bg-white/5 border border-white/5 text-bwb-text">4. 3 Tech Stack</span>
-              <span className="p-1.5 rounded-lg bg-white/5 border border-white/5 text-bwb-text">5. Advantage</span>
-            </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
 
       <Textarea
         label={currentRound === 1 ? "Problem Understanding & What Your Solution Does *" : "What does your solution do? *"}

@@ -263,7 +263,13 @@ export default function GamePage() {
               <div className="flex items-center justify-between mb-5">
                 <div>
                   <h2 className="font-display text-lg font-bold text-bwb-text flex items-center gap-2">
-                    <span>Solution Architecture Form</span>
+                    <span>
+                      {game.currentRound === 1
+                        ? 'Round 1: Problem Understanding & Analysis Form'
+                        : game.currentRound === 2
+                        ? 'Round 2: Solution Architecture & 1v1 Showdown Form'
+                        : 'Round 3: Grand Finals Master Architecture Form'}
+                    </span>
                     {isEditing && (
                       <span className="text-xs px-2.5 py-0.5 rounded-full bg-amber-400/15 text-amber-300 font-mono font-bold">
                         Editing Mode
@@ -272,8 +278,10 @@ export default function GamePage() {
                   </h2>
                   <p className="text-xs text-bwb-muted mt-0.5">
                     {isFormLocked
-                      ? 'Form is currently locked in view mode. Click "Edit Solution" above to modify.'
-                      : 'Fill in your architecture and technical formulation below.'}
+                      ? `Form is currently locked in view mode. Click "${game.currentRound === 1 ? 'Edit Analysis' : 'Edit Solution'}" above to modify.`
+                      : game.currentRound === 1
+                      ? 'Document your problem root causes, critique of existing solutions, and initial 3-card tech stack below.'
+                      : 'Fill in your architecture flow and technical formulation below.'}
                   </p>
                 </div>
 
@@ -285,7 +293,7 @@ export default function GamePage() {
                     className="text-xs text-amber-300 border-amber-400/40 hover:bg-amber-400/10"
                   >
                     <Edit3 size={13} className="mr-1" />
-                    <span>Edit Answers</span>
+                    <span>{game.currentRound === 1 ? 'Edit Analysis' : 'Edit Answers'}</span>
                   </Button>
                 )}
               </div>
@@ -295,7 +303,11 @@ export default function GamePage() {
                 onSubmit={handleSubmit}
                 disabled={isFormLocked || saving}
                 initial={currentSubmission}
-                submitLabel={isEditing ? (saving ? 'Saving Changes…' : 'Update & Save Solution') : (saving ? 'Submitting…' : 'Submit Solution')}
+                submitLabel={
+                  isEditing
+                    ? (saving ? 'Saving Changes…' : game.currentRound === 1 ? 'Update & Save Analysis' : 'Update & Save Solution')
+                    : (saving ? 'Submitting…' : undefined)
+                }
                 currentRound={game.currentRound || 1}
               />
             </Card>

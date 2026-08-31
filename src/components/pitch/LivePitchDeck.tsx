@@ -222,6 +222,20 @@ export function LivePitchDeck({
         </div>
 
         <div className="flex items-center gap-2">
+          {/* Auto-Slide Toggle Button */}
+          <button
+            onClick={() => setIsAutoPlay(!isAutoPlay)}
+            className={`px-2.5 py-1 rounded-xl border text-[11px] font-mono font-bold flex items-center gap-1.5 transition-all ${
+              isAutoPlay
+                ? 'bg-cyan-500/15 text-cyan-300 border-cyan-500/30 shadow-sm'
+                : 'bg-amber-500/20 text-amber-300 border-amber-500/30'
+            }`}
+            title={isAutoPlay ? 'Auto-Advancing Slides (Click to Pause)' : 'Auto-Advancing Paused (Click to Resume)'}
+          >
+            {isAutoPlay ? <Pause size={12} /> : <Play size={12} />}
+            <span>{isAutoPlay ? 'Auto-Slide' : 'Paused'}</span>
+          </button>
+
           {/* Projector Sync Indicator */}
           <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-[10px] font-mono font-bold text-emerald-300">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
@@ -338,49 +352,32 @@ export function LivePitchDeck({
           />
         </div>
 
-        {/* Slide Tabs & Auto-Play Controls */}
-        <div className="flex items-center justify-between gap-2 flex-wrap">
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none flex-wrap sm:flex-nowrap">
-            {slides.map((s, idx) => {
-              const isActive = idx === currentIndex
-              const shortLabels: Record<number, Record<number, string>> = {
-                1: { 0: 'Overview', 1: 'Root Causes', 2: 'Gap Analysis', 3: 'Tech Stack', 4: 'Defense' },
-                2: { 0: 'Overview', 1: 'Alignment', 2: 'System Flow', 3: '3 Frontier Tech', 4: 'Defense' },
-                3: { 0: 'Overview', 1: 'Deep Dive', 2: 'Architecture', 3: 'Tech Matrix', 4: 'Final Edge' },
-              }
-              const tabLabel = shortLabels[round]?.[idx] || (s.title.length > 16 ? `${s.title.slice(0, 14)}..` : s.title)
+        {/* Slide Tabs */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none flex-wrap sm:flex-nowrap justify-between sm:justify-start">
+          {slides.map((s, idx) => {
+            const isActive = idx === currentIndex
+            const shortLabels: Record<number, Record<number, string>> = {
+              1: { 0: 'Overview', 1: 'Root Causes', 2: 'Gap Analysis', 3: 'Tech Stack', 4: 'Defense' },
+              2: { 0: 'Overview', 1: 'Alignment', 2: 'System Flow', 3: '3 Frontier Tech', 4: 'Defense' },
+              3: { 0: 'Overview', 1: 'Deep Dive', 2: 'Architecture', 3: 'Tech Matrix', 4: 'Final Edge' },
+            }
+            const tabLabel = shortLabels[round]?.[idx] || (s.title.length > 16 ? `${s.title.slice(0, 14)}..` : s.title)
 
-              return (
-                <button
-                  key={s.id}
-                  onClick={() => goToSlide(idx)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition-all shrink-0 flex items-center gap-1.5 border whitespace-nowrap ${
-                    isActive
-                      ? 'bg-cyan-400 text-black border-cyan-400 shadow-lg scale-105 font-black'
-                      : 'bg-white/5 hover:bg-white/10 text-bwb-muted border-white/10 hover:text-white'
-                  }`}
-                >
-                  <span className="text-xs">{s.icon || `#${idx + 1}`}</span>
-                  <span>{tabLabel}</span>
-                </button>
-              )
-            })}
-          </div>
-
-          <div className="flex items-center gap-2 shrink-0">
-            <button
-              onClick={() => setIsAutoPlay(!isAutoPlay)}
-              className={`px-2.5 py-1.5 rounded-xl border text-xs font-mono font-bold flex items-center gap-1.5 transition-all ${
-                isAutoPlay
-                  ? 'bg-cyan-500/15 text-cyan-300 border-cyan-500/30 shadow-sm'
-                  : 'bg-amber-500/20 text-amber-300 border-amber-500/30'
-              }`}
-              title={isAutoPlay ? 'Auto-Advancing Slides (Click to Pause)' : 'Auto-Advancing Paused (Click to Resume)'}
-            >
-              {isAutoPlay ? <Pause size={12} /> : <Play size={12} />}
-              <span>{isAutoPlay ? 'Auto-Slide' : 'Paused'}</span>
-            </button>
-          </div>
+            return (
+              <button
+                key={s.id}
+                onClick={() => goToSlide(idx)}
+                className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition-all shrink-0 flex items-center gap-1.5 border whitespace-nowrap ${
+                  isActive
+                    ? 'bg-cyan-400 text-black border-cyan-400 shadow-lg scale-105 font-black'
+                    : 'bg-white/5 hover:bg-white/10 text-bwb-muted border-white/10 hover:text-white'
+                }`}
+              >
+                <span className="text-xs">{s.icon || `#${idx + 1}`}</span>
+                <span>{tabLabel}</span>
+              </button>
+            )
+          })}
         </div>
 
         {/* Controller Tip for Presenters */}

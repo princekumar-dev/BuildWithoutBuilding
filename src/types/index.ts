@@ -111,6 +111,7 @@ export interface Game {
   currentPitchTeamId?: string
   currentSlideIndex?: number
   pitchedTeamIds?: string[]
+  pitchedTeamIdsByRound?: Record<number, string[]>
   isFinalRound: boolean
   finalistTeamIds?: string[]
   problemTeamCounts?: Record<string, number>

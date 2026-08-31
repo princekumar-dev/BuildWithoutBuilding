@@ -635,7 +635,29 @@ function publicGame(game) {
     game.finalistTeamIds = game.finalistTeamIds || [];
   }
 
-  game.pitchedTeamIds = game.pitchedTeamIds || [];
+  if (!game.pitchedTeamIdsByRound) {
+    game.pitchedTeamIdsByRound = { 1: [], 2: [], 3: [] };
+  }
+
+  const activeRound = game.currentRound;
+  if (!game.pitchedTeamIdsByRound[activeRound]) {
+    game.pitchedTeamIdsByRound[activeRound] = [];
+  }
+
+  // Ensure pitched team list is strictly isolated to the active round
+  const scoredInActiveRound = game.teams.filter((t) => {
+    if (activeRound === 1) return (t.round1Score > 0 || (t.score > 0 && (!t.round2Score && !t.round3Score)));
+    if (activeRound === 2) return (t.round2Score > 0);
+    if (activeRound === 3) return (t.round3Score > 0);
+    return false;
+  }).map((t) => t.id);
+
+  const activePitchedSet = new Set([
+    ...(game.pitchedTeamIdsByRound[activeRound] || []),
+    ...scoredInActiveRound
+  ]);
+  game.pitchedTeamIdsByRound[activeRound] = Array.from(activePitchedSet);
+  game.pitchedTeamIds = game.pitchedTeamIdsByRound[activeRound];
   game.currentPitchTeamId = game.currentPitchTeamId || null;
   game.problemTeamCounts = counts;
   game.whatsappGroupUrl = game.whatsappGroupUrl || null;
@@ -1151,10 +1173,13 @@ createServer(async (request, response) => {
       team.score = total;
     }
 
-    if (!game.pitchedTeamIds) game.pitchedTeamIds = [];
-    if (!game.pitchedTeamIds.includes(team.id)) {
-      game.pitchedTeamIds.push(team.id);
+    if (!game.pitchedTeamIdsByRound) game.pitchedTeamIdsByRound = { 1: [], 2: [], 3: [] };
+    if (!game.pitchedTeamIdsByRound[currentRound]) game.pitchedTeamIdsByRound[currentRound] = [];
+    if (!game.pitchedTeamIdsByRound[currentRound].includes(team.id)) {
+      game.pitchedTeamIdsByRound[currentRound].push(team.id);
     }
+    game.pitchedTeamIds = game.pitchedTeamIdsByRound[currentRound];
+
     if (game.currentPitchTeamId === team.id) {
       game.currentPitchTeamId = null;
       game.pitchExpiresAt = null;
@@ -1221,15 +1246,20 @@ createServer(async (request, response) => {
     if (!requireHostOrJudge(request, response)) return;
     const team = game.teams.find((item) => item.id === input.teamId);
     if (!team) return json(response, 404, { error: 'Team not found.' });
-    if (!game.pitchedTeamIds) game.pitchedTeamIds = [];
-    if (!game.pitchedTeamIds.includes(input.teamId)) {
-      game.pitchedTeamIds.push(input.teamId);
+    const currentRound = game.currentRound || 1;
+    if (!game.pitchedTeamIdsByRound) game.pitchedTeamIdsByRound = { 1: [], 2: [], 3: [] };
+    if (!game.pitchedTeamIdsByRound[currentRound]) game.pitchedTeamIdsByRound[currentRound] = [];
+    if (!game.pitchedTeamIdsByRound[currentRound].includes(input.teamId)) {
+      game.pitchedTeamIdsByRound[currentRound].push(input.teamId);
     }
+    game.pitchedTeamIds = game.pitchedTeamIdsByRound[currentRound];
     if (game.currentPitchTeamId === input.teamId) {
       game.currentPitchTeamId = null;
     }
     save(database);
-    return json(response, 200, publicGame(game));
+    const pGame = publicGame(game);
+    broadcastToClients({ type: 'games-updated', game: pGame });
+    return json(response, 200, pGame);
   }
 
   return json(response, 405, { error: 'Method not allowed.' })

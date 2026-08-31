@@ -38,7 +38,6 @@ export default function JudgeDashboardPage() {
 
   const scoredTeamsCount = game.teams.filter((t) => getTeamRoundScore(t) > 0).length
   const allScored = game.teams.length > 0 && scoredTeamsCount === game.teams.length
-  const pitchedTeamIds = game.pitchedTeamIds || []
 
   const handleCallToPitch = async (teamId: string, teamName: string) => {
     if (!game.id) return
@@ -160,7 +159,8 @@ export default function JudgeDashboardPage() {
               {game.teams.map((team, idx) => {
                 const currentRoundScore = getTeamRoundScore(team)
                 const isScored = currentRoundScore > 0
-                const isPitched = pitchedTeamIds.includes(team.id) || isScored
+                const roundPitchedIds = game.pitchedTeamIdsByRound?.[currentRound] || []
+                const isPitched = roundPitchedIds.includes(team.id) || isScored || (currentRound === 1 && (game.pitchedTeamIds || []).includes(team.id))
                 const selectedProblem =
                   (game.activeProblems || []).find((p) => p.id === team.selectedProblemId) ||
                   (catalog.problems || []).find((p) => p.id === team.selectedProblemId)

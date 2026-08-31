@@ -259,6 +259,11 @@ export default function ProjectorPage() {
   const [isTeamPagePaused, setIsTeamPagePaused] = useState(false)
   const [teamPageSwapProgress, setTeamPageSwapProgress] = useState(0)
 
+  // Live Building Phase Team Matrix Auto-Pagination (4 teams per view to fit 100vh frame without scrolling)
+  const [buildPageIndex, setBuildPageIndex] = useState(0)
+  const [isBuildPagePaused, setIsBuildPagePaused] = useState(false)
+  const [buildPageSwapProgress, setBuildPageSwapProgress] = useState(0)
+
   // Active display phase (strictly driven in real-time by host via SSE)
   const currentPhase: GamePhase = game.phase ?? 'LOBBY'
   const currentRound = game.currentRound || (game.isFinalRound ? 3 : 1)
@@ -291,6 +296,11 @@ export default function ProjectorPage() {
   const safeTeamPageIndex = teamPageIndex % totalTeamPages
   const currentBatchTeams = lobbyTeams.slice(safeTeamPageIndex * TEAMS_PER_PAGE, (safeTeamPageIndex + 1) * TEAMS_PER_PAGE)
 
+  const BUILD_TEAMS_PER_PAGE = 4
+  const totalBuildPages = Math.max(1, Math.ceil(game.teams.length / BUILD_TEAMS_PER_PAGE))
+  const safeBuildPageIndex = buildPageIndex % totalBuildPages
+  const currentBuildBatchTeams = game.teams.slice(safeBuildPageIndex * BUILD_TEAMS_PER_PAGE, (safeBuildPageIndex + 1) * BUILD_TEAMS_PER_PAGE)
+
   // Auto-cycle lobby teams every 7.5s with progress bar when > 8 teams
   useEffect(() => {
     if (totalTeamPages <= 1 || isTeamPagePaused || currentPhase !== 'LOBBY') {
@@ -315,6 +325,31 @@ export default function ProjectorPage() {
 
     return () => clearInterval(progressTimer)
   }, [totalTeamPages, isTeamPagePaused, currentPhase])
+
+  // Auto-cycle building teams every 6.5s with progress bar when > 4 teams
+  useEffect(() => {
+    if (totalBuildPages <= 1 || isBuildPagePaused || currentPhase !== 'BUILDING') {
+      setBuildPageSwapProgress(0)
+      return
+    }
+
+    const DURATION_MS = 6500
+    const STEP_MS = 50
+    let elapsed = 0
+
+    const progressTimer = setInterval(() => {
+      elapsed += STEP_MS
+      setBuildPageSwapProgress(Math.min(100, (elapsed / DURATION_MS) * 100))
+
+      if (elapsed >= DURATION_MS) {
+        elapsed = 0
+        setBuildPageSwapProgress(0)
+        setBuildPageIndex((prev) => (prev + 1) % totalBuildPages)
+      }
+    }, STEP_MS)
+
+    return () => clearInterval(progressTimer)
+  }, [totalBuildPages, isBuildPagePaused, currentPhase])
 
   return (
     <div className="projector-mobile-view min-h-screen bg-bwb-bg grid-bg text-bwb-text flex flex-col select-none overflow-x-hidden font-sans">
@@ -1502,155 +1537,255 @@ export default function ProjectorPage() {
         {/* ============================================================
             4. BUILDING PHASE: LIVE COUNTDOWN & TEAMS STRATEGY ARENA
             ============================================================ */}
+        {/* ============================================================
+            4. BUILDING PHASE: LIVE COUNTDOWN & AUTO-SWAPPING TEAMS MATRIX
+            ============================================================ */}
         {currentPhase === 'BUILDING' && (
-          <div className="w-full max-w-7xl mx-auto flex flex-col items-center justify-center my-auto px-4">
-            {/* Round & Phase Badges + Title */}
-            <div className="w-full text-center mb-8">
-              <div className="flex items-center justify-center gap-2 mb-3">
-                <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30">
+          <div className="w-full max-w-7xl mx-auto flex flex-col items-center justify-between my-auto px-3 sm:px-6 py-2">
+            {/* Top Round & Phase HUD */}
+            <div className="w-full text-center mb-2 sm:mb-3">
+              <div className="flex items-center justify-center gap-2 mb-1.5 flex-wrap">
+                <span className="px-3 py-0.5 rounded-full text-[11px] font-mono font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30">
                   {currentRound === 1
                     ? 'Round 1 · Open Qualifier (No Elimination)'
                     : currentRound === 2
                     ? 'Round 2 · Problem Showdown (Top 8 Qualify)'
                     : 'Round 3 · Grand Finals (Top 4 Prized)'}
                 </span>
-                <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-bwb-accent/20 text-bwb-accent border border-bwb-accent/30">
+                <span className="px-3 py-0.5 rounded-full text-[11px] font-mono font-bold bg-bwb-accent/20 text-bwb-accent border border-bwb-accent/30">
                   Build Phase
                 </span>
+                <span className="px-2.5 py-0.5 rounded-lg text-[11px] font-mono text-bwb-muted bg-white/5 border border-white/10">
+                  {game.code}
+                </span>
               </div>
-              <h1 className="font-display text-3xl sm:text-5xl font-black flex items-center justify-center gap-3 text-gradient">
-                <Zap className="text-amber-400" size={36} />
-                Live Engineering Arena
+              <h1 className="font-display text-2xl sm:text-4xl font-black flex items-center justify-center gap-2 text-gradient">
+                <Zap className="text-amber-400" size={26} />
+                <span>Live Engineering Arena</span>
               </h1>
-              <p className="text-bwb-muted mt-2">{game.name || 'Build Without Building Tournament'}</p>
+              <p className="text-bwb-muted text-xs mt-0.5">{game.name || 'Build Without Building Tournament'}</p>
             </div>
 
-            {/* Countdown Hero */}
-            <div className="w-full text-center mb-8">
-              <div className="stereo-card rounded-3xl p-6 sm:p-8 max-w-2xl mx-auto border-2 border-bwb-accent/40 shadow-2xl mb-6 relative overflow-hidden">
-                <div className="absolute -top-20 -right-20 w-48 h-48 rounded-full bg-bwb-accent/10 blur-3xl pointer-events-none" />
-                <CountdownTimer
-                  key={`proj-build-${currentRound}-${game.phaseExpiresAt}`}
-                  targetTime={game.phaseExpiresAt}
-                  initialSeconds={getPhaseDuration(game.id, currentRound, 'BUILDING', game.buildDurationMinutes)}
-                  size="xl"
-                  label="BUILD PHASE TIME REMAINING"
-                />
+            {/* Countdown Hero & Submissions Tracker in a Single Compact Bar */}
+            <div className="w-full max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 mb-3 p-3 px-5 rounded-2xl stereo-card border border-bwb-accent/40 bg-gradient-to-r from-bwb-surface-2/90 via-bwb-surface/90 to-bwb-surface-2/90 shadow-xl backdrop-blur-xl">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-bwb-accent/15 text-bwb-accent border border-bwb-accent/30 flex items-center justify-center shrink-0">
+                  <Clock size={18} className="animate-spin text-bwb-accent" />
+                </div>
+                <div>
+                  <span className="text-[9px] font-mono font-bold text-bwb-muted uppercase tracking-wider block">
+                    BUILD PHASE REMAINING
+                  </span>
+                  <CountdownTimer
+                    key={`proj-build-${currentRound}-${game.phaseExpiresAt}`}
+                    targetTime={game.phaseExpiresAt}
+                    initialSeconds={getPhaseDuration(game.id, currentRound, 'BUILDING', game.buildDurationMinutes)}
+                    size="md"
+                    showExpired={false}
+                  />
+                </div>
               </div>
 
-              {/* Live Submission Status Tracker */}
-              <div className="p-3.5 px-6 rounded-2xl glass border border-bwb-border max-w-2xl mx-auto flex items-center justify-between shadow-lg">
-                <div className="flex items-center gap-2 text-sm">
-                  <Activity className="text-bwb-accent animate-pulse" size={18} />
-                  <span>Submissions: <strong className="text-bwb-accent">{totalSubmissions}</strong> / {game.teams.length} teams submitted</span>
+              <div className="w-full sm:w-72 bg-bwb-bg/80 p-2 rounded-xl border border-white/5">
+                <div className="flex items-center justify-between text-xs font-mono mb-1">
+                  <span className="text-bwb-muted flex items-center gap-1 text-[11px]">
+                    <Activity className="text-bwb-accent animate-pulse" size={12} /> Submissions
+                  </span>
+                  <span className="text-bwb-accent font-bold text-[11px]">
+                    {totalSubmissions} / {game.teams.length} ({game.teams.length > 0 ? Math.round((totalSubmissions / game.teams.length) * 100) : 0}%)
+                  </span>
                 </div>
-                <div className="w-36 bg-bwb-surface-2 rounded-full h-3 overflow-hidden border border-white/5">
+                <div className="w-full bg-white/5 rounded-full h-1.5 overflow-hidden">
                   <div
-                    className="bg-bwb-accent h-full transition-all duration-500 rounded-full"
+                    className="bg-gradient-to-r from-bwb-accent to-emerald-400 h-full transition-all duration-500 rounded-full"
                     style={{ width: `${game.teams.length > 0 ? (totalSubmissions / game.teams.length) * 100 : 0}%` }}
                   />
                 </div>
               </div>
             </div>
 
-            {/* Live Teams Wall: Showing their actual chosen problem & tech stack */}
-            <div className="w-full">
-              <div className="flex items-center justify-between mb-4 px-1">
-                <h3 className="font-display font-bold text-lg text-bwb-text flex items-center gap-2">
-                  <Users size={18} className="text-bwb-accent" />
-                  Live Team Challenges & Architectures
+            {/* Live Teams Wall with Auto-Rotation Carousel (4 Teams Per View to Fit 100vh Single Frame) */}
+            <div
+              className="w-full"
+              onMouseEnter={() => setIsBuildPagePaused(true)}
+              onMouseLeave={() => setIsBuildPagePaused(false)}
+            >
+              <div className="flex items-center justify-between mb-2.5 px-1">
+                <h3 className="font-display font-bold text-sm sm:text-base text-bwb-text flex items-center gap-2">
+                  <Users size={16} className="text-bwb-accent" />
+                  <span>Live Team Challenges & Architectures</span>
+                  <span className="text-xs font-mono text-bwb-muted font-normal">({game.teams.length} Competing Teams)</span>
                 </h3>
-                <span className="text-xs font-mono text-bwb-muted">
-                  {game.teams.length} Competing Teams
-                </span>
+
+                {totalBuildPages > 1 && (
+                  <div className="flex items-center gap-2 bg-bwb-surface-2/95 border border-cyan-500/30 px-3 py-1 rounded-xl shadow-lg backdrop-blur-xl shrink-0">
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
+                      <span className="text-xs font-mono font-black text-cyan-300">
+                        PAGE {safeBuildPageIndex + 1}/{totalBuildPages}
+                      </span>
+                    </div>
+
+                    {/* Progress Countdown Line */}
+                    <div className="w-14 sm:w-18 bg-white/10 h-1.5 rounded-full overflow-hidden relative" title="Time until next batch rotates">
+                      <motion.div
+                        className="h-full bg-gradient-to-r from-cyan-400 to-amber-400 rounded-full"
+                        style={{ width: `${buildPageSwapProgress}%` }}
+                      />
+                    </div>
+
+                    {/* Interactive Page Dot Buttons */}
+                    <div className="flex items-center gap-1">
+                      {Array.from({ length: totalBuildPages }).map((_, pIdx) => (
+                        <button
+                          key={pIdx}
+                          onClick={() => setBuildPageIndex(pIdx)}
+                          className={`w-4 h-4 rounded-full text-[9px] font-mono font-bold flex items-center justify-center transition-all ${
+                            pIdx === safeBuildPageIndex
+                              ? 'bg-cyan-400 text-black font-black scale-110 shadow-[0_0_8px_rgba(0,229,199,0.5)]'
+                              : 'bg-white/10 text-bwb-muted hover:bg-white/20 hover:text-white'
+                          }`}
+                          title={`View Page ${pIdx + 1}`}
+                        >
+                          {pIdx + 1}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Controls */}
+                    <div className="flex items-center gap-1 pl-1 border-l border-white/10">
+                      <button
+                        onClick={() => setBuildPageIndex((prev) => (prev - 1 + totalBuildPages) % totalBuildPages)}
+                        className="p-1 rounded-md bg-white/5 hover:bg-white/15 text-bwb-muted hover:text-white transition-colors"
+                        title="Previous Squads"
+                      >
+                        <ChevronLeft size={12} />
+                      </button>
+                      <button
+                        onClick={() => setIsBuildPagePaused(!isBuildPagePaused)}
+                        className={`p-1 rounded-md transition-colors ${
+                          isBuildPagePaused ? 'bg-amber-400/20 text-amber-300' : 'bg-white/5 hover:bg-white/15 text-bwb-muted hover:text-white'
+                        }`}
+                        title={isBuildPagePaused ? 'Resume Auto-Rotation' : 'Pause on these Squads'}
+                      >
+                        {isBuildPagePaused ? <Play size={12} /> : <Pause size={12} />}
+                      </button>
+                      <button
+                        onClick={() => setBuildPageIndex((prev) => (prev + 1) % totalBuildPages)}
+                        className="p-1 rounded-md bg-white/5 hover:bg-white/15 text-bwb-muted hover:text-white transition-colors"
+                        title="Next Squads"
+                      >
+                        <ChevronRight size={12} />
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
 
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                {game.teams.map((team, tIdx) => {
-                  const teamProblem = catalog.problems.find((p) => p.id === team.selectedProblemId) ?? catalog.problems[0]
-                  const theme = teamProblem ? categoryThemes[teamProblem.category] : null
-                  const teamTechs = (team.technologies && team.technologies.length >= 3)
-                    ? team.technologies
-                    : (catalog.technologies.length >= 3 ? catalog.technologies.slice(0, 3) : [])
-                  const isSubmitted = !!team.submission
+              {/* 4-Card Auto-Swapping Staggered Row */}
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={`build-page-${safeBuildPageIndex}`}
+                  initial="hidden"
+                  animate="show"
+                  exit="exit"
+                  variants={{
+                    hidden: {},
+                    show: { transition: { staggerChildren: 0.045 } },
+                    exit: { transition: { staggerChildren: 0.025, staggerDirection: -1 } },
+                  }}
+                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3"
+                >
+                  {currentBuildBatchTeams.map((team, idx) => {
+                    const teamAbsoluteIndex = safeBuildPageIndex * BUILD_TEAMS_PER_PAGE + idx + 1
+                    const teamProblem = catalog.problems.find((p) => p.id === team.selectedProblemId) ?? catalog.problems[0]
+                    const theme = teamProblem ? categoryThemes[teamProblem.category] : null
+                    const teamTechs = (team.technologies && team.technologies.length >= 3)
+                      ? team.technologies
+                      : (team.selectedProblemId ? drawProblemCards(team.selectedProblemId) : (catalog.technologies.length >= 3 ? catalog.technologies.slice(0, 3) : []))
+                    const isSubmitted = !!team.submission
 
-                  return (
-                    <motion.div
-                      key={team.id}
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: tIdx * 0.05 }}
-                      className="stereo-card rounded-3xl p-5 border border-bwb-border relative overflow-hidden flex flex-col justify-between shadow-xl"
-                    >
-                      <div>
-                        {/* Team Header */}
-                        <div className="flex items-center justify-between mb-3 pb-2.5 border-b border-white/5">
-                          <div className="flex items-center gap-2">
-                            <span className="font-mono text-xs text-bwb-accent font-bold px-2 py-0.5 rounded-lg bg-bwb-accent/10 border border-bwb-accent/20">
-                              #{tIdx + 1}
-                            </span>
-                            <h4 className="font-display font-bold text-base text-bwb-text truncate">
-                              {team.name}
-                            </h4>
-                          </div>
-
-                          <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-lg flex items-center gap-1 border ${
-                            isSubmitted
-                              ? 'bg-bwb-success/20 text-bwb-success border-bwb-success/30'
-                              : 'bg-bwb-surface-2 text-bwb-muted border-bwb-border'
-                          }`}>
-                            {isSubmitted ? (
-                              <>
-                                <CheckCircle2 size={12} />
-                                <span>Submitted</span>
-                              </>
-                            ) : (
-                              <span>Building...</span>
-                            )}
-                          </span>
-                        </div>
-
-                        {/* Chosen Problem */}
-                        {teamProblem && theme && (
-                          <div className={`p-3.5 rounded-2xl bg-gradient-to-br ${theme.gradient} border ${theme.border} mb-3`}>
-                            <div className="flex items-center gap-1.5 mb-1.5">
-                              <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold border ${theme.badge}`}>
-                                {theme.icon} {teamProblem.category}
+                    return (
+                      <motion.div
+                        key={team.id}
+                        variants={{
+                          hidden: { opacity: 0, scale: 0.92, y: 12 },
+                          show: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.32, ease: [0.16, 1, 0.3, 1] } },
+                          exit: { opacity: 0, scale: 0.92, y: -12, transition: { duration: 0.22, ease: 'easeIn' } },
+                        }}
+                        className="stereo-card rounded-2xl p-3.5 border border-bwb-border hover:border-cyan-400/40 relative overflow-hidden flex flex-col justify-between shadow-xl bg-bwb-surface-2/95 group transition-all"
+                      >
+                        <div>
+                          {/* Team Header */}
+                          <div className="flex items-center justify-between mb-2 pb-1.5 border-b border-white/5">
+                            <div className="flex items-center gap-1.5 min-w-0">
+                              <span className="font-mono text-[10px] text-bwb-accent font-bold px-1.5 py-0.5 rounded-md bg-bwb-accent/10 border border-bwb-accent/20 shrink-0">
+                                #{teamAbsoluteIndex}
                               </span>
+                              <h4 className="font-display font-bold text-sm text-bwb-text truncate group-hover:text-cyan-300 transition-colors">
+                                {team.name}
+                              </h4>
                             </div>
-                            <h5 className="font-display font-bold text-sm text-bwb-text leading-snug line-clamp-2">
-                              {teamProblem.title}
-                            </h5>
-                            {teamProblem.twist && (
-                              <p className="text-[10px] text-bwb-warn mt-1.5 font-medium line-clamp-1">
-                                ⚡ Twist: {teamProblem.twist}
-                              </p>
-                            )}
-                          </div>
-                        )}
-                      </div>
 
-                      {/* 3 Assigned Tech Cards */}
-                      <div>
-                        <p className="text-[10px] uppercase font-mono text-bwb-muted font-bold mb-1.5">
-                          Assigned Tech Stack:
-                        </p>
-                        <div className="grid grid-cols-3 gap-1.5">
-                          {teamTechs.map((tech) => (
-                            <div
-                              key={tech.id}
-                              className="p-1.5 rounded-xl bg-bwb-surface-2 border border-white/5 flex items-center gap-1.5 text-xs text-bwb-text truncate"
-                            >
-                              <span className="text-sm shrink-0">{tech.icon}</span>
-                              <span className="truncate font-semibold text-[11px]">{tech.name}</span>
+                            <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-lg flex items-center gap-1 border shrink-0 ${
+                              isSubmitted
+                                ? 'bg-bwb-success/20 text-bwb-success border-bwb-success/30'
+                                : 'bg-bwb-surface text-bwb-muted border-white/10'
+                            }`}>
+                              {isSubmitted ? (
+                                <>
+                                  <CheckCircle2 size={11} />
+                                  <span>Submitted</span>
+                                </>
+                              ) : (
+                                <span>Building...</span>
+                              )}
+                            </span>
+                          </div>
+
+                          {/* Problem Statement Card */}
+                          {teamProblem && theme && (
+                            <div className={`p-2 rounded-xl bg-gradient-to-br ${theme.gradient} border ${theme.border} mb-2`}>
+                              <div className="flex items-center gap-1 mb-0.5">
+                                <span className={`px-1.5 py-0.5 rounded text-[8px] font-bold border ${theme.badge}`}>
+                                  {theme.icon} {teamProblem.category}
+                                </span>
+                              </div>
+                              <h5 className="font-display font-bold text-xs text-bwb-text leading-snug line-clamp-2">
+                                {teamProblem.title}
+                              </h5>
+                              {teamProblem.twist && (
+                                <p className="text-[9px] text-bwb-warn mt-0.5 font-medium line-clamp-1">
+                                  ⚡ Twist: {teamProblem.twist}
+                                </p>
+                              )}
                             </div>
-                          ))}
+                          )}
                         </div>
-                      </div>
-                    </motion.div>
-                  )
-                })}
-              </div>
+
+                        {/* 3 Assigned Frontier Tech Stack */}
+                        <div>
+                          <p className="text-[8px] uppercase font-mono text-bwb-muted font-bold mb-1">
+                            Assigned Tech Stack:
+                          </p>
+                          <div className="grid grid-cols-3 gap-1">
+                            {teamTechs.map((tech) => (
+                              <div
+                                key={tech.id}
+                                className="p-1 rounded-lg bg-bwb-surface border border-white/5 flex items-center gap-1 text-[9px] text-bwb-text truncate"
+                                title={tech.name}
+                              >
+                                <span className="text-xs shrink-0">{tech.icon}</span>
+                                <span className="truncate font-semibold text-[8px]">{tech.name}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </motion.div>
+                    )
+                  })}
+                </motion.div>
+              </AnimatePresence>
             </div>
           </div>
         )}

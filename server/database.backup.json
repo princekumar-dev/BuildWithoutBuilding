@@ -467,7 +467,7 @@
       "isRegistrationOpen": true,
       "isFinalRound": false,
       "createdAt": "2026-08-25T10:00:00.000Z",
-      "updatedAt": "2026-08-31T18:31:54.036Z",
+      "updatedAt": "2026-08-31T18:38:28.087Z",
       "totalTeams": 16,
       "phaseStartedAt": null,
       "phaseDurationSeconds": null,
@@ -477,8 +477,8 @@
       "id": "game_91fd6ebb-e95b-4eed-bab2-56f907670205",
       "code": "BWB-170",
       "name": "trail 001",
-      "phase": "LEADERBOARD",
-      "currentRound": 1,
+      "phase": "LOBBY",
+      "currentRound": 2,
       "finalistTeamIds": [],
       "teams": [
         {
@@ -801,7 +801,7 @@
       "isRegistrationOpen": true,
       "isFinalRound": false,
       "createdAt": "2026-08-31T16:21:23.920Z",
-      "updatedAt": "2026-08-31T18:31:54.037Z",
+      "updatedAt": "2026-08-31T18:38:28.087Z",
       "totalTeams": 8,
       "phaseStartedAt": null,
       "phaseDurationSeconds": null,

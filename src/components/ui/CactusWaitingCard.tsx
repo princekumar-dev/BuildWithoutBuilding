@@ -55,9 +55,6 @@ export function CactusWaitingCard({
   whatsappGroupUrl,
 }: CactusWaitingCardProps) {
   const { game } = useGameStore()
-  const trackCount = (game?.activeProblems && game.activeProblems.length > 0)
-    ? game.activeProblems.length
-    : (game?.maxTeams === 8 ? 4 : 8)
 
   const [copied, setCopied] = useState(false)
   const [quoteIndex, setQuoteIndex] = useState(0)
@@ -862,7 +859,11 @@ export function CactusWaitingCard({
               </div>
 
               {/* Round 1 */}
-              <div className="p-3 rounded-xl bg-bwb-surface border border-purple-500/20 flex items-start gap-3">
+              <div className={`p-3 rounded-xl transition-all flex items-start gap-3 border ${
+                (game?.currentRound || 1) === 1
+                  ? 'bg-purple-950/30 border-purple-400 ring-1 ring-purple-500/40'
+                  : 'bg-bwb-surface border-purple-500/20 opacity-80'
+              }`}>
                 <span className="w-7 h-7 rounded-lg bg-purple-500/20 text-purple-300 border border-purple-500/40 flex items-center justify-center text-xs font-mono font-bold shrink-0">
                   R1
                 </span>
@@ -870,17 +871,21 @@ export function CactusWaitingCard({
                   <div className="flex items-center gap-1.5 flex-wrap">
                     <p className="text-xs font-bold text-bwb-text">Round 1: Problem & Existing Landscape (100 Pts)</p>
                     <span className="text-[10px] font-mono font-bold px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                      Zero Elimination · 45m Build
+                      {(game?.currentRound || 1) === 1 ? 'CURRENT ACTIVE ROUND · Zero Elim' : 'Zero Elimination · 45m Build'}
                     </span>
                   </div>
                   <p className="text-[11px] text-bwb-muted mt-0.5 leading-relaxed">
-                    Select 1 of {trackCount} problems, draft 3 frontier tech cards, and pitch your deep problem root causes and critique of existing solutions. 45-minute build sprint. Evaluated for 100 pts.
+                    Select your problem track, preview surprise tech cards, and pitch your deep problem root causes and critique of existing solutions. 45-minute sprint (100 pts).
                   </p>
                 </div>
               </div>
 
               {/* Round 2 */}
-              <div className="p-3 rounded-xl bg-bwb-surface border border-bwb-accent/20 flex items-start gap-3">
+              <div className={`p-3 rounded-xl transition-all flex items-start gap-3 border ${
+                game?.currentRound === 2
+                  ? 'bg-cyan-950/30 border-bwb-accent ring-1 ring-bwb-accent/40'
+                  : 'bg-bwb-surface border-bwb-accent/20 opacity-80'
+              }`}>
                 <span className="w-7 h-7 rounded-lg bg-bwb-accent/20 text-bwb-accent border border-bwb-accent/40 flex items-center justify-center text-xs font-mono font-bold shrink-0">
                   R2
                 </span>
@@ -888,17 +893,21 @@ export function CactusWaitingCard({
                   <div className="flex items-center gap-1.5 flex-wrap">
                     <p className="text-xs font-bold text-bwb-text">Round 2: Solution & Tech Architecture (100 Pts)</p>
                     <span className="text-[10px] font-mono font-bold px-1.5 py-0.2 rounded bg-bwb-accent/20 text-bwb-accent border border-bwb-accent/30">
-                      Top {trackCount} Advance · 30m Build
+                      {game?.currentRound === 2 ? 'CURRENT ACTIVE ROUND · 1v1 Duels' : 'Top 8 Champions Advance · 30m Build'}
                     </span>
                   </div>
                   <p className="text-[11px] text-bwb-muted mt-0.5 leading-relaxed">
-                    Present your enhanced architecture and deep 3-card frontier tech synergy. 30-minute build sprint. Evaluated for 100 pts. Top {trackCount} Problem Champions advance to Grand Finals!
+                    1v1 problem showdown duels! Integrate all 3 surprise tech cards into your enhanced architecture. 30-minute build sprint. Top 8 Problem Champions advance to Grand Finals!
                   </p>
                 </div>
               </div>
 
               {/* Round 3 */}
-              <div className="p-3 rounded-xl bg-bwb-surface border border-amber-500/20 flex items-start gap-3">
+              <div className={`p-3 rounded-xl transition-all flex items-start gap-3 border ${
+                game?.currentRound === 3 || game?.isFinalRound
+                  ? 'bg-amber-950/30 border-amber-400 ring-1 ring-amber-500/40'
+                  : 'bg-bwb-surface border-amber-500/20 opacity-80'
+              }`}>
                 <span className="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center justify-center text-xs font-mono font-bold shrink-0">
                   R3
                 </span>
@@ -906,11 +915,11 @@ export function CactusWaitingCard({
                   <div className="flex items-center gap-1.5 flex-wrap">
                     <p className="text-xs font-bold text-bwb-text">Round 3: Grand Finals & Championship Defense</p>
                     <span className="text-[10px] font-mono font-bold px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                      Top 4 Podium · 30m Polish
+                      {game?.currentRound === 3 || game?.isFinalRound ? 'CURRENT ACTIVE ROUND · Grand Finals' : 'Top 4 Podium · 30m Polish'}
                     </span>
                   </div>
                   <p className="text-[11px] text-bwb-muted mt-0.5 leading-relaxed">
-                    Top {trackCount} Finalists polish master blueprints (30m) and defend live on stage against judge Q&A. Top 4 teams win honors: 🥇 1st Champion, 🥈 2nd Runner-Up, 🥉 Dual 3rd Bronze Winners.
+                    The 8 Problem Champions deliver master blueprints and defend live on stage against judge Q&A. Top 4 teams win podium honors: 🥇 1st Champion, 🥈 2nd Runner-Up, 🥉 Dual 3rd Bronze Winners.
                   </p>
                 </div>
               </div>

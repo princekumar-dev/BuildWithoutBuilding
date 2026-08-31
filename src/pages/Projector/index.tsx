@@ -19,14 +19,25 @@ import { getPhaseDuration } from '../../lib/phaseTimers'
 import { drawProblemCards } from '../../data/mockData'
 import type { Game, GamePhase, Problem, Technology } from '../../types'
 
-const STADIUM_ANNOUNCEMENTS = [
-  { icon: '🚀', tag: 'ARENA STAGE BROADCAST', text: 'Welcome squads! Connect your devices at /join and prepare your architecture strategy!' },
-  { icon: '⚡', tag: 'ROUND 1 · 100 PTS', text: 'Round 1: Pitch deep problem understanding, root causes & landscape (Zero elimination, all scores carry forward)!' },
-  { icon: '🎯', tag: 'ROUND 2 · 100 PTS', text: 'Round 2: Pitch enhanced solution architecture & 3 frontier tech integrations (Top 8 squads advance to Grand Finals)!' },
-  { icon: '🏆', tag: 'ROUND 3 · GRAND FINALS', text: 'Round 3: Top 8 Finalists pitch master solutions and defend live on stage against judge Q&A!' },
-  { icon: '🥇', tag: 'CHAMPIONSHIP PODIUM', text: 'Top 4 winners crowned on podium: 1st Champion, 2nd Runner-Up, and Dual 3rd Place Bronze winners!' },
-  { icon: '⏱️', tag: 'RAPID ARCHITECTURE', text: 'Formulate system flows, edge-to-cloud handshakes, and realistic BOM feasibility!' },
-]
+const LOBBY_ROUND_ANNOUNCEMENTS: Record<number, Array<{ icon: string; tag: string; text: string }>> = {
+  1: [
+    { icon: '🚀', tag: 'ROUND 1 · OPEN QUALIFIER', text: 'Welcome squads! Connect your devices at /join and prepare your problem root cause analysis!' },
+    { icon: '⚡', tag: 'ROUND 1 · 100 PTS', text: 'Round 1: Pitch deep problem understanding, target user needs & landscape critique (Zero elimination, all points carry forward)!' },
+    { icon: '🎯', tag: '45-MIN SPRINT', text: 'Formulate stakeholder pain points, legacy shortcomings & initial open architectural tech stack!' },
+    { icon: '💡', tag: 'ZERO ELIMINATION', text: 'All squads advance to Round 2 to compete across the problem statement duel tracks!' },
+  ],
+  2: [
+    { icon: '⚔️', tag: 'ROUND 2 · 1V1 DUELS', text: 'Round 2 Showdown Duels! 1v1 match per problem statement. Top 8 Problem Champions advance to Grand Finals!' },
+    { icon: '🔮', tag: '3-TECH CARDS ACTIVE', text: 'Incorporate all 3 surprise frontier tech constraint cards seamlessly into your solution architecture!' },
+    { icon: '⚡', tag: 'ROUND 2 · 100 PTS', text: 'Defend your enhanced architecture, edge-to-cloud data flows, and BOM cost feasibility!' },
+    { icon: '🏆', tag: '8 PROBLEM CHAMPIONS', text: 'The winner of each problem track advances directly into Round 3 Grand Finals!' },
+  ],
+  3: [
+    { icon: '🏆', tag: 'ROUND 3 · GRAND FINALS', text: 'The 8 Problem Champions deliver master blueprints and defend live on stage against aggressive judge Q&A!' },
+    { icon: '🥇', tag: 'CHAMPIONSHIP PODIUM', text: 'Top 4 winners crowned on podium: 1st Champion, 2nd Runner-Up, and Dual 3rd Place Bronze winners!' },
+    { icon: '🎤', tag: 'STAGE SPOTLIGHT', text: 'Deliver your master presentation and defend system architectures under judge cross-examination.' },
+  ],
+}
 
 const PITCH_ROUND_CONFIG: Record<number, {
   roundLabel: string
@@ -187,8 +198,8 @@ export default function ProjectorPage() {
   // Auto-cycle stage announcements
   useEffect(() => {
     const announcer = setInterval(() => {
-      setAnnouncementIndex((prev) => (prev + 1) % STADIUM_ANNOUNCEMENTS.length)
-    }, 4500)
+      setAnnouncementIndex((prev) => (prev + 1) % 4)
+    }, 5500)
     return () => clearInterval(announcer)
   }, [])
 
@@ -272,7 +283,8 @@ export default function ProjectorPage() {
   const lobbyTeams = game.currentRound === 3 && (game.finalistTeamIds?.length ?? 0) > 0
     ? game.teams.filter((team) => game.finalistTeamIds?.includes(team.id))
     : game.teams
-  const currentAnnouncement = STADIUM_ANNOUNCEMENTS[announcementIndex]
+  const activeAnnouncements = LOBBY_ROUND_ANNOUNCEMENTS[currentRound] || LOBBY_ROUND_ANNOUNCEMENTS[1]
+  const currentAnnouncement = activeAnnouncements[announcementIndex % activeAnnouncements.length]
 
   const TEAMS_PER_PAGE = 8
   const totalTeamPages = Math.max(1, Math.ceil(lobbyTeams.length / TEAMS_PER_PAGE))
@@ -671,7 +683,7 @@ export default function ProjectorPage() {
                     <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500" />
                   </span>
                   <span className="text-sm font-mono font-bold text-emerald-300 tracking-wider uppercase">
-                    Host Standby Mode · Tournament Launches Live When Round 1 Begins
+                    Host Standby Mode · Tournament Launches Live When Round {currentRound} Begins
                   </span>
                 </div>
               )}
@@ -691,38 +703,74 @@ export default function ProjectorPage() {
                 {/* 3-Round Format Cards */}
                 <div className="grid sm:grid-cols-3 gap-3.5">
                   {/* Round 1 */}
-                  <div className="p-4 rounded-2xl bg-bwb-bg/80 border border-purple-500/30 space-y-1.5 shadow-sm">
+                  <div className={`p-4 rounded-2xl bg-bwb-bg/80 space-y-1.5 shadow-sm transition-all border ${
+                    currentRound === 1
+                      ? 'border-purple-400 ring-2 ring-purple-500/30 bg-purple-950/25 shadow-purple-500/10'
+                      : 'border-purple-500/20 opacity-75'
+                  }`}>
                     <div className="flex items-center justify-between">
-                      <span className="px-2 py-0.5 rounded-md bg-purple-500/20 text-purple-300 font-mono text-[10px] font-bold">ROUND 1 · 100 PTS</span>
-                      <span className="text-[10px] font-mono text-emerald-400 font-bold">45m Build · Zero Elim</span>
+                      <span className="px-2 py-0.5 rounded-md bg-purple-500/20 text-purple-300 font-mono text-[10px] font-bold">
+                        ROUND 1 · 100 PTS
+                      </span>
+                      {currentRound === 1 ? (
+                        <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-black bg-purple-500 text-bwb-bg">
+                          ACTIVE ROUND
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-mono text-emerald-400 font-bold">45m Build · Zero Elim</span>
+                      )}
                     </div>
                     <h4 className="font-display font-bold text-sm text-bwb-text">Problem & Existing Landscape</h4>
                     <p className="text-xs text-bwb-muted leading-relaxed">
-                      Select 1 of {trackCount} problems, draft 3 surprise tech cards, and pitch your deep problem understanding, root causes, and critique of existing solutions.
+                      Select your problem track, preview surprise tech cards, and pitch deep problem root causes, pain points & critique of existing solutions.
                     </p>
                   </div>
 
                   {/* Round 2 */}
-                  <div className="p-4 rounded-2xl bg-bwb-bg/80 border border-bwb-accent/30 space-y-1.5 shadow-sm">
+                  <div className={`p-4 rounded-2xl bg-bwb-bg/80 space-y-1.5 shadow-sm transition-all border ${
+                    currentRound === 2
+                      ? 'border-cyan-400 ring-2 ring-cyan-500/30 bg-cyan-950/25 shadow-cyan-500/10'
+                      : 'border-bwb-accent/20 opacity-75'
+                  }`}>
                     <div className="flex items-center justify-between">
-                      <span className="px-2 py-0.5 rounded-md bg-bwb-accent/20 text-bwb-accent font-mono text-[10px] font-bold">ROUND 2 · 100 PTS</span>
-                      <span className="text-[10px] font-mono text-bwb-accent font-bold">30m Build · Top {trackCount}</span>
+                      <span className="px-2 py-0.5 rounded-md bg-bwb-accent/20 text-bwb-accent font-mono text-[10px] font-bold">
+                        ROUND 2 · 100 PTS
+                      </span>
+                      {currentRound === 2 ? (
+                        <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-black bg-bwb-accent text-bwb-bg">
+                          ACTIVE ROUND
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-mono text-bwb-accent font-bold">30m Build · Top 8 Champions</span>
+                      )}
                     </div>
                     <h4 className="font-display font-bold text-sm text-bwb-text">Solution & Tech Architecture</h4>
                     <p className="text-xs text-bwb-muted leading-relaxed">
-                      Present how you enhance your solution, integrate all 3 surprise tech cards, and deliver novel ideation. Top {trackCount} squads qualify for Grand Finals!
+                      1v1 problem showdown duels! Integrate all 3 surprise frontier tech constraint cards into your solution architecture. The 8 Problem Champions qualify for Grand Finals!
                     </p>
                   </div>
 
                   {/* Round 3 */}
-                  <div className="p-4 rounded-2xl bg-bwb-bg/80 border border-amber-500/30 space-y-1.5 shadow-sm">
+                  <div className={`p-4 rounded-2xl bg-bwb-bg/80 space-y-1.5 shadow-sm transition-all border ${
+                    currentRound === 3
+                      ? 'border-amber-400 ring-2 ring-amber-500/30 bg-amber-950/25 shadow-amber-500/10'
+                      : 'border-amber-500/20 opacity-75'
+                  }`}>
                     <div className="flex items-center justify-between">
-                      <span className="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 font-mono text-[10px] font-bold">ROUND 3 · GRAND FINALS</span>
-                      <span className="text-[10px] font-mono text-amber-300 font-bold">30m Polish · Top 4</span>
+                      <span className="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 font-mono text-[10px] font-bold">
+                        ROUND 3 · GRAND FINALS
+                      </span>
+                      {currentRound === 3 ? (
+                        <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-black bg-amber-400 text-bwb-bg">
+                          ACTIVE ROUND
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-mono text-amber-300 font-bold">30m Polish · Top 4 Prized</span>
+                      )}
                     </div>
                     <h4 className="font-display font-bold text-sm text-bwb-text">Master Pitch & Defense</h4>
                     <p className="text-xs text-bwb-muted leading-relaxed">
-                      Top {trackCount} Finalists pitch refined master architectures and defend against live judge Q&A. Top 4 squads are crowned on the championship podium!
+                      The 8 Problem Champions deliver master blueprints and defend live on stage against judge Q&A. Top 4 squads are crowned on the championship podium!
                     </p>
                   </div>
                 </div>

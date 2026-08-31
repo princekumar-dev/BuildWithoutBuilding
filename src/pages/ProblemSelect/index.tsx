@@ -36,11 +36,20 @@ export default function ProblemSelectPage() {
 
   useEffect(() => {
     if (game?.activeProblems && game.activeProblems.length > 0) {
-      setProblems(game.activeProblems)
+      setProblems((prev) => {
+        const prevIds = prev.map((p) => p.id).join(',')
+        const nextIds = game.activeProblems!.map((p) => p.id).join(',')
+        return prevIds === nextIds ? prev : game.activeProblems!
+      })
     } else {
       api.getCatalog().then((c) => {
         if (game?.activeProblemIds && game.activeProblemIds.length > 0) {
-          setProblems(c.problems.filter((p) => game.activeProblemIds?.includes(p.id)))
+          const filtered = c.problems.filter((p) => game.activeProblemIds?.includes(p.id))
+          setProblems((prev) => {
+            const prevIds = prev.map((p) => p.id).join(',')
+            const nextIds = filtered.map((p) => p.id).join(',')
+            return prevIds === nextIds ? prev : filtered
+          })
         } else if (game?.maxTeams === 8) {
           setProblems(c.problems.slice(0, 4))
         } else {
@@ -48,7 +57,7 @@ export default function ProblemSelectPage() {
         }
       }).catch(() => {})
     }
-  }, [game?.activeProblems, game?.activeProblemIds, game?.maxTeams])
+  }, [game?.activeProblems, (game?.activeProblemIds || []).join(','), game?.maxTeams])
 
   useEffect(() => {
     const myTeam = game.teams.find((t) => t.id === session?.teamId)

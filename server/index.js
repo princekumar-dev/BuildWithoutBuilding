@@ -510,9 +510,23 @@ function ensureGameActiveProblems(game) {
 
   if (!game.activeProblemIds || !Array.isArray(game.activeProblemIds) || game.activeProblemIds.length !== targetCount) {
     if (targetCount === 4) {
-      // Randomly pick 4 distinct problems from catalog for 8-team 1v1 duels
-      const shuffled = [...catalog.problems].sort(() => Math.random() - 0.5);
-      game.activeProblemIds = shuffled.slice(0, 4).map((p) => p.id);
+      // Deterministically seed selection based on game.id / game.code so the exact same 4 problems are permanently locked for this room!
+      const seedStr = `${game.id || ''}_${game.code || ''}`;
+      let hash = 0;
+      for (let i = 0; i < seedStr.length; i++) {
+        hash = (hash * 31 + seedStr.charCodeAt(i)) >>> 0;
+      }
+      const list = [...catalog.problems];
+      const selectedIds = [];
+      let currentHash = hash || 12345;
+      
+      while (selectedIds.length < 4 && list.length > 0) {
+        currentHash = (currentHash * 1664525 + 1013904223) >>> 0;
+        const idx = currentHash % list.length;
+        selectedIds.push(list[idx].id);
+        list.splice(idx, 1);
+      }
+      game.activeProblemIds = selectedIds;
     } else {
       // All 8 problems for 16-team 1v1 duels
       game.activeProblemIds = catalog.problems.map((p) => p.id);

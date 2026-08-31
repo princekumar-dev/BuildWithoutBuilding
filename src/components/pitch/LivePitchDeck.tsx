@@ -13,6 +13,7 @@ interface LivePitchDeckProps {
   isController?: boolean
   onSlideChange?: (index: number) => void
   catalogProblems?: Array<{ id: string; title: string; category: string; twist?: string }>
+  round?: number
 }
 
 export function LivePitchDeck({
@@ -21,6 +22,7 @@ export function LivePitchDeck({
   isController = false,
   onSlideChange,
   catalogProblems = [],
+  round = 1,
 }: LivePitchDeckProps) {
   const [localIndex, setLocalIndex] = useState(activeSlideIndex)
   const [isFullscreen, setIsFullscreen] = useState(false)
@@ -38,13 +40,14 @@ export function LivePitchDeck({
     ? submission.slides
     : generateNativeSlides(
         submission || {
-          solutionName: 'System Architecture Proposal',
-          whatItDoes: 'Scalable autonomous domain architecture.',
+          solutionName: round === 1 ? 'Problem & Landscape Formulation' : 'System Architecture Proposal',
+          whatItDoes: 'Scalable autonomous domain architecture and ecosystem strategy.',
           howItWorks: 'Real-time telemetry and edge computation loop.',
           mainAdvantage: 'High reliability and resilient fault tolerance.',
           mainLimitation: 'Initial calibration requirements.',
         },
-        team.technologies || []
+        team.technologies || [],
+        round
       )
 
   const maxIndex = slides.length - 1

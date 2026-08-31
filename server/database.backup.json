@@ -467,7 +467,7 @@
       "isRegistrationOpen": true,
       "isFinalRound": false,
       "createdAt": "2026-08-25T10:00:00.000Z",
-      "updatedAt": "2026-08-31T18:01:06.717Z",
+      "updatedAt": "2026-08-31T18:11:05.134Z",
       "totalTeams": 16,
       "phaseStartedAt": null,
       "phaseDurationSeconds": null,
@@ -477,7 +477,7 @@
       "id": "game_91fd6ebb-e95b-4eed-bab2-56f907670205",
       "code": "BWB-170",
       "name": "trail 001",
-      "phase": "CARD_REVEAL",
+      "phase": "JUDGING",
       "currentRound": 1,
       "finalistTeamIds": [],
       "teams": [
@@ -534,7 +534,7 @@
           "rank": 1,
           "registeredAt": "2026-08-31T16:22:55.966Z",
           "isOnline": true,
-          "currentSlideIndex": 4
+          "currentSlideIndex": 3
         },
         {
           "id": "team_4eeac8f0-8907-49d4-a926-e0e6e7668013",
@@ -774,16 +774,16 @@
       "isRegistrationOpen": true,
       "isFinalRound": false,
       "createdAt": "2026-08-31T16:21:23.920Z",
-      "updatedAt": "2026-08-31T18:01:06.717Z",
+      "updatedAt": "2026-08-31T18:11:05.134Z",
       "totalTeams": 8,
       "phaseStartedAt": null,
       "phaseDurationSeconds": null,
       "phaseExpiresAt": null,
-      "currentPitchTeamId": null,
-      "pitchStartedAt": "2026-08-31T17:40:27.477Z",
+      "currentPitchTeamId": "team_f4726671-0072-42cf-8c9b-e7c207225437",
+      "pitchStartedAt": "2026-08-31T18:08:47.351Z",
       "pitchDurationSeconds": 180,
-      "pitchExpiresAt": "2026-08-31T17:43:27.477Z",
-      "currentSlideIndex": 4,
+      "pitchExpiresAt": "2026-08-31T18:11:47.351Z",
+      "currentSlideIndex": 3,
       "pitchedTeamIds": [
         "team_45ab5c8e-2d10-42f1-ada5-ce089d032bf9"
       ]

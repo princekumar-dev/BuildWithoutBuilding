@@ -215,6 +215,7 @@ export default function PitchPage() {
                       }
                     }}
                     catalogProblems={problems}
+                    round={game.currentRound || 1}
                   />
                 </div>
               </div>

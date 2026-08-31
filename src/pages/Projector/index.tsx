@@ -1740,6 +1740,7 @@ export default function ProjectorPage() {
                       activeSlideIndex={game.currentSlideIndex ?? pitchTeam.currentSlideIndex ?? 0}
                       isController={false}
                       catalogProblems={catalog.problems}
+                      round={game.currentRound || 1}
                     />
                   </div>
                 </motion.div>

@@ -32,20 +32,93 @@ export function getPresentationEmbedUrl(url?: string): string | null {
   return trimmed
 }
 
-export function generateNativeSlides(form: Partial<Submission>, technologies: Technology[]): SlideItem[] {
-  const name = form.solutionName || 'System Architecture Proposal'
+export function generateNativeSlides(form: Partial<Submission>, technologies: Technology[], currentRound: number = 1): SlideItem[] {
+  const name = form.solutionName || (currentRound === 1 ? 'Problem & Landscape Formulation' : 'System Architecture Proposal')
   const whatItDoes = form.whatItDoes || 'Innovative solution addressing critical domain challenges.'
   const howItWorks = form.howItWorks || 'End-to-end intelligent data pipeline and automated actuation system.'
   const mainAdvantage = form.mainAdvantage || 'High reliability, low latency, and cost-effective deployment.'
   const mainLimitation = form.mainLimitation || 'Initial hardware calibration and edge synchronization.'
 
+  if (currentRound === 1) {
+    return [
+      {
+        id: 'slide-1',
+        title: name,
+        subtitle: 'Round 1 Pitch · Problem Understanding & Landscape (100 Pts)',
+        badge: 'SLIDE 1 · EXECUTIVE OVERVIEW',
+        icon: '🎯',
+        content: whatItDoes,
+        visualType: 'conclusion',
+        bulletPoints: [
+          `Initiative Scope: ${whatItDoes.slice(0, 130)}...`,
+          'Strategic Domain: Comprehensive Problem Root Cause Formulation',
+          'Zero Elimination Qualifier · Full Standing Carried to Round 2',
+        ],
+      },
+      {
+        id: 'slide-2',
+        title: 'Problem Understanding & Root Cause Analysis',
+        subtitle: 'Target stakeholder pain points & deep ecosystem bottlenecks',
+        badge: 'SLIDE 2 · ROOT CAUSES',
+        icon: '🔍',
+        content: whatItDoes,
+        visualType: 'bullets',
+        bulletPoints: [
+          `Core Problem & Stakeholders: ${whatItDoes.slice(0, 130)}...`,
+          'Ecosystem Impact: High operational downtime and workflow friction',
+          'Root Cause Diagnosis: Architectural latency and legacy bottlenecks',
+        ],
+      },
+      {
+        id: 'slide-3',
+        title: 'Critique of Existing Solutions & Market Gaps',
+        subtitle: 'Why legacy alternatives fail & where the strategic opportunity lies',
+        badge: 'SLIDE 3 · GAP ANALYSIS',
+        icon: '⚡',
+        content: howItWorks,
+        visualType: 'architecture',
+        bulletPoints: [
+          `Existing System Shortcomings: ${howItWorks.slice(0, 130)}...`,
+          'Legacy Vulnerabilities: High infrastructure costs & single failure points',
+          'The Strategic Opportunity: Modern resilient workflow with real-time telemetry',
+        ],
+      },
+      {
+        id: 'slide-4',
+        title: 'Proposed Initial Tech Stack & Tools',
+        subtitle: 'Open architectural technologies, frameworks & data pipelines',
+        badge: 'SLIDE 4 · TECH FORMULATION',
+        icon: '🛠️',
+        visualType: 'bullets',
+        bulletPoints: [
+          `Proposed Technology Stack: ${mainAdvantage.slice(0, 140)}...`,
+          'Core Building Blocks: Edge computing, real-time messaging & modular microservices',
+          'Strategic Feasibility: Designed for zero downtime, low latency & rapid field deployment',
+        ],
+      },
+      {
+        id: 'slide-5',
+        title: 'Key Constraints & Judge Defense Strategy',
+        subtitle: 'Anticipated failure modes, risks & live Q&A defense',
+        badge: 'SLIDE 5 · RISK DEFENSE',
+        icon: '🛡️',
+        visualType: 'comparison',
+        bulletPoints: [
+          `Operational Constraints & Risks: ${mainLimitation}`,
+          'Defense Strategy: Redundancy protocols & fail-safe fallback modes',
+          'Squad Alignment: Prepared to defend all technical assumptions during judge interrogation',
+        ],
+      },
+    ]
+  }
+
   return [
     {
       id: 'slide-1',
       title: name,
-      subtitle: 'Grand Finals Pitch Deck · Live Architecture Defense',
+      subtitle: currentRound === 3 ? 'Grand Finals Pitch Deck · Live Stage Defense' : 'Round 2 Pitch Deck · 1v1 Showdown',
       badge: 'SLIDE 1 · EXECUTIVE OVERVIEW',
-      icon: '🏆',
+      icon: currentRound === 3 ? '🏆' : '⚡',
       content: whatItDoes,
       visualType: 'conclusion',
       bulletPoints: [
@@ -162,7 +235,7 @@ export function SolutionForm({ technologies, onSubmit, disabled, initial, submit
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     const embedUrl = form.presentationUrl ? getPresentationEmbedUrl(form.presentationUrl) || undefined : undefined
-    const nativeSlides = generateNativeSlides(form, technologies)
+    const nativeSlides = generateNativeSlides(form, technologies, currentRound)
 
     onSubmit({
       ...form,

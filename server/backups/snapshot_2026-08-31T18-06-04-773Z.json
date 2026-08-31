@@ -467,7 +467,7 @@
       "isRegistrationOpen": true,
       "isFinalRound": false,
       "createdAt": "2026-08-25T10:00:00.000Z",
-      "updatedAt": "2026-08-31T18:01:01.312Z",
+      "updatedAt": "2026-08-31T18:03:46.031Z",
       "totalTeams": 16,
       "phaseStartedAt": null,
       "phaseDurationSeconds": null,
@@ -522,14 +522,18 @@
             }
           ],
           "selectedProblemId": "p3",
-          "revealedCards": [],
+          "revealedCards": [
+            0,
+            1,
+            2
+          ],
           "score": 0,
           "round1Score": 0,
           "round2Score": 0,
           "round3Score": 0,
           "rank": 1,
           "registeredAt": "2026-08-31T16:22:55.966Z",
-          "isOnline": true,
+          "isOnline": false,
           "currentSlideIndex": 4
         },
         {
@@ -715,7 +719,8 @@
           "selectedProblemId": "p3",
           "revealedCards": [
             0,
-            1
+            1,
+            2
           ],
           "score": 0,
           "round1Score": 0,
@@ -723,7 +728,7 @@
           "round3Score": 0,
           "rank": 8,
           "registeredAt": "2026-08-31T16:32:02.590Z",
-          "isOnline": true
+          "isOnline": false
         },
         {
           "id": "team_63f2e9e9-a492-47e5-a1f7-709701a9e014",
@@ -769,7 +774,7 @@
       "isRegistrationOpen": true,
       "isFinalRound": false,
       "createdAt": "2026-08-31T16:21:23.920Z",
-      "updatedAt": "2026-08-31T18:01:01.312Z",
+      "updatedAt": "2026-08-31T18:03:46.032Z",
       "totalTeams": 8,
       "phaseStartedAt": null,
       "phaseDurationSeconds": null,

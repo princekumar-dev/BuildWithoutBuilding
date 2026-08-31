@@ -467,7 +467,7 @@
       "isRegistrationOpen": true,
       "isFinalRound": false,
       "createdAt": "2026-08-25T10:00:00.000Z",
-      "updatedAt": "2026-08-31T16:43:27.669Z",
+      "updatedAt": "2026-08-31T18:01:01.312Z",
       "totalTeams": 16,
       "phaseStartedAt": null,
       "phaseDurationSeconds": null,
@@ -477,7 +477,7 @@
       "id": "game_91fd6ebb-e95b-4eed-bab2-56f907670205",
       "code": "BWB-170",
       "name": "trail 001",
-      "phase": "JUDGING",
+      "phase": "CARD_REVEAL",
       "currentRound": 1,
       "finalistTeamIds": [],
       "teams": [
@@ -498,8 +498,30 @@
             "yy"
           ],
           "memberCount": 2,
-          "technologies": [],
-          "selectedProblemId": null,
+          "technologies": [
+            {
+              "id": "gps-1",
+              "name": "GPS",
+              "icon": "📍",
+              "category": "Mobility",
+              "description": "High-precision global satellite positioning and location tracking coordinate system."
+            },
+            {
+              "id": "digital-twin-2",
+              "name": "Digital Twin",
+              "icon": "🌐",
+              "category": "Intelligence",
+              "description": "Real-time synchronized virtual replica mirroring the physical state and dynamics."
+            },
+            {
+              "id": "cloud-computing-3",
+              "name": "Cloud Computing",
+              "icon": "☁️",
+              "category": "Infrastructure",
+              "description": "Elastic distributed cloud infrastructure scaling compute, storage, and serverless APIs."
+            }
+          ],
+          "selectedProblemId": "p3",
           "revealedCards": [],
           "score": 0,
           "round1Score": 0,
@@ -507,7 +529,8 @@
           "round3Score": 0,
           "rank": 1,
           "registeredAt": "2026-08-31T16:22:55.966Z",
-          "isOnline": true
+          "isOnline": true,
+          "currentSlideIndex": 4
         },
         {
           "id": "team_4eeac8f0-8907-49d4-a926-e0e6e7668013",
@@ -535,7 +558,7 @@
           "round3Score": 0,
           "rank": 2,
           "registeredAt": "2026-08-31T16:27:27.170Z",
-          "isOnline": true
+          "isOnline": false
         },
         {
           "id": "team_158f35ad-4a7c-4424-9d6d-ce72706a5438",
@@ -563,7 +586,7 @@
           "round3Score": 0,
           "rank": 3,
           "registeredAt": "2026-08-31T16:27:37.666Z",
-          "isOnline": true
+          "isOnline": false
         },
         {
           "id": "team_dfa5e420-ae65-4b14-bea6-d9665b8f01cb",
@@ -591,7 +614,7 @@
           "round3Score": 0,
           "rank": 4,
           "registeredAt": "2026-08-31T16:28:55.089Z",
-          "isOnline": true
+          "isOnline": false
         },
         {
           "id": "team_2c0c7bf2-f14e-4df7-995f-376cf8456590",
@@ -619,7 +642,7 @@
           "round3Score": 0,
           "rank": 5,
           "registeredAt": "2026-08-31T16:29:00.435Z",
-          "isOnline": true
+          "isOnline": false
         },
         {
           "id": "team_a52329fa-a511-40c4-aa81-4f9ca74ad65f",
@@ -647,7 +670,7 @@
           "round3Score": 0,
           "rank": 6,
           "registeredAt": "2026-08-31T16:29:34.244Z",
-          "isOnline": true
+          "isOnline": false
         },
         {
           "id": "team_45ab5c8e-2d10-42f1-ada5-ce089d032bf9",
@@ -666,16 +689,41 @@
             "P"
           ],
           "memberCount": 2,
-          "technologies": [],
-          "selectedProblemId": null,
-          "revealedCards": [],
+          "technologies": [
+            {
+              "id": "drone-1",
+              "name": "Drone",
+              "icon": "🚁",
+              "category": "Mobility",
+              "description": "Autonomous unmanned aerial vehicles providing rapid aerial reconnaissance and dispatch."
+            },
+            {
+              "id": "predictive-analytics-2",
+              "name": "Predictive Analytics",
+              "icon": "📈",
+              "category": "Intelligence",
+              "description": "Forward-looking algorithmic forecasting detecting anomalies before failure thresholds."
+            },
+            {
+              "id": "lorawan-3",
+              "name": "LoRaWAN",
+              "icon": "📻",
+              "category": "Connectivity",
+              "description": "Long-range low-power RF protocol transmitting sensor packets over 15km+ distances."
+            }
+          ],
+          "selectedProblemId": "p3",
+          "revealedCards": [
+            0,
+            1
+          ],
           "score": 0,
           "round1Score": 0,
           "round2Score": 0,
           "round3Score": 0,
           "rank": 8,
           "registeredAt": "2026-08-31T16:32:02.590Z",
-          "isOnline": false
+          "isOnline": true
         },
         {
           "id": "team_63f2e9e9-a492-47e5-a1f7-709701a9e014",
@@ -703,7 +751,7 @@
           "round3Score": 0,
           "rank": 8,
           "registeredAt": "2026-08-31T16:42:36.052Z",
-          "isOnline": true
+          "isOnline": false
         }
       ],
       "currentProblem": {
@@ -714,18 +762,26 @@
         "challenge": "Design a system that can identify, prioritize, and coordinate emergency assistance without relying on normal internet connectivity.",
         "twist": "No Internet — the solution must work without normal internet connectivity."
       },
-      "buildDurationMinutes": 15,
+      "buildDurationMinutes": 45,
       "maxTeams": 8,
       "scheduledStartTime": "2026-08-31T16:40:00.000Z",
       "whatsappGroupUrl": "https://chat.whatsapp.com/DHke2VBDQnbKxVBiLcpN5t?s=cl&p=a&ilr=1",
       "isRegistrationOpen": true,
       "isFinalRound": false,
       "createdAt": "2026-08-31T16:21:23.920Z",
-      "updatedAt": "2026-08-31T16:43:27.669Z",
+      "updatedAt": "2026-08-31T18:01:01.312Z",
       "totalTeams": 8,
       "phaseStartedAt": null,
       "phaseDurationSeconds": null,
-      "phaseExpiresAt": null
+      "phaseExpiresAt": null,
+      "currentPitchTeamId": null,
+      "pitchStartedAt": "2026-08-31T17:40:27.477Z",
+      "pitchDurationSeconds": 180,
+      "pitchExpiresAt": "2026-08-31T17:43:27.477Z",
+      "currentSlideIndex": 4,
+      "pitchedTeamIds": [
+        "team_45ab5c8e-2d10-42f1-ada5-ce089d032bf9"
+      ]
     }
   ]
 }

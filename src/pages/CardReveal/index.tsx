@@ -55,7 +55,7 @@ export default function CardRevealPage() {
 
   return (
     <PageLayout>
-      <div className="max-w-4xl mx-auto px-2 sm:px-4">
+      <div className="max-w-4xl mx-auto px-2 sm:px-4 pb-16 sm:pb-24">
         {/* Header HUD */}
         <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
           <div>
@@ -110,7 +110,7 @@ export default function CardRevealPage() {
         </motion.div>
 
         {/* 3 Interactive Tech Card Slots */}
-        <div className="grid sm:grid-cols-3 gap-4 mb-1">
+        <div className="grid sm:grid-cols-3 gap-5 sm:gap-6 mb-8 sm:mb-10">
           {[0, 1, 2].map((slotIndex) => {
             const isRevealed = revealed.includes(slotIndex)
             const tech = myTechs[slotIndex]
@@ -151,7 +151,7 @@ export default function CardRevealPage() {
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 15 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              className="holo-card rounded-3xl p-6 sm:p-8 text-center"
+              className="holo-card rounded-3xl p-6 sm:p-8 text-center mt-6 sm:mt-8 shadow-2xl border border-bwb-success/30"
             >
               <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-bwb-success/20 text-bwb-success mb-3 border border-bwb-success/30">
                 <CheckCircle2 size={24} />

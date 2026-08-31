@@ -217,7 +217,14 @@ export default function HostGameControlPage() {
     if (!game.id || phase === game.phase || phaseChangeInFlight.current) return
     phaseChangeInFlight.current = true
     try {
-      setGame(await api.setPhase(game.id, phase, problemId))
+      const durSec = phase === 'BUILDING'
+        ? getPhaseDuration(game.id, currentRound, 'BUILDING', buildMinutes)
+        : phase === 'PITCHING'
+        ? getPhaseDuration(game.id, currentRound, 'PITCHING')
+        : undefined
+      const durMin = phase === 'BUILDING' ? Math.round(durSec! / 60) : undefined
+
+      setGame(await api.setPhase(game.id, phase, problemId, durMin, durSec))
       toast.success(`Phase advanced to ${PHASE_LABELS[phase]}`)
     } catch (reason) {
       toast.error(reason instanceof Error ? reason.message : 'Unable to update phase.')

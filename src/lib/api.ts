@@ -50,7 +50,7 @@ export const api = {
     year?: string
     section?: string
   }) => request<{ session: ParticipantSession; game: Game }>(`/games/${encodeURIComponent(code)}/join`, { method: 'POST', body: JSON.stringify(input) }),
-  setPhase: (gameId: string, phase: GamePhase, problemId?: string) => request<Game>(`/games/${gameId}/phase`, { method: 'PATCH', body: JSON.stringify({ phase, problemId }) }, true),
+  setPhase: (gameId: string, phase: GamePhase, problemId?: string, durationMinutes?: number, durationSeconds?: number) => request<Game>(`/games/${gameId}/phase`, { method: 'PATCH', body: JSON.stringify({ phase, problemId, durationMinutes, durationSeconds }) }, true),
   assignCards: (gameId: string) => request<Game>(`/games/${gameId}/assign-cards`, { method: 'POST' }, true),
   selectProblem: (gameId: string, teamId: string, problemId: string) => request<Game>(`/games/${gameId}/select-problem`, { method: 'POST', body: JSON.stringify({ teamId, problemId }) }),
   revealCard: (gameId: string, teamId: string, slotIndex: number) => request<Game>(`/games/${gameId}/reveal-card`, { method: 'POST', body: JSON.stringify({ teamId, slotIndex }) }),

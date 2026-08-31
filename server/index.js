@@ -290,20 +290,30 @@ const catalog = {
 }
 
 function readDatabase() {
+  let db = null
   if (existsSync(databaseFile)) {
     try {
       const data = JSON.parse(readFileSync(databaseFile, 'utf8'))
-      if (data && Array.isArray(data.games)) return data
+      if (data && Array.isArray(data.games)) db = data
     } catch {}
   }
   // Fallback to backupFile if databaseFile was corrupted or empty
-  if (existsSync(backupFile)) {
+  if (!db && existsSync(backupFile)) {
     try {
       const bData = JSON.parse(readFileSync(backupFile, 'utf8'))
-      if (bData && Array.isArray(bData.games) && bData.games.length > 0) return bData
+      if (bData && Array.isArray(bData.games) && bData.games.length > 0) db = bData
     } catch {}
   }
-  return { games: [] }
+  if (!db) db = { games: [] }
+
+  // Auto-upgrade any legacy 15m default build duration to standard 45m (Round 1 default)
+  db.games.forEach((g) => {
+    if (!g.buildDurationMinutes || g.buildDurationMinutes === 15) {
+      g.buildDurationMinutes = 45
+    }
+  })
+
+  return db
 }
 
 function readArchivedDatabase() {
@@ -804,7 +814,7 @@ createServer(async (request, response) => {
       finalistTeamIds: [],
       teams: [],
       currentProblem: catalog.problems[0],
-      buildDurationMinutes: Number(input.buildDurationMinutes) || 15,
+      buildDurationMinutes: Number(input.buildDurationMinutes) || 45,
       maxTeams: requestedMax,
       scheduledStartTime: input.scheduledStartTime || null,
       whatsappGroupUrl: input.whatsappGroupUrl?.trim() || null,
@@ -963,7 +973,7 @@ createServer(async (request, response) => {
     let durationSec = 0;
     if (input.phase === 'BUILDING') {
       const defaultMins = currentRound === 1 ? 45 : 30;
-      const mins = Number(input.durationMinutes) || Number(game.buildDurationMinutes) || defaultMins;
+      const mins = Number(input.durationMinutes) || (Number(game.buildDurationMinutes) && Number(game.buildDurationMinutes) !== 15 ? Number(game.buildDurationMinutes) : defaultMins);
       durationSec = mins * 60;
     } else if (input.phase === 'PITCHING') {
       durationSec = Number(input.durationSeconds) || 180;

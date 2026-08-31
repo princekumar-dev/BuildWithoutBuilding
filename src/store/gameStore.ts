@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { Game, GamePhase, ParticipantSession, Problem, Submission } from '../types'
 
-const EMPTY_GAME: Game = { id: '', code: '', name: '', phase: 'LOBBY', currentRound: 1, teams: [], buildDurationMinutes: 15, isFinalRound: false }
+const EMPTY_GAME: Game = { id: '', code: '', name: '', phase: 'LOBBY', currentRound: 1, teams: [], buildDurationMinutes: 45, isFinalRound: false }
 
 interface GameStore {
   game: Game

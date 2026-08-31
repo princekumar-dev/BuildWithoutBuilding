@@ -1,11 +1,13 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
   ChevronLeft, ChevronRight, Sparkles, Zap, Shield, 
-  ExternalLink, Maximize2, Monitor, Radio
+  ExternalLink, Maximize2, Monitor, Radio, Play, Pause
 } from 'lucide-react'
 import type { Team, SlideItem } from '../../types'
 import { generateNativeSlides } from '../forms/SolutionForm'
+
+const SLIDE_DURATION_MS = 22000 // 22 seconds auto-advance per slide
 
 interface LivePitchDeckProps {
   team: Team
@@ -26,10 +28,14 @@ export function LivePitchDeck({
 }: LivePitchDeckProps) {
   const [localIndex, setLocalIndex] = useState(activeSlideIndex)
   const [isFullscreen, setIsFullscreen] = useState(false)
+  const [isAutoPlay, setIsAutoPlay] = useState(true)
+  const [progress, setProgress] = useState(0)
+  const progressTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const teamProblem = catalogProblems.find((p) => p.id === team.selectedProblemId)
 
   useEffect(() => {
     setLocalIndex(activeSlideIndex)
+    setProgress(0)
   }, [activeSlideIndex])
 
   const submission = team.submission
@@ -63,26 +69,53 @@ export function LivePitchDeck({
   const goToSlide = useCallback((newIdx: number) => {
     const clamped = Math.max(0, Math.min(newIdx, maxIndex))
     setLocalIndex(clamped)
+    setProgress(0)
     if (onSlideChange) {
       onSlideChange(clamped)
     }
   }, [maxIndex, onSlideChange])
 
-  // Keyboard navigation for controller
+  // Auto-advance slides periodically across projector and presenter devices
+  useEffect(() => {
+    if (!isAutoPlay || slides.length <= 1) {
+      if (progressTimerRef.current) clearInterval(progressTimerRef.current)
+      return
+    }
+
+    const intervalStep = 100 // ms
+    const increment = (intervalStep / SLIDE_DURATION_MS) * 100
+
+    progressTimerRef.current = setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= 100) {
+          const nextIdx = (currentIndex + 1) % (maxIndex + 1)
+          goToSlide(nextIdx)
+          return 0
+        }
+        return prev + increment
+      })
+    }, intervalStep)
+
+    return () => {
+      if (progressTimerRef.current) clearInterval(progressTimerRef.current)
+    }
+  }, [isAutoPlay, currentIndex, maxIndex, slides.length, goToSlide])
+
+  // Keyboard navigation for controller (instantly skips and resets auto-advance)
   useEffect(() => {
     if (!isController) return
     const handleKeyDown = (e: KeyboardEvent) => {
       if (['ArrowRight', 'Space', 'PageDown'].includes(e.code)) {
         e.preventDefault()
-        goToSlide(currentIndex + 1)
+        goToSlide((currentIndex + 1) % (maxIndex + 1))
       } else if (['ArrowLeft', 'PageUp'].includes(e.code)) {
         e.preventDefault()
-        goToSlide(currentIndex - 1)
+        goToSlide((currentIndex - 1 + (maxIndex + 1)) % (maxIndex + 1))
       }
     }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [isController, currentIndex, goToSlide])
+  }, [isController, currentIndex, maxIndex, goToSlide])
 
   // If user uploaded a PDF/Image file or provided a presentation URL
   const rawUrl = submission?.presentationUrl
@@ -296,26 +329,51 @@ export function LivePitchDeck({
       </div>
 
       {/* Slide Navigation Controls & Queue Tabs */}
-      <div className="pt-4 mt-2 border-t border-white/10 relative z-10 space-y-3">
-        {/* Slide Progress / Thumbnails */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none flex-wrap sm:flex-nowrap">
-          {slides.map((s, idx) => {
-            const isActive = idx === currentIndex
-            return (
-              <button
-                key={s.id}
-                onClick={() => goToSlide(idx)}
-                className={`px-3 py-2 rounded-xl text-xs font-mono font-bold transition-all shrink-0 flex items-center gap-1.5 border ${
-                  isActive
-                    ? 'bg-cyan-400 text-black border-cyan-400 shadow-lg scale-105 font-black'
-                    : 'bg-white/5 hover:bg-white/10 text-bwb-muted border-white/10 hover:text-white'
-                }`}
-              >
-                <span>{s.icon || idx + 1}</span>
-                <span className="truncate max-w-[130px] sm:max-w-[180px]">{s.title}</span>
-              </button>
-            )
-          })}
+      <div className="pt-3 mt-2 border-t border-white/10 relative z-10 space-y-2.5">
+        {/* Auto-Slide Progress Bar */}
+        <div className="w-full bg-white/5 h-1.5 rounded-full overflow-hidden relative" title={`Auto-advances every ${SLIDE_DURATION_MS / 1000}s`}>
+          <motion.div
+            className="h-full bg-gradient-to-r from-cyan-400 via-amber-400 to-emerald-400 rounded-full"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+
+        {/* Slide Tabs & Auto-Play Controls */}
+        <div className="flex items-center justify-between gap-2 flex-wrap">
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none flex-wrap sm:flex-nowrap">
+            {slides.map((s, idx) => {
+              const isActive = idx === currentIndex
+              return (
+                <button
+                  key={s.id}
+                  onClick={() => goToSlide(idx)}
+                  className={`px-3 py-2 rounded-xl text-xs font-mono font-bold transition-all shrink-0 flex items-center gap-1.5 border ${
+                    isActive
+                      ? 'bg-cyan-400 text-black border-cyan-400 shadow-lg scale-105 font-black'
+                      : 'bg-white/5 hover:bg-white/10 text-bwb-muted border-white/10 hover:text-white'
+                  }`}
+                >
+                  <span>{s.icon || idx + 1}</span>
+                  <span className="truncate max-w-[130px] sm:max-w-[180px]">{s.title}</span>
+                </button>
+              )
+            })}
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              onClick={() => setIsAutoPlay(!isAutoPlay)}
+              className={`px-2.5 py-1.5 rounded-xl border text-xs font-mono font-bold flex items-center gap-1.5 transition-all ${
+                isAutoPlay
+                  ? 'bg-cyan-500/15 text-cyan-300 border-cyan-500/30 shadow-sm'
+                  : 'bg-amber-500/20 text-amber-300 border-amber-500/30'
+              }`}
+              title={isAutoPlay ? 'Auto-Advancing Slides (Click to Pause)' : 'Auto-Advancing Paused (Click to Resume)'}
+            >
+              {isAutoPlay ? <Pause size={12} /> : <Play size={12} />}
+              <span>{isAutoPlay ? 'Auto-Slide' : 'Paused'}</span>
+            </button>
+          </div>
         </div>
 
         {/* Controller Tip for Presenters */}
@@ -326,7 +384,7 @@ export function LivePitchDeck({
               <span>You are controlling the Stadium Projector slides live</span>
             </div>
             <span className="hidden sm:inline text-bwb-muted">
-              Keyboard shortcut: <kbd className="px-1 py-0.5 rounded bg-black/40 text-white">←</kbd> <kbd className="px-1 py-0.5 rounded bg-black/40 text-white">→</kbd> / <kbd className="px-1 py-0.5 rounded bg-black/40 text-white">Space</kbd>
+              Press <kbd className="px-1.5 py-0.5 rounded bg-black/50 text-white border border-white/10">←</kbd> <kbd className="px-1.5 py-0.5 rounded bg-black/50 text-white border border-white/10">→</kbd> or <kbd className="px-1.5 py-0.5 rounded bg-black/50 text-white border border-white/10">Space</kbd> to skip
             </span>
           </div>
         )}

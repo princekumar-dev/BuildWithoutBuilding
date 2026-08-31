@@ -340,21 +340,28 @@ export function LivePitchDeck({
 
         {/* Slide Tabs & Auto-Play Controls */}
         <div className="flex items-center justify-between gap-2 flex-wrap">
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none flex-wrap sm:flex-nowrap">
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none flex-wrap sm:flex-nowrap">
             {slides.map((s, idx) => {
               const isActive = idx === currentIndex
+              const shortLabels: Record<number, Record<number, string>> = {
+                1: { 0: 'Overview', 1: 'Root Causes', 2: 'Gap Analysis', 3: 'Tech Stack', 4: 'Defense' },
+                2: { 0: 'Overview', 1: 'Alignment', 2: 'System Flow', 3: '3 Frontier Tech', 4: 'Defense' },
+                3: { 0: 'Overview', 1: 'Deep Dive', 2: 'Architecture', 3: 'Tech Matrix', 4: 'Final Edge' },
+              }
+              const tabLabel = shortLabels[round]?.[idx] || (s.title.length > 16 ? `${s.title.slice(0, 14)}..` : s.title)
+
               return (
                 <button
                   key={s.id}
                   onClick={() => goToSlide(idx)}
-                  className={`px-3 py-2 rounded-xl text-xs font-mono font-bold transition-all shrink-0 flex items-center gap-1.5 border ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition-all shrink-0 flex items-center gap-1.5 border whitespace-nowrap ${
                     isActive
                       ? 'bg-cyan-400 text-black border-cyan-400 shadow-lg scale-105 font-black'
                       : 'bg-white/5 hover:bg-white/10 text-bwb-muted border-white/10 hover:text-white'
                   }`}
                 >
-                  <span>{s.icon || idx + 1}</span>
-                  <span className="truncate max-w-[130px] sm:max-w-[180px]">{s.title}</span>
+                  <span className="text-xs">{s.icon || `#${idx + 1}`}</span>
+                  <span>{tabLabel}</span>
                 </button>
               )
             })}

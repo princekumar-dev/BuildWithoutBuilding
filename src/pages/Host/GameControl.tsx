@@ -1252,7 +1252,7 @@ export default function HostGameControlPage() {
                       const selectedProblem = problems.find((p) => p.id === team.selectedProblemId)
                       const revealedCardsCount = team.revealedCards?.length ?? 0
                       const isSubmitted = !!team.submission
-                      const teamPasscode = team.passcode || (team.name.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 4) || 'TEAM') + '-' + Math.floor(100 + Math.random() * 900)
+                      const teamPasscode = team.passcode || team.id
 
                       return (
                         <div

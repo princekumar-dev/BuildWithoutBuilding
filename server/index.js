@@ -557,11 +557,42 @@ function calculateProblemTrackWinners(game) {
   return winners;
 }
 
+function generateUniqueTeamPasscode(game, teamName) {
+  const cleanSlug = (teamName.trim().toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 4) || 'TEAM').padEnd(4, 'X');
+  const existing = new Set();
+  if (game && game.teams) {
+    game.teams.forEach((t) => {
+      if (t.passcode) existing.add(t.passcode.toUpperCase());
+    });
+  }
+
+  let code = '';
+  let tries = 0;
+  do {
+    const num = Math.floor(100 + Math.random() * 900);
+    code = `${cleanSlug}-${num}`;
+    tries++;
+  } while (existing.has(code) && tries < 500);
+
+  if (existing.has(code)) {
+    code = `${cleanSlug}-${Math.floor(1000 + Math.random() * 9000)}`;
+  }
+  return code;
+}
+
 function publicGame(game) {
   ensureGameActiveProblems(game);
   const counts = {};
+  const seenPasscodes = new Set();
+
   game.teams.forEach((team) => {
     assignTeamTechs(team);
+    // Guarantee strict uniqueness of team passcodes across all teams
+    if (!team.passcode || seenPasscodes.has(team.passcode.toUpperCase())) {
+      team.passcode = generateUniqueTeamPasscode(game, team.name);
+    }
+    seenPasscodes.add(team.passcode.toUpperCase());
+
     if (team.selectedProblemId) {
       counts[team.selectedProblemId] = (counts[team.selectedProblemId] || 0) + 1;
     }
@@ -851,10 +882,8 @@ createServer(async (request, response) => {
       }
 
       
-      // Generate clean unique team ID/Passcode
-      const cleanSlug = input.teamName.trim().toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 4) || 'TEAM';
-      const randNum = Math.floor(100 + Math.random() * 900);
-      const uniquePasscode = `${cleanSlug}-${randNum}`;
+      // Generate clean unique team ID/Passcode with collision prevention
+      const uniquePasscode = generateUniqueTeamPasscode(game, input.teamName);
 
       const initialMembers = rawMembers.length > 0 ? rawMembers : [name];
       const leaderName = initialMembers[0] || name;

@@ -12,7 +12,31 @@ export function Navbar() {
   const [open, setOpen] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
-  const { game, session, setSession } = useGameStore()
+  const { game, session, setSession, clearSession } = useGameStore()
+
+  const storedSession = (() => {
+    if (session?.teamId) return session
+    try {
+      const raw = localStorage.getItem('bwb_game_storage')
+      if (raw) {
+        const parsed = JSON.parse(raw)
+        return parsed.state?.session || null
+      }
+    } catch {}
+    return null
+  })()
+
+  const currentTeamName = session?.teamName || storedSession?.teamName
+  const currentRoomCode = game.code || (() => {
+    try {
+      const raw = localStorage.getItem('bwb_game_storage')
+      if (raw) {
+        const parsed = JSON.parse(raw)
+        return parsed.state?.game?.code || ''
+      }
+    } catch {}
+    return ''
+  })()
 
   const isHost =
     location.pathname.startsWith('/host') &&
@@ -25,7 +49,9 @@ export function Navbar() {
     !isHost &&
     !isJudge &&
     (!!session?.teamId ||
-      ['/lobby', '/problem-select', '/card-reveal', '/game', '/pitch'].some((p) =>
+      !!storedSession?.teamId ||
+      !!currentTeamName ||
+      ['/lobby', '/problem-select', '/card-reveal', '/game', '/pitch', '/judging', '/leaderboard'].some((p) =>
         location.pathname.startsWith(p)
       ))
 
@@ -40,6 +66,7 @@ export function Navbar() {
   }
 
   const handleParticipantLeave = () => {
+    clearSession()
     setSession(null as any)
     navigate('/')
   }
@@ -72,9 +99,9 @@ export function Navbar() {
               <Sparkles size={11} /> JUDGE PANEL
             </span>
           )}
-          {isParticipant && game.code && (
+          {isParticipant && currentRoomCode && (
             <Badge variant="accent" className="font-mono text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 shrink-0">
-              {game.code}
+              {currentRoomCode}
             </Badge>
           )}
         </div>
@@ -169,7 +196,7 @@ export function Navbar() {
             <div className="flex items-center gap-2 px-3 py-1 rounded-xl bg-bwb-surface-2 border border-white/5 text-xs">
               <User size={13} className="text-bwb-accent" />
               <span className="text-bwb-muted">Team:</span>
-              <span className="text-bwb-text font-bold">{session?.teamName ?? 'Participant'}</span>
+              <span className="text-bwb-text font-bold">{currentTeamName || 'Participant'}</span>
             </div>
 
             {game.phase && (
@@ -354,7 +381,7 @@ export function Navbar() {
           ) : isParticipant ? (
             <>
               <div className="px-3 py-2 text-xs text-bwb-muted">
-                Signed in as: <strong className="text-bwb-accent">{session?.teamName}</strong>
+                Signed in as: <strong className="text-bwb-accent">{currentTeamName || 'Participant'}</strong>
               </div>
               <Link
                 to="/how-to-play"

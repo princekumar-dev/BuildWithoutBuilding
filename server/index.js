@@ -1028,6 +1028,11 @@ createServer(async (request, response) => {
     game.phaseStartedAt = null;
     game.phaseDurationSeconds = null;
     game.phaseExpiresAt = null;
+    game.pitchedTeamIds = [];
+    game.currentPitchTeamId = null;
+    game.pitchStartedAt = null;
+    game.pitchDurationSeconds = null;
+    game.pitchExpiresAt = null;
     save(database);
     const pGame = publicGame(game);
     broadcastToClients({ type: 'games-updated', game: pGame });

@@ -28,7 +28,15 @@ export default function JudgeDashboardPage() {
   }, [game.id, setGame])
 
   const currentRound = game.currentRound || (game.isFinalRound ? 3 : 1)
-  const scoredTeamsCount = game.teams.filter((t) => (t.score ?? 0) > 0).length
+
+  const getTeamRoundScore = (team: typeof game.teams[0]) => {
+    if (currentRound === 1) return team.round1Score ?? team.score ?? 0
+    if (currentRound === 2) return team.round2Score ?? 0
+    if (currentRound === 3) return team.round3Score ?? 0
+    return 0
+  }
+
+  const scoredTeamsCount = game.teams.filter((t) => getTeamRoundScore(t) > 0).length
   const allScored = game.teams.length > 0 && scoredTeamsCount === game.teams.length
   const pitchedTeamIds = game.pitchedTeamIds || []
 
@@ -150,7 +158,9 @@ export default function JudgeDashboardPage() {
           ) : (
             <div className="grid md:grid-cols-2 gap-5">
               {game.teams.map((team, idx) => {
-                const isScored = (team.score ?? 0) > 0
+                const currentRoundScore = getTeamRoundScore(team)
+                const isScored = currentRoundScore > 0
+                const isPitched = pitchedTeamIds.includes(team.id) || isScored
                 const selectedProblem =
                   (game.activeProblems || []).find((p) => p.id === team.selectedProblemId) ||
                   (catalog.problems || []).find((p) => p.id === team.selectedProblemId)
@@ -187,7 +197,7 @@ export default function JudgeDashboardPage() {
                         {isScored ? (
                           <div className="text-right">
                             <span className="px-3 py-1 rounded-xl text-xs font-black bg-bwb-success/20 text-bwb-success border border-bwb-success/30 inline-flex items-center gap-1">
-                              <CheckCircle2 size={12} /> {team.score}/100
+                              <CheckCircle2 size={12} /> {currentRoundScore}/100
                             </span>
                           </div>
                         ) : (
@@ -277,7 +287,7 @@ export default function JudgeDashboardPage() {
                             </Button>
                           </div>
                         </div>
-                      ) : pitchedTeamIds.includes(team.id) ? (
+                      ) : isPitched ? (
                         <div className="flex items-center gap-2">
                           <Link to={`/judge/score/${team.id}`} className="flex-1 block">
                             <Button

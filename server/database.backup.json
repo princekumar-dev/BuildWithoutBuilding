@@ -467,7 +467,7 @@
       "isRegistrationOpen": true,
       "isFinalRound": false,
       "createdAt": "2026-08-25T10:00:00.000Z",
-      "updatedAt": "2026-08-31T23:34:57.231Z",
+      "updatedAt": "2026-08-31T23:38:04.685Z",
       "totalTeams": 16,
       "phaseStartedAt": null,
       "phaseDurationSeconds": null,
@@ -527,21 +527,21 @@
             1,
             2
           ],
-          "score": 86,
+          "score": 177,
           "round1Score": 86,
-          "round2Score": 0,
+          "round2Score": 91,
           "round3Score": 0,
           "rank": 1,
           "registeredAt": "2026-08-31T16:22:55.966Z",
           "isOnline": true,
           "currentSlideIndex": 3,
           "scoreBreakdown": {
-            "problemUnderstanding": 35,
-            "creativity": 0,
-            "technologyUsage": 20,
+            "problemUnderstanding": 10,
+            "creativity": 25,
+            "technologyUsage": 30,
             "technicalFeasibility": 11,
             "realWorldImpact": 0,
-            "pitch": 15,
+            "pitch": 10,
             "defense": 5
           }
         },
@@ -746,7 +746,7 @@
           "round3Score": 0,
           "rank": 8,
           "registeredAt": "2026-08-31T16:32:02.590Z",
-          "isOnline": false,
+          "isOnline": true,
           "scoreBreakdown": {
             "problemUnderstanding": 11,
             "creativity": 0,
@@ -755,7 +755,8 @@
             "realWorldImpact": 0,
             "pitch": 11,
             "defense": 5
-          }
+          },
+          "currentSlideIndex": 4
         },
         {
           "id": "team_63f2e9e9-a492-47e5-a1f7-709701a9e014",
@@ -801,23 +802,26 @@
       "isRegistrationOpen": true,
       "isFinalRound": false,
       "createdAt": "2026-08-31T16:21:23.920Z",
-      "updatedAt": "2026-08-31T23:34:57.231Z",
+      "updatedAt": "2026-08-31T23:38:04.685Z",
       "totalTeams": 8,
-      "phaseStartedAt": "2026-08-31T23:32:12.463Z",
-      "phaseDurationSeconds": 180,
-      "phaseExpiresAt": "2026-08-31T23:35:12.463Z",
-      "currentPitchTeamId": "team_f4726671-0072-42cf-8c9b-e7c207225437",
-      "pitchStartedAt": "2026-08-31T23:32:21.382Z",
+      "phaseStartedAt": null,
+      "phaseDurationSeconds": null,
+      "phaseExpiresAt": null,
+      "currentPitchTeamId": "team_45ab5c8e-2d10-42f1-ada5-ce089d032bf9",
+      "pitchStartedAt": "2026-08-31T23:37:48.007Z",
       "pitchDurationSeconds": 180,
-      "pitchExpiresAt": "2026-08-31T23:35:21.382Z",
-      "currentSlideIndex": 3,
+      "pitchExpiresAt": "2026-08-31T23:40:48.007Z",
+      "currentSlideIndex": 4,
       "pitchedTeamIds": [
-        "team_45ab5c8e-2d10-42f1-ada5-ce089d032bf9",
-        "team_f4726671-0072-42cf-8c9b-e7c207225437",
-        "team_4eeac8f0-8907-49d4-a926-e0e6e7668013",
-        "team_158f35ad-4a7c-4424-9d6d-ce72706a5438",
-        "team_dfa5e420-ae65-4b14-bea6-d9665b8f01cb"
-      ]
+        "team_f4726671-0072-42cf-8c9b-e7c207225437"
+      ],
+      "pitchedTeamIdsByRound": {
+        "1": [],
+        "2": [
+          "team_f4726671-0072-42cf-8c9b-e7c207225437"
+        ],
+        "3": []
+      }
     }
   ]
 }

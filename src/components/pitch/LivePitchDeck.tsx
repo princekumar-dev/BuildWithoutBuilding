@@ -298,47 +298,24 @@ export function LivePitchDeck({
       {/* Slide Navigation Controls & Queue Tabs */}
       <div className="pt-4 mt-2 border-t border-white/10 relative z-10 space-y-3">
         {/* Slide Progress / Thumbnails */}
-        <div className="flex items-center justify-between gap-2 overflow-x-auto pb-1 scrollbar-none">
-          <div className="flex items-center gap-1.5">
-            {slides.map((s, idx) => {
-              const isActive = idx === currentIndex
-              return (
-                <button
-                  key={s.id}
-                  onClick={() => goToSlide(idx)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition-all shrink-0 flex items-center gap-1.5 border ${
-                    isActive
-                      ? 'bg-cyan-400 text-black border-cyan-400 shadow-lg scale-105 font-black'
-                      : 'bg-white/5 hover:bg-white/10 text-bwb-muted border-white/10 hover:text-white'
-                  }`}
-                >
-                  <span>{s.icon || idx + 1}</span>
-                  <span className="hidden sm:inline-block truncate max-w-[110px]">{s.title}</span>
-                  <span className="sm:hidden">{idx + 1}</span>
-                </button>
-              )
-            })}
-          </div>
-
-          <div className="flex items-center gap-2 shrink-0">
-            <button
-              onClick={() => goToSlide(currentIndex - 1)}
-              disabled={currentIndex <= 0}
-              className="p-2 rounded-xl bg-bwb-surface-2 hover:bg-white/15 text-bwb-text disabled:opacity-30 disabled:pointer-events-none border border-white/10 shadow transition-all flex items-center gap-1 text-xs font-mono font-bold"
-            >
-              <ChevronLeft size={16} />
-              <span className="hidden sm:inline">Prev</span>
-            </button>
-
-            <button
-              onClick={() => goToSlide(currentIndex + 1)}
-              disabled={currentIndex >= maxIndex}
-              className="px-3.5 py-2 rounded-xl bg-cyan-400 hover:bg-cyan-300 text-black font-black shadow-lg hover:shadow-cyan-400/40 disabled:opacity-30 disabled:pointer-events-none transition-all flex items-center gap-1 text-xs font-mono"
-            >
-              <span>Next Slide</span>
-              <ChevronRight size={16} />
-            </button>
-          </div>
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none flex-wrap sm:flex-nowrap">
+          {slides.map((s, idx) => {
+            const isActive = idx === currentIndex
+            return (
+              <button
+                key={s.id}
+                onClick={() => goToSlide(idx)}
+                className={`px-3 py-2 rounded-xl text-xs font-mono font-bold transition-all shrink-0 flex items-center gap-1.5 border ${
+                  isActive
+                    ? 'bg-cyan-400 text-black border-cyan-400 shadow-lg scale-105 font-black'
+                    : 'bg-white/5 hover:bg-white/10 text-bwb-muted border-white/10 hover:text-white'
+                }`}
+              >
+                <span>{s.icon || idx + 1}</span>
+                <span className="truncate max-w-[130px] sm:max-w-[180px]">{s.title}</span>
+              </button>
+            )
+          })}
         </div>
 
         {/* Controller Tip for Presenters */}

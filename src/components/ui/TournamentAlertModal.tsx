@@ -10,16 +10,43 @@ import { SoundFX } from '../../lib/soundEffects'
 export function TournamentAlertModal() {
   const navigate = useNavigate()
   const { game, session } = useGameStore()
-  const [dismissedKey, setDismissedKey] = useState<string | null>(null)
+  const [dismissedKeys, setDismissedKeys] = useState<Set<string>>(() => new Set())
 
   const myTeam = game.teams.find((t) => t.id === session?.teamId)
   const currentRound = game.currentRound ?? 1
   const isResultsPhase = game.phase === 'RESULTS'
   const isFinalRound = currentRound === 3 || game.phase === 'FINAL_ROUND'
 
-  // Trigger when entering Round 3 or when Results phase is published
-  const triggerKey = myTeam && (isFinalRound || isResultsPhase) ? `${myTeam.id}-r${currentRound}-${game.phase}` : null
-  const isOpen = !!triggerKey && dismissedKey !== triggerKey && !!myTeam
+  // Trigger ONLY when first entering Round 3 announcement (in LOBBY or LEADERBOARD or FINAL_ROUND) OR at the official RESULTS ceremony
+  const isRound3AnnouncementPhase = isFinalRound && (game.phase === 'LOBBY' || game.phase === 'LEADERBOARD' || game.phase === 'FINAL_ROUND')
+
+  // Generate stable trigger keys (not tied to transient in-game phases like PITCHING or BUILDING)
+  const triggerKey = myTeam
+    ? isResultsPhase
+      ? `${myTeam.id}-final-results-ceremony`
+      : isRound3AnnouncementPhase
+      ? `${myTeam.id}-round3-qualifier-alert`
+      : null
+    : null
+
+  const isStoredDismissed = triggerKey ? (() => {
+    try {
+      return sessionStorage.getItem(`bwb_alert_${triggerKey}`) === 'dismissed'
+    } catch {
+      return false
+    }
+  })() : false
+
+  const isOpen = !!triggerKey && !dismissedKeys.has(triggerKey) && !isStoredDismissed && !!myTeam
+
+  const dismissModal = () => {
+    if (triggerKey) {
+      setDismissedKeys((prev) => new Set([...prev, triggerKey]))
+      try {
+        sessionStorage.setItem(`bwb_alert_${triggerKey}`, 'dismissed')
+      } catch {}
+    }
+  }
 
   const isFinalist = (game.finalistTeamIds && myTeam)
     ? game.finalistTeamIds.includes(myTeam.id)
@@ -70,7 +97,7 @@ export function TournamentAlertModal() {
           {/* Close button */}
           <button
             type="button"
-            onClick={() => setDismissedKey(triggerKey)}
+            onClick={dismissModal}
             className="absolute top-4 right-4 p-2 rounded-xl bg-white/5 text-bwb-muted hover:text-bwb-text hover:bg-white/10 transition-all"
           >
             <X size={18} />
@@ -136,7 +163,7 @@ export function TournamentAlertModal() {
             <Button
               size="lg"
               onClick={() => {
-                setDismissedKey(triggerKey)
+                dismissModal()
                 if (!isFinalist) {
                   navigate('/leaderboard?round=2')
                 }

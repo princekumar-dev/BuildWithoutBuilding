@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Sparkles, Target, ShieldCheck, Presentation, Link as LinkIcon, Layers, FileText, CheckCircle2 } from 'lucide-react'
+import { Sparkles, ShieldCheck, Presentation, Link as LinkIcon, FileText, CheckCircle2 } from 'lucide-react'
 import type { Submission, Technology, SlideItem } from '../../types'
 import { Button } from '../ui/Button'
 import { Input } from '../ui/Input'
@@ -283,7 +283,11 @@ export function SolutionForm({ technologies, onSubmit, disabled, initial, submit
   })
 
   const [slideMode, setSlideMode] = useState<'url' | 'upload' | 'smart'>(
-    initial?.presentationUrl ? (initial.presentationUrl.startsWith('data:') ? 'upload' : 'url') : 'smart'
+    currentRound === 3
+      ? (initial?.presentationUrl?.startsWith('data:') ? 'upload' : 'url')
+      : initial?.presentationUrl
+      ? (initial.presentationUrl.startsWith('data:') ? 'upload' : 'url')
+      : 'smart'
   )
 
   useEffect(() => {
@@ -300,9 +304,13 @@ export function SolutionForm({ technologies, onSubmit, disabled, initial, submit
       })
       if (initial.presentationUrl) {
         setSlideMode(initial.presentationUrl.startsWith('data:') ? 'upload' : 'url')
+      } else if (currentRound === 3) {
+        setSlideMode('url')
       }
+    } else if (currentRound === 3) {
+      setSlideMode('url')
     }
-  }, [initial, technologies])
+  }, [initial, technologies, currentRound])
 
   const update = (field: keyof Submission, value: string) =>
     setForm((prev) => ({ ...prev, [field]: value }))
@@ -332,11 +340,11 @@ export function SolutionForm({ technologies, onSubmit, disabled, initial, submit
         <div className="p-4 rounded-2xl bg-purple-500/10 border border-purple-500/30 text-left space-y-1.5">
           <div className="flex items-center justify-between">
             <span className="text-xs font-mono font-bold text-purple-300 uppercase flex items-center gap-1.5">
-              <Target size={14} className="text-purple-400" />
+              <Sparkles size={14} className="text-purple-400" />
               Round 1 Evaluation Focus · 100 Pts
             </span>
-            <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300">
-              Zero Elimination
+            <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-purple-400/20 text-purple-300">
+              No Elimination
             </span>
           </div>
           <p className="text-xs text-bwb-muted leading-relaxed">
@@ -353,7 +361,7 @@ export function SolutionForm({ technologies, onSubmit, disabled, initial, submit
               Round 2 Evaluation Focus · 100 Pts
             </span>
             <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-bwb-accent/20 text-bwb-accent">
-              Top 8 Qualify
+              Top Qualify
             </span>
           </div>
           <p className="text-xs text-bwb-muted leading-relaxed">
@@ -390,15 +398,15 @@ export function SolutionForm({ technologies, onSubmit, disabled, initial, submit
 
       {/* Presentation Deck / PPT Section - SHOWN ONLY IN ROUND 3 (GRAND FINALS) */}
       {isRound3 && (
-        <div className="p-4 sm:p-5 rounded-2xl bg-bwb-surface-2 border border-bwb-accent/30 space-y-3.5 text-left">
+        <div className="p-4 sm:p-5 rounded-2xl bg-bwb-surface-2 border border-bwb-accent/30 space-y-4 text-left">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
               <span className="text-xs font-mono font-bold text-bwb-accent uppercase flex items-center gap-1.5">
                 <Presentation size={15} className="text-bwb-accent" />
-                Grand Finals Pitch Deck & Slides (Required)
+                Grand Finals Pitch Deck & Slides (Upload or Link Required)
               </span>
               <p className="text-[11px] text-bwb-muted mt-0.5">
-                This presentation will appear on the Stadium Projector and be controlled live from your phone/laptop.
+                Upload your slide deck (PDF/PPT) or provide your Google Slides/Canva link to broadcast on the Stadium Projector.
               </p>
             </div>
 
@@ -406,30 +414,39 @@ export function SolutionForm({ technologies, onSubmit, disabled, initial, submit
               <button
                 type="button"
                 onClick={() => setSlideMode('url')}
-                className={`px-2.5 py-1 rounded-lg text-[11px] font-mono font-bold transition-all flex items-center gap-1 ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
                   slideMode === 'url' ? 'bg-bwb-accent text-bwb-bg shadow' : 'text-bwb-muted hover:text-white'
                 }`}
               >
-                <LinkIcon size={12} /> Google Slides / URL
+                <LinkIcon size={13} /> Google Slides / URL
               </button>
               <button
                 type="button"
                 onClick={() => setSlideMode('upload')}
-                className={`px-2.5 py-1 rounded-lg text-[11px] font-mono font-bold transition-all flex items-center gap-1 ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
                   slideMode === 'upload' ? 'bg-bwb-accent text-bwb-bg shadow' : 'text-bwb-muted hover:text-white'
                 }`}
               >
-                <FileText size={12} /> Upload PDF / Slides
+                <FileText size={13} /> Upload PDF / Slides
               </button>
-              <button
-                type="button"
-                onClick={() => setSlideMode('smart')}
-                className={`px-2.5 py-1 rounded-lg text-[11px] font-mono font-bold transition-all flex items-center gap-1 ${
-                  slideMode === 'smart' ? 'bg-bwb-accent text-bwb-bg shadow' : 'text-bwb-muted hover:text-white'
-                }`}
-              >
-                <Layers size={12} /> Smart Deck (Auto)
-              </button>
+            </div>
+          </div>
+
+          {/* Recommended 5-Slide Structure Guidelines */}
+          <div className="p-3.5 rounded-xl bg-bwb-bg/70 border border-white/10 space-y-2 text-xs">
+            <div className="flex items-center gap-2 text-bwb-accent font-mono font-bold">
+              <Sparkles size={14} className="text-bwb-accent" />
+              <span>Recommended 5-Slide Pitch Blueprint</span>
+            </div>
+            <p className="text-bwb-muted text-[11px] leading-relaxed">
+              Ensure your presentation deck covers these 5 core architectural pillars for live stage defense:
+            </p>
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-1.5 pt-1 text-[10px] font-mono text-center">
+              <span className="p-1.5 rounded-lg bg-white/5 border border-white/5 text-bwb-text font-bold">1. Master Architecture</span>
+              <span className="p-1.5 rounded-lg bg-white/5 border border-white/5 text-bwb-text font-bold">2. Production Viability</span>
+              <span className="p-1.5 rounded-lg bg-white/5 border border-white/5 text-bwb-text font-bold">3. System Flow</span>
+              <span className="p-1.5 rounded-lg bg-white/5 border border-white/5 text-bwb-text font-bold">4. Tech Synthesis</span>
+              <span className="p-1.5 rounded-lg bg-white/5 border border-white/5 text-bwb-text font-bold">5. Stage Defense</span>
             </div>
           </div>
 
@@ -452,7 +469,7 @@ export function SolutionForm({ technologies, onSubmit, disabled, initial, submit
                 </div>
               )}
             </div>
-          ) : slideMode === 'upload' ? (
+          ) : (
             <div className="space-y-2.5">
               <label className="block text-xs font-mono font-bold text-bwb-text uppercase">
                 Upload PDF Presentation / Exported Slides (.pdf, .png, .jpg)
@@ -509,23 +526,6 @@ export function SolutionForm({ technologies, onSubmit, disabled, initial, submit
                 </div>
               )}
             </div>
-          ) : (
-            <div className="p-3.5 rounded-xl bg-bwb-bg/70 border border-white/10 space-y-2 text-xs">
-              <div className="flex items-center gap-2 text-cyan-300 font-mono font-bold">
-                <Sparkles size={14} className="text-cyan-400" />
-                <span>Smart Holographic Pitch Deck Generator Active</span>
-              </div>
-              <p className="text-bwb-muted text-[11px] leading-relaxed">
-                We will automatically construct a 5-slide interactive holographic presentation for the Stadium Projector from your solution details, tech cards, and system architecture below.
-              </p>
-              <div className="grid grid-cols-2 sm:grid-cols-5 gap-1.5 pt-1 text-[10px] font-mono text-center">
-                <span className="p-1.5 rounded-lg bg-white/5 border border-white/5 text-bwb-text">1. Architecture [30]</span>
-                <span className="p-1.5 rounded-lg bg-white/5 border border-white/5 text-bwb-text">2. Viability [25]</span>
-                <span className="p-1.5 rounded-lg bg-white/5 border border-white/5 text-bwb-text">3. System Flow</span>
-                <span className="p-1.5 rounded-lg bg-white/5 border border-white/5 text-bwb-text">4. Tech Synthesis [20]</span>
-                <span className="p-1.5 rounded-lg bg-white/5 border border-white/5 text-bwb-text">5. Stage Defense [15]</span>
-              </div>
-            </div>
           )}
         </div>
       )}
@@ -535,7 +535,7 @@ export function SolutionForm({ technologies, onSubmit, disabled, initial, submit
           currentRound === 1
             ? "Problem Understanding & Root Cause Analysis *"
             : isRound3
-            ? "Master Architecture & Innovation Formulation [30 Pts] *"
+            ? "Master Architecture & Innovation Formulation *"
             : "What does your solution do? *"
         }
         placeholder={
@@ -586,7 +586,7 @@ export function SolutionForm({ technologies, onSubmit, disabled, initial, submit
         <div className="space-y-3">
           <div>
             <p className="text-sm font-medium text-bwb-text">
-              {isRound3 ? "3 Frontier Tech Cards Synthesis [20 Pts] *" : "3 Frontier Tech Cards Integration *"}
+              {isRound3 ? "3 Frontier Tech Cards Synthesis *" : "3 Frontier Tech Cards Integration *"}
             </p>
             <p className="text-[11px] text-bwb-muted mt-0.5">
               Explain how your architecture synthesizes and deeply integrates all 3 drawn constraint cards:
@@ -635,7 +635,7 @@ export function SolutionForm({ technologies, onSubmit, disabled, initial, submit
         />
       ) : (
         <Textarea
-          label="Production Viability, Real-World Moat & Scalability [25 Pts] *"
+          label="Production Viability, Real-World Moat & Scalability *"
           placeholder="Explain why this master architecture wins in real-world deployment, security protocols, edge fallback resilience, and commercial viability."
           value={form.mainAdvantage}
           onChange={(e) => update('mainAdvantage', e.target.value)}
@@ -649,7 +649,7 @@ export function SolutionForm({ technologies, onSubmit, disabled, initial, submit
           currentRound === 1
             ? "Key Operational Risks & Anticipated Constraints *"
             : isRound3
-            ? "Live Stage Defense & Vulnerability Mitigation [15 Pts] *"
+            ? "Live Stage Defense & Vulnerability Mitigation *"
             : "Main Limitation & Risk Mitigation *"
         }
         placeholder={

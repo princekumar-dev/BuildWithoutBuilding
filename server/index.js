@@ -941,7 +941,7 @@ const server = createServer(async (request, response) => {
     }
   }
 
-  const match = url.pathname.match(/^\/api\/games\/([^/]+)(?:\/(join|phase|round|finalists|schedule|config|assign-cards|select-problem|reveal-card|submissions|scores|ping|pitch-team|mark-pitched|timer|restore|permanent|slide))?$/)
+  const match = url.pathname.match(/^\/api\/games\/([^/]+)(?:\/(join|phase|round|finalists|schedule|config|assign-cards|select-problem|reveal-card|submissions|scores|ping|pitch-team|mark-pitched|timer|toggle-timer-pause|restore|permanent|slide))?$/)
   if (!match) return json(response, 404, { error: 'API route not found.' })
 
   const rawKey = decodeURIComponent(match[1])

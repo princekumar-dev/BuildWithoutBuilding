@@ -191,68 +191,71 @@ export function generateNativeSlides(form: Partial<Submission>, technologies: Te
     {
       id: 'slide-1',
       title: name,
-      subtitle: 'Grand Finals Pitch Deck · Live Championship Defense',
-      badge: 'GRAND FINALS · SLIDE 1 · EXECUTIVE OVERVIEW',
+      subtitle: 'Grand Finals · Master Architecture Blueprint & Innovation [30 Pts]',
+      badge: 'GRAND FINALS · SLIDE 1 · MASTER ARCHITECTURE [30 PTS]',
       icon: '🏆',
       content: whatItDoes,
       visualType: 'conclusion',
       bulletPoints: [
-        `Core Purpose: ${whatItDoes.slice(0, 120)}...`,
-        `Frontier Tech Stack: ${technologies.map((t) => t.name).join(', ')}`,
-        'Built for zero downtime & scalable field deployment',
+        `Master Blueprint: ${whatItDoes.slice(0, 130)}...`,
+        `Frontier Tech Stack: ${technologies.map((t) => t.name).join(' + ')}`,
+        'Championship Standard: Production-grade elegance, resilience & end-to-end telemetry',
       ],
     },
     {
       id: 'slide-2',
-      title: 'Problem Landscape & Root Causes',
-      subtitle: 'Why current solutions fail & what makes this critical',
-      badge: 'GRAND FINALS · SLIDE 2 · PROBLEM DEEP DIVE',
-      icon: '🎯',
-      content: whatItDoes,
+      title: 'Production Viability & Resilience [25 Pts]',
+      subtitle: 'Real-world deployment feasibility, security protocols & edge failover',
+      badge: 'GRAND FINALS · SLIDE 2 · VIABILITY & EDGE RESILIENCE [25 PTS]',
+      icon: '🛡️',
+      content: mainAdvantage,
       visualType: 'bullets',
       bulletPoints: [
-        'Critical user friction & operational bottlenecks in legacy workflows',
-        'Failure points: Data latency, high infrastructure costs, and lack of real-time telemetry',
-        'Our paradigm shift: Autonomous edge intelligence and decentralized coordination',
+        `Deployment Feasibility: ${mainAdvantage.slice(0, 130)}...`,
+        `Edge Failover & Mitigation: ${mainLimitation}`,
+        'High-resilience architecture with zero single points of failure',
       ],
     },
     {
       id: 'slide-3',
-      title: 'System Architecture & Data Flow',
-      subtitle: 'End-to-end engineering pipeline & execution logic',
-      badge: 'GRAND FINALS · SLIDE 3 · ARCHITECTURE',
-      icon: '⚡',
+      title: 'End-to-End System Flow & Execution Logic',
+      subtitle: 'Architectural data handshakes, ingestion pipeline & autonomous loops',
+      badge: 'GRAND FINALS · SLIDE 3 · SYSTEM WORKFLOW',
+      icon: '🔄',
       content: howItWorks,
       visualType: 'architecture',
       bulletPoints: [
-        `System Workflow: ${howItWorks.slice(0, 140)}...`,
-        'Edge sensing ➔ Real-time inference engine ➔ Autonomous dispatch loop',
-        'Fail-safe redundancy with cryptographic verification',
+        `System Pipeline: ${howItWorks.slice(0, 140)}...`,
+        'Edge Sensing ➔ Real-Time Inference ➔ Autonomous Dispatch & Control',
+        'Cryptographic handshake verification & hot-standby redundancy',
       ],
     },
     {
       id: 'slide-4',
-      title: '3 Frontier Technology Stack',
-      subtitle: 'Deep integration of required technological components',
-      badge: 'GRAND FINALS · SLIDE 4 · TECH INTEGRATION',
+      title: 'Seamless Tech Synthesis & Stack Mastery [20 Pts]',
+      subtitle: 'Deep technical integration and cross-technology communication',
+      badge: 'GRAND FINALS · SLIDE 4 · TECH SYNTHESIS [20 PTS]',
       icon: '🔮',
       visualType: 'tech-stack',
-      bulletPoints: technologies.map((t) => {
-        const usage = form.techUsage?.[t.id] || 'Integrated into core pipeline for telemetry and processing.'
-        return `${t.name}: ${usage}`
-      }),
+      bulletPoints: [
+        ...technologies.map((t) => {
+          const usage = form.techUsage?.[t.id] || 'Synthesized into core pipeline for processing and control.'
+          return `${t.name}: ${usage}`
+        }),
+        ...(form.techUsage?.['cross_synthesis'] ? [`Cross-Synthesis: ${form.techUsage['cross_synthesis']}`] : []),
+      ],
     },
     {
       id: 'slide-5',
-      title: 'Competitive Advantage vs Trade-offs',
-      subtitle: 'Why this architecture wins in the real world',
-      badge: 'GRAND FINALS · SLIDE 5 · STRATEGIC EDGE',
-      icon: '🛡️',
+      title: 'Live Stage Defense & Championship Moat [15 Pts]',
+      subtitle: 'Technical depth, judge attack defense & competitive superiority',
+      badge: 'GRAND FINALS · SLIDE 5 · STAGE DEFENSE & Q&A [15 PTS]',
+      icon: '🎯',
       visualType: 'comparison',
       bulletPoints: [
-        `Key Advantage: ${mainAdvantage}`,
-        `Risk Mitigation: Overcoming ${mainLimitation}`,
-        'Scalable unit economics and rapid deployment velocity',
+        `Architectural Moat: ${mainAdvantage}`,
+        `Edge Risk Mitigation: ${mainLimitation}`,
+        'Prepared for live judge interrogation, technical stress tests & red teaming',
       ],
     },
   ]
@@ -516,11 +519,11 @@ export function SolutionForm({ technologies, onSubmit, disabled, initial, submit
                 We will automatically construct a 5-slide interactive holographic presentation for the Stadium Projector from your solution details, tech cards, and system architecture below.
               </p>
               <div className="grid grid-cols-2 sm:grid-cols-5 gap-1.5 pt-1 text-[10px] font-mono text-center">
-                <span className="p-1.5 rounded-lg bg-white/5 border border-white/5 text-bwb-text">1. Overview</span>
-                <span className="p-1.5 rounded-lg bg-white/5 border border-white/5 text-bwb-text">2. Problem</span>
-                <span className="p-1.5 rounded-lg bg-white/5 border border-white/5 text-bwb-text">3. Architecture</span>
-                <span className="p-1.5 rounded-lg bg-white/5 border border-white/5 text-bwb-text">4. 3 Tech Stack</span>
-                <span className="p-1.5 rounded-lg bg-white/5 border border-white/5 text-bwb-text">5. Advantage</span>
+                <span className="p-1.5 rounded-lg bg-white/5 border border-white/5 text-bwb-text">1. Architecture [30]</span>
+                <span className="p-1.5 rounded-lg bg-white/5 border border-white/5 text-bwb-text">2. Viability [25]</span>
+                <span className="p-1.5 rounded-lg bg-white/5 border border-white/5 text-bwb-text">3. System Flow</span>
+                <span className="p-1.5 rounded-lg bg-white/5 border border-white/5 text-bwb-text">4. Tech Synthesis [20]</span>
+                <span className="p-1.5 rounded-lg bg-white/5 border border-white/5 text-bwb-text">5. Stage Defense [15]</span>
               </div>
             </div>
           )}
@@ -531,11 +534,15 @@ export function SolutionForm({ technologies, onSubmit, disabled, initial, submit
         label={
           currentRound === 1
             ? "Problem Understanding & Root Cause Analysis *"
+            : isRound3
+            ? "Master Architecture & Innovation Formulation [30 Pts] *"
             : "What does your solution do? *"
         }
         placeholder={
           currentRound === 1
             ? "Detail the deep root causes, target stakeholder pain points, and specific ecosystem bottlenecks this challenge addresses."
+            : isRound3
+            ? "Formulate your end-to-end master system blueprint, core architectural innovation, and deployment elegance."
             : "Describe the core purpose and enhanced capabilities in 2-3 sentences"
         }
         value={form.whatItDoes}
@@ -548,11 +555,15 @@ export function SolutionForm({ technologies, onSubmit, disabled, initial, submit
         label={
           currentRound === 1
             ? "Critique of Existing Solutions & Market Gaps *"
+            : isRound3
+            ? "End-to-End System Flow & Execution Logic *"
             : "How does your solution work & System Flow? *"
         }
         placeholder={
           currentRound === 1
             ? "Why do current methods fail? What gaps or architectural shortcomings exist in today's alternatives, and where is the opportunity?"
+            : isRound3
+            ? "Detail the technical pipeline: edge sensing ➔ real-time inference ➔ autonomous actuation and fail-safe redundancy."
             : "Explain the architecture flow, edge-to-cloud handshakes, and execution logic"
         }
         value={form.howItWorks}
@@ -575,7 +586,7 @@ export function SolutionForm({ technologies, onSubmit, disabled, initial, submit
         <div className="space-y-3">
           <div>
             <p className="text-sm font-medium text-bwb-text">
-              3 Frontier Tech Cards Integration *
+              {isRound3 ? "3 Frontier Tech Cards Synthesis [20 Pts] *" : "3 Frontier Tech Cards Integration *"}
             </p>
             <p className="text-[11px] text-bwb-muted mt-0.5">
               Explain how your architecture synthesizes and deeply integrates all 3 drawn constraint cards:
@@ -593,9 +604,9 @@ export function SolutionForm({ technologies, onSubmit, disabled, initial, submit
             />
           ))}
 
-          {currentRound === 2 && (
+          {(currentRound === 2 || isRound3) && (
             <Textarea
-              label="3-Card Cross-Tech Interoperability & Synthesis"
+              label={isRound3 ? "Cross-Technology Communication & Synthesis Protocol" : "3-Card Cross-Tech Interoperability & Synthesis"}
               placeholder="How do all 3 frontier tech cards communicate and work cohesively together in your architecture pipeline?"
               value={form.techUsage['cross_synthesis'] ?? ''}
               onChange={(e) => updateTech('cross_synthesis', e.target.value)}
@@ -624,8 +635,8 @@ export function SolutionForm({ technologies, onSubmit, disabled, initial, submit
         />
       ) : (
         <Textarea
-          label="Main Advantage *"
-          placeholder="What's the biggest strength of your approach compared to existing solutions?"
+          label="Production Viability, Real-World Moat & Scalability [25 Pts] *"
+          placeholder="Explain why this master architecture wins in real-world deployment, security protocols, edge fallback resilience, and commercial viability."
           value={form.mainAdvantage}
           onChange={(e) => update('mainAdvantage', e.target.value)}
           disabled={disabled}
@@ -637,11 +648,15 @@ export function SolutionForm({ technologies, onSubmit, disabled, initial, submit
         label={
           currentRound === 1
             ? "Key Operational Risks & Anticipated Constraints *"
+            : isRound3
+            ? "Live Stage Defense & Vulnerability Mitigation [15 Pts] *"
             : "Main Limitation & Risk Mitigation *"
         }
         placeholder={
           currentRound === 1
             ? "What is the biggest operational risk, edge case, or constraint in this problem domain, and how will your team defend it during judge Q&A?"
+            : isRound3
+            ? "Anticipate live judge attack vectors, edge-case failure modes, and your architectural mitigations."
             : "Be honest — what's the weakest point, key constraint, or risk, and how do you mitigate it?"
         }
         value={form.mainLimitation}

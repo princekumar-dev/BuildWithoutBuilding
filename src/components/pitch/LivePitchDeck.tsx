@@ -357,11 +357,11 @@ export function LivePitchDeck({
           {slides.map((s, idx) => {
             const isActive = idx === currentIndex
             const shortLabels: Record<number, Record<number, string>> = {
-              1: { 0: 'Overview', 1: 'Root Causes', 2: 'Gap Analysis', 3: 'Tech Stack', 4: 'Defense' },
-              2: { 0: 'Overview', 1: 'Alignment', 2: 'System Flow', 3: '3 Frontier Tech', 4: 'Defense' },
-              3: { 0: 'Overview', 1: 'Deep Dive', 2: 'Architecture', 3: 'Tech Matrix', 4: 'Final Edge' },
+              1: { 0: 'Overview', 1: 'Root Causes', 2: 'Market Gaps', 3: 'Tech Stack', 4: 'Risk Defense' },
+              2: { 0: 'Overview', 1: 'Alignment', 2: 'System Flow', 3: '3 Frontier Tech', 4: 'Novelty' },
+              3: { 0: 'Architecture [30]', 1: 'Viability [25]', 2: 'System Flow', 3: 'Tech Synthesis [20]', 4: 'Stage Defense [15]' },
             }
-            const tabLabel = shortLabels[round]?.[idx] || (s.title.length > 16 ? `${s.title.slice(0, 14)}..` : s.title)
+            const tabLabel = shortLabels[round]?.[idx] || (s.title.length > 18 ? `${s.title.slice(0, 16)}..` : s.title)
 
             return (
               <button

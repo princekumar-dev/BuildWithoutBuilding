@@ -34,7 +34,15 @@ function CountUpNumber({ target }: { target: number }) {
 }
 
 export function TournamentPodium({ teams }: TournamentPodiumProps) {
-  const sorted = [...teams].sort((a, b) => (b.score ?? 0) - (a.score ?? 0))
+  // Filter contenders strictly to qualified finalists
+  const finalists = teams.filter((t) => t.isFinalist || (t.round3Score && t.round3Score > 0))
+  const pool = finalists.length >= 3 ? finalists : teams
+  const sorted = [...pool].sort((a, b) => {
+    const scoreA = a.round3Score ?? a.score ?? 0
+    const scoreB = b.round3Score ?? b.score ?? 0
+    return scoreB - scoreA
+  })
+
   const first = sorted[0]
   const second = sorted[1]
   const thirdA = sorted[2]

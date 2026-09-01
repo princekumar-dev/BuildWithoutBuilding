@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { Trophy, Award, Swords, Layers } from 'lucide-react'
 import { PageLayout } from '../../components/layout/PageLayout'
 import { Card } from '../../components/ui/Card'
@@ -12,19 +13,27 @@ import { usePhaseNavigation } from '../../hooks/usePhaseNavigation'
 export default function LeaderboardPage() {
   usePhaseNavigation()
   useRealtimeGame()
+  const [searchParams] = useSearchParams()
   const { game, session, demoPhase } = useGameStore()
   const isResults = demoPhase === 'RESULTS' || game.phase === 'RESULTS'
   const currentRound = game.currentRound ?? 1
   const is8TeamRoom = Number(game.maxTeams) === 8 || (game.teams.length <= 8 && (game.activeProblemIds?.length === 4 || game.activeProblems?.length === 4))
   const targetFinalists = is8TeamRoom ? 4 : 8
 
-  const [selectedRound, setSelectedRound] = useState<number>(currentRound)
+  const myTeam = game.teams.find((t) => t.id === session?.teamId)
+  const isEliminatedInR2 = myTeam && !myTeam.isFinalist && currentRound >= 2
+  const roundParam = searchParams.get('round') ? Number(searchParams.get('round')) : null
+
+  const initialRound = roundParam || (isEliminatedInR2 && !isResults ? 2 : currentRound)
+  const [selectedRound, setSelectedRound] = useState<number>(initialRound)
 
   useEffect(() => {
-    if (game.currentRound) {
-      setSelectedRound(game.currentRound)
+    if (roundParam) {
+      setSelectedRound(roundParam)
+    } else if (isResults) {
+      setSelectedRound(3)
     }
-  }, [game.currentRound])
+  }, [roundParam, isResults])
 
   return (
     <PageLayout>
@@ -43,13 +52,19 @@ export default function LeaderboardPage() {
 
           <h1 className="font-display text-4xl sm:text-5xl font-black flex items-center justify-center gap-3 text-gradient">
             <Trophy className="text-bwb-gold" size={42} />
-            {isResults || currentRound === 3 ? 'Grand Finals Championship Results' : `Round ${selectedRound} Leaderboard`}
+            {isResults && selectedRound === 3
+              ? 'Grand Finals Championship Results'
+              : selectedRound === 2
+              ? 'Round 2 · Problem Showdown Duels'
+              : selectedRound === 1
+              ? 'Round 1 · Open Qualifier Leaderboard'
+              : 'Round 3 · Grand Finals Standings'}
           </h1>
           <p className="text-bwb-muted mt-2">{game.name || 'Build Without Building Tournament'}</p>
         </div>
 
-        {/* 3D Animated Podium for Finals / Results */}
-        {(isResults || currentRound === 3) && selectedRound === 3 && game.teams.length > 0 && (
+        {/* 3D Animated Podium for Finals / Results: ONLY during official RESULTS ceremony */}
+        {isResults && selectedRound === 3 && game.teams.length > 0 && (
           <TournamentPodium teams={game.teams} />
         )}
 

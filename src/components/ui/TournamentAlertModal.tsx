@@ -138,7 +138,7 @@ export function TournamentAlertModal() {
               onClick={() => {
                 setDismissedKey(triggerKey)
                 if (!isFinalist) {
-                  navigate('/leaderboard')
+                  navigate('/leaderboard?round=2')
                 }
               }}
               className={`w-full sm:w-auto h-12 px-6 justify-center flex items-center gap-2 ${

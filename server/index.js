@@ -548,10 +548,9 @@ function ensureGameActiveProblems(game) {
 
 function calculateProblemTrackWinners(game) {
   const winners = [];
-  const targetFinalists = Number(game.maxTeams) === 8 ? 4 : 8;
   const problemIds = game.activeProblemIds && game.activeProblemIds.length > 0
     ? game.activeProblemIds
-    : (targetFinalists === 4 ? ['p1', 'p2', 'p3', 'p4'] : ['p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8']);
+    : ['p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8'];
   
   problemIds.forEach((pid) => {
     const teamsForProblem = game.teams.filter((t) => t.selectedProblemId === pid);
@@ -562,21 +561,10 @@ function calculateProblemTrackWinners(game) {
         const scoreB = b.round2Score ?? b.score ?? 0;
         return scoreB - scoreA;
       });
+      // Strictly only the #1 top-scoring squad per problem track advances as the finalist!
       winners.push(sorted[0].id);
     }
   });
-
-  // If fewer than targetFinalists unique problem tracks have teams, backfill with top scoring teams
-  if (winners.length < targetFinalists) {
-    const remainingTeams = [...game.teams]
-      .filter((t) => !winners.includes(t.id))
-      .sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
-    
-    while (winners.length < targetFinalists && remainingTeams.length > 0) {
-      const next = remainingTeams.shift();
-      if (next) winners.push(next.id);
-    }
-  }
 
   return winners;
 }
@@ -629,11 +617,7 @@ function publicGame(game) {
   game.currentRound = game.currentRound || (game.isFinalRound ? 3 : 1);
   const problemWinners = calculateProblemTrackWinners(game);
   
-  if (game.currentRound >= 3 && (!game.finalistTeamIds || game.finalistTeamIds.length === 0)) {
-    game.finalistTeamIds = problemWinners;
-  } else {
-    game.finalistTeamIds = game.finalistTeamIds || [];
-  }
+  game.finalistTeamIds = problemWinners;
 
   if (!game.pitchedTeamIdsByRound) {
     game.pitchedTeamIdsByRound = { 1: [], 2: [], 3: [] };

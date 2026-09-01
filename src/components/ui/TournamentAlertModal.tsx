@@ -100,7 +100,7 @@ export function TournamentAlertModal() {
                 ? 'bg-amber-500 text-amber-950 shadow-lg'
                 : isFinalist
                 ? 'bg-emerald-500 text-emerald-950 shadow-lg animate-pulse'
-                : 'bg-purple-500/20 text-purple-300 border border-purple-500/40'
+                : 'bg-purple-500/25 text-purple-200 border border-purple-400/40 shadow-sm'
             }`}>
               {isChampion
                 ? '🏆 1ST PLACE · GRAND CHAMPION'
@@ -110,12 +110,12 @@ export function TournamentAlertModal() {
                 ? '🥉 3RD PLACE · DUAL BRONZE'
                 : isFinalist
                 ? '⚡ QUALIFIED FOR GRAND FINALS (ROUND 3)'
-                : '🎖️ ROUND 2 COMPLETED'}
+                : '🎖️ VALIANT BATTLE · TOURNAMENT HONOR'}
             </span>
           </div>
 
           <h2 className="font-display font-black text-2xl sm:text-3xl text-bwb-text mt-1 mb-2">
-            {myTeam.name}
+            {isFinalist ? myTeam.name : `Well Fought, ${myTeam.name}!`}
           </h2>
 
           <p className="text-sm text-bwb-muted leading-relaxed mb-6">
@@ -127,7 +127,7 @@ export function TournamentAlertModal() {
               ? `Fantastic architecture! You earned an official 3rd Place Bronze Award with ${round3Score} points.`
               : isFinalist
               ? `Outstanding victory! You won your Round 2 Problem Duel with ${round2Score > 0 ? round2Score : 100} points and earned a ticket to the Grand Finals (Round 3)!`
-              : `Your squad completed Round 2 with ${round2Score} points. While only the top Problem Track Champions advance to Round 3, you can cheer and spectate the live championship arena!`}
+              : `You delivered a formidable architecture formulation in the 1v1 Problem Duel with ${round2Score} points! Although only 1 champion per challenge track advances to the Grand Finals, your engineering ingenuity and teamwork made this battle legendary. Stand tall and cheer the finalists live!`}
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">

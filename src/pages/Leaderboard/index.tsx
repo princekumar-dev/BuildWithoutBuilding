@@ -1,4 +1,5 @@
-import { Trophy, Award } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Trophy, Award, Swords, Layers } from 'lucide-react'
 import { PageLayout } from '../../components/layout/PageLayout'
 import { Card } from '../../components/ui/Card'
 import { PhaseIndicator } from '../../components/ui/PhaseIndicator'
@@ -17,10 +18,18 @@ export default function LeaderboardPage() {
   const is8TeamRoom = Number(game.maxTeams) === 8 || (game.teams.length <= 8 && (game.activeProblemIds?.length === 4 || game.activeProblems?.length === 4))
   const targetFinalists = is8TeamRoom ? 4 : 8
 
+  const [selectedRound, setSelectedRound] = useState<number>(currentRound)
+
+  useEffect(() => {
+    if (game.currentRound) {
+      setSelectedRound(game.currentRound)
+    }
+  }, [game.currentRound])
+
   return (
     <PageLayout>
       <div className="max-w-5xl mx-auto px-2 sm:px-4 pb-12">
-        <div className="text-center mb-8">
+        <div className="text-center mb-6 sm:mb-8">
           <div className="flex items-center justify-center gap-2 mb-3">
             <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30">
               {currentRound === 1
@@ -34,31 +43,77 @@ export default function LeaderboardPage() {
 
           <h1 className="font-display text-4xl sm:text-5xl font-black flex items-center justify-center gap-3 text-gradient">
             <Trophy className="text-bwb-gold" size={42} />
-            {isResults || currentRound === 3 ? 'Grand Finals Championship Results' : `Round ${currentRound} Leaderboard`}
+            {isResults || currentRound === 3 ? 'Grand Finals Championship Results' : `Round ${selectedRound} Leaderboard`}
           </h1>
           <p className="text-bwb-muted mt-2">{game.name || 'Build Without Building Tournament'}</p>
         </div>
 
         {/* 3D Animated Podium for Finals / Results */}
-        {(isResults || currentRound === 3) && game.teams.length > 0 && (
+        {(isResults || currentRound === 3) && selectedRound === 3 && game.teams.length > 0 && (
           <TournamentPodium teams={game.teams} />
         )}
+
+        {/* Round Switcher Tabs */}
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-6 bg-bwb-surface-2/80 p-2 rounded-2xl border border-white/10">
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <button
+              type="button"
+              onClick={() => setSelectedRound(1)}
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-mono font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                selectedRound === 1
+                  ? 'bg-bwb-accent text-bwb-bg shadow-sm'
+                  : 'text-bwb-muted hover:text-bwb-text hover:bg-white/5'
+              }`}
+            >
+              <Layers size={13} />
+              <span>Round 1 (Open)</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setSelectedRound(2)}
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-mono font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                selectedRound === 2
+                  ? 'bg-bwb-accent text-bwb-bg shadow-sm'
+                  : 'text-bwb-muted hover:text-bwb-text hover:bg-white/5'
+              }`}
+            >
+              <Swords size={13} />
+              <span>Round 2 (1v1 Duels)</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setSelectedRound(3)}
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-mono font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                selectedRound === 3
+                  ? 'bg-bwb-accent text-bwb-bg shadow-sm'
+                  : 'text-bwb-muted hover:text-bwb-text hover:bg-white/5'
+              }`}
+            >
+              <Trophy size={13} />
+              <span>Round 3 (Finals)</span>
+            </button>
+          </div>
+
+          <span className="text-[11px] font-mono text-purple-300 font-bold px-2 hidden sm:inline">
+            Viewing: Round 0{selectedRound} Standings
+          </span>
+        </div>
 
         <LeaderboardTable
           teams={game.teams}
           highlightTeamId={session?.teamId}
-          showMovement={!isResults}
-          round={currentRound}
-          isFinalResults={isResults || currentRound === 3}
+          showMovement={!isResults && selectedRound === currentRound}
+          round={selectedRound}
+          isFinalResults={(isResults || currentRound === 3) && selectedRound === 3}
         />
 
         {/* Round Explanatory Card */}
         <Card padding="md" className="mt-6 text-center border-purple-500/20 bg-gradient-to-r from-bwb-surface via-bwb-surface-2 to-bwb-surface">
-          {currentRound === 1 ? (
+          {selectedRound === 1 ? (
             <p className="text-xs sm:text-sm text-bwb-text">
               ✨ <strong className="text-bwb-accent">Round 1 (No Elimination)</strong>: All registered teams advance to Round 2 to compete across the {targetFinalists} Problem Statements (max 2 teams per problem).
             </p>
-          ) : currentRound === 2 ? (
+          ) : selectedRound === 2 ? (
             <p className="text-xs sm:text-sm text-bwb-text">
               ⚡ <strong className="text-emerald-400">Round 2 Showdown</strong>: The <strong className="text-bwb-accent">Top {targetFinalists} Problem Champions</strong> on this leaderboard advance to the Grand Finals (Round 3).
             </p>

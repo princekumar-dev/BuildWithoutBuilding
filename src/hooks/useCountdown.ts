@@ -1,9 +1,18 @@
 import { useEffect, useState } from 'react'
 import { SoundFX } from '../lib/soundEffects'
 
-export function useCountdown(initialSeconds: number, running = true, targetTime?: string | number | Date | null) {
+export function useCountdown(
+  initialSeconds: number,
+  running = true,
+  targetTime?: string | number | Date | null,
+  isPaused = false,
+  pausedSeconds?: number | null
+) {
   const calculateRemaining = (): number => {
-    if (targetTime) {
+    if (isPaused && pausedSeconds != null) {
+      return Math.max(0, pausedSeconds)
+    }
+    if (targetTime && !isPaused) {
       const targetMs = new Date(targetTime).getTime()
       if (!isNaN(targetMs) && targetMs > 0) {
         const diffSecs = Math.round((targetMs - Date.now()) / 1000)
@@ -17,10 +26,10 @@ export function useCountdown(initialSeconds: number, running = true, targetTime?
 
   useEffect(() => {
     setSeconds(calculateRemaining())
-  }, [initialSeconds, targetTime])
+  }, [initialSeconds, targetTime, isPaused, pausedSeconds])
 
   useEffect(() => {
-    if (!running) return
+    if (!running || isPaused) return
 
     const tick = () => {
       if (targetTime) {

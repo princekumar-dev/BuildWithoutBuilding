@@ -1086,10 +1086,14 @@ const server = createServer(async (request, response) => {
       game.phaseStartedAt = new Date().toISOString();
       game.phaseDurationSeconds = durationSec;
       game.phaseExpiresAt = new Date(Date.now() + durationSec * 1000).toISOString();
+      game.isTimerPaused = false;
+      game.timerPausedRemainingSeconds = null;
     } else {
       game.phaseStartedAt = null;
       game.phaseDurationSeconds = null;
       game.phaseExpiresAt = null;
+      game.isTimerPaused = false;
+      game.timerPausedRemainingSeconds = null;
     }
 
     save(database); 
@@ -1105,10 +1109,46 @@ const server = createServer(async (request, response) => {
       game.phaseDurationSeconds = sec;
       game.phaseStartedAt = new Date().toISOString();
       game.phaseExpiresAt = new Date(Date.now() + sec * 1000).toISOString();
+      game.isTimerPaused = false;
+      game.timerPausedRemainingSeconds = null;
       if (input.phase) game.phase = input.phase;
     } else if (sec === 0) {
       game.phaseExpiresAt = new Date().toISOString();
+      game.isTimerPaused = false;
+      game.timerPausedRemainingSeconds = null;
     }
+    save(database);
+    const pGame = publicGame(game);
+    broadcastToClients({ type: 'games-updated', game: pGame });
+    return json(response, 200, pGame);
+  }
+
+  if ((request.method === 'PATCH' || request.method === 'POST') && action === 'toggle-timer-pause') {
+    if (!requireHost(request, response)) return;
+    const shouldPause = input.isPaused !== undefined ? Boolean(input.isPaused) : !game.isTimerPaused;
+    
+    if (shouldPause) {
+      // Calculate exact remaining seconds to freeze
+      let remainingSec = 0;
+      if (game.phaseExpiresAt) {
+        const diff = Math.round((new Date(game.phaseExpiresAt).getTime() - Date.now()) / 1000);
+        remainingSec = Math.max(0, diff);
+      } else if (game.phaseDurationSeconds) {
+        remainingSec = game.phaseDurationSeconds;
+      }
+      game.isTimerPaused = true;
+      game.timerPausedRemainingSeconds = remainingSec;
+    } else {
+      // Resume timer
+      const remainingSec = game.timerPausedRemainingSeconds != null ? Number(game.timerPausedRemainingSeconds) : 0;
+      game.isTimerPaused = false;
+      if (remainingSec > 0) {
+        game.phaseExpiresAt = new Date(Date.now() + remainingSec * 1000).toISOString();
+        game.phaseDurationSeconds = remainingSec;
+      }
+      game.timerPausedRemainingSeconds = null;
+    }
+
     save(database);
     const pGame = publicGame(game);
     broadcastToClients({ type: 'games-updated', game: pGame });
@@ -1129,6 +1169,8 @@ const server = createServer(async (request, response) => {
     game.phaseStartedAt = null;
     game.phaseDurationSeconds = null;
     game.phaseExpiresAt = null;
+    game.isTimerPaused = false;
+    game.timerPausedRemainingSeconds = null;
     game.pitchedTeamIds = [];
     game.currentPitchTeamId = null;
     game.pitchStartedAt = null;

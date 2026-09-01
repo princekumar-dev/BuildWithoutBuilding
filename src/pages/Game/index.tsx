@@ -98,12 +98,14 @@ export default function GamePage() {
           </div>
 
           <CountdownTimer
-            key={`build-timer-${game.phase}-${game.phaseExpiresAt || game.currentRound || 1}`}
+            key={`build-timer-${game.phase}-${game.phaseExpiresAt || game.currentRound || 1}-${game.isTimerPaused}`}
             targetTime={game.phaseExpiresAt}
             initialSeconds={getPhaseDuration(game.id, game.currentRound || 1, 'BUILDING', game.buildDurationMinutes)}
-            running={!hasSubmitted}
+            running={!hasSubmitted && !game.isTimerPaused}
+            isPaused={game.isTimerPaused}
+            pausedSeconds={game.timerPausedRemainingSeconds}
             size="md"
-            label="Build Time Remaining"
+            label={game.isTimerPaused ? 'Build Time (Paused by Host)' : 'Build Time Remaining'}
           />
 
           {hasSubmitted && (

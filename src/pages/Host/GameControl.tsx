@@ -1,12 +1,13 @@
 import { useParams, Link } from 'react-router-dom'
 import { useState, useEffect, useRef } from 'react'
 import {
-  Play, SkipForward, Eye, Lock, Unlock, AlertTriangle, Users,
+  Play, Pause, SkipForward, Eye, Lock, Unlock, AlertTriangle, Users,
   ChevronLeft, Timer, Zap, Shield, Trophy, CheckCircle2,
   ExternalLink, Copy, Trash2, Key, UserCheck, Crown,
   Calendar, Edit3, Clock, Rocket
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { SoundFX } from '../../lib/soundEffects'
 import { PageLayout } from '../../components/layout/PageLayout'
 import { Card } from '../../components/ui/Card'
 import { Button } from '../../components/ui/Button'
@@ -202,6 +203,19 @@ export default function HostGameControlPage() {
     } catch {}
     setIsEditingTimer(false)
     toast.success(`Round ${currentRound} timers updated & synced: Build ${buildMinutes}m, Pitch ${pitchSeconds / 60}m.`)
+  }
+
+  const handleToggleTimerPause = async () => {
+    if (!game.id) return
+    try {
+      const nextPaused = !game.isTimerPaused
+      const updated = await api.toggleTimerPause(game.id, nextPaused)
+      setGame(updated)
+      toast.success(nextPaused ? 'Phase timer PAUSED across all screens & participant devices!' : 'Phase timer RESUMED across all screens!')
+      SoundFX.playCutePop()
+    } catch (err: any) {
+      toast.error(err.message || 'Unable to toggle timer pause.')
+    }
   }
 
   useEffect(() => {
@@ -405,29 +419,70 @@ export default function HostGameControlPage() {
               </div>
 
               {/* Countdown timer HUD */}
-              <div className="flex items-center justify-between sm:justify-start gap-4 bg-bwb-surface-2/90 p-3 sm:p-3.5 rounded-2xl border border-white/5 shadow-inner">
-                <div className={`p-2.5 rounded-xl border ${phaseTimer ? 'bg-bwb-accent/10 border-bwb-accent/30 text-bwb-accent' : 'bg-bwb-surface border-bwb-border text-bwb-muted'}`}>
-                  <Timer size={20} />
+              <div className={`flex items-center justify-between sm:justify-start gap-3 sm:gap-4 p-3 sm:p-3.5 rounded-2xl border shadow-inner transition-all ${
+                game.isTimerPaused
+                  ? 'bg-amber-950/30 border-amber-400/40 shadow-amber-400/10'
+                  : 'bg-bwb-surface-2/90 border-white/5'
+              }`}>
+                <div className={`p-2.5 rounded-xl border ${
+                  game.isTimerPaused
+                    ? 'bg-amber-400/20 border-amber-400/40 text-amber-300'
+                    : phaseTimer
+                    ? 'bg-bwb-accent/10 border-bwb-accent/30 text-bwb-accent'
+                    : 'bg-bwb-surface border-bwb-border text-bwb-muted'
+                }`}>
+                  {game.isTimerPaused ? <Pause size={20} className="text-amber-300" /> : <Timer size={20} className={phaseTimer ? 'animate-pulse' : ''} />}
                 </div>
                 <div className="text-right sm:text-left">
-                  <p className="text-[10px] uppercase font-bold tracking-widest text-bwb-muted">{phaseTimer?.label ?? 'Stage Timer'}</p>
+                  <div className="flex items-center gap-1.5 justify-end sm:justify-start mb-0.5">
+                    <p className="text-[10px] uppercase font-bold tracking-widest text-bwb-muted">{phaseTimer?.label ?? 'Stage Timer'}</p>
+                    {game.isTimerPaused && (
+                      <span className="px-1.5 py-0.2 rounded bg-amber-400/20 text-amber-300 border border-amber-400/40 text-[9px] font-mono font-bold">PAUSED</span>
+                    )}
+                  </div>
                   {phaseTimer ? (
-                    <CountdownTimer
-                      key={`host-timer-${game.phase}-${game.phaseExpiresAt || timerRevision}`}
-                      targetTime={game.phaseExpiresAt}
-                      initialSeconds={phaseTimer.seconds}
-                      running
-                      size="sm"
-                      showExpired={false}
-                      onComplete={() => {
-                        if (game.phase === 'BUILDING') {
-                          toast.success(`${phaseTimer.label} finished. Ready for Pitch Phase!`)
-                          void advanceStage()
-                        } else if (game.phase === 'PITCHING') {
-                          toast.info('Pitch time completed for current squad. Grade team or call next squad.')
-                        }
-                      }}
-                    />
+                    <div className="flex items-center gap-2.5">
+                      <CountdownTimer
+                        key={`host-timer-${game.phase}-${game.phaseExpiresAt || timerRevision}-${game.isTimerPaused}`}
+                        targetTime={game.phaseExpiresAt}
+                        initialSeconds={phaseTimer.seconds}
+                        running={!game.isTimerPaused}
+                        isPaused={game.isTimerPaused}
+                        pausedSeconds={game.timerPausedRemainingSeconds}
+                        size="sm"
+                        showExpired={false}
+                        onComplete={() => {
+                          if (game.phase === 'BUILDING') {
+                            toast.success(`${phaseTimer.label} finished. Ready for Pitch Phase!`)
+                            void advanceStage()
+                          } else if (game.phase === 'PITCHING') {
+                            toast.info('Pitch time completed for current squad. Grade team or call next squad.')
+                          }
+                        }}
+                      />
+                      <button
+                        type="button"
+                        onClick={handleToggleTimerPause}
+                        className={`px-2.5 py-1.5 rounded-xl text-xs font-mono font-bold flex items-center gap-1.5 transition-all shadow-md active:scale-95 shrink-0 ${
+                          game.isTimerPaused
+                            ? 'bg-emerald-500 hover:bg-emerald-400 text-black font-black shadow-emerald-500/20'
+                            : 'bg-amber-400/20 hover:bg-amber-400/30 text-amber-300 border border-amber-400/40'
+                        }`}
+                        title={game.isTimerPaused ? 'Resume Timer across all screens' : 'Pause Timer across all screens'}
+                      >
+                        {game.isTimerPaused ? (
+                          <>
+                            <Play size={12} className="fill-current" />
+                            <span>Resume</span>
+                          </>
+                        ) : (
+                          <>
+                            <Pause size={12} className="fill-current" />
+                            <span>Pause</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
                   ) : (
                     <p className="font-display font-bold text-xl sm:text-2xl text-bwb-muted">STANDBY</p>
                   )}
@@ -942,15 +997,31 @@ export default function HostGameControlPage() {
                   </p>
                 </div>
               </div>
-              <Button
-                size="sm"
-                variant="secondary"
-                onClick={() => setIsEditingTimer(!isEditingTimer)}
-                className="w-full sm:w-auto text-xs border-white/10 justify-center"
-              >
-                <Edit3 size={13} className="mr-1.5 text-bwb-accent" />
-                {isEditingTimer ? 'Close Timer Editor' : 'Edit Phase Timers'}
-              </Button>
+              <div className="flex items-center gap-2 w-full sm:w-auto">
+                {phaseTimer && (
+                  <Button
+                    size="sm"
+                    onClick={handleToggleTimerPause}
+                    className={`w-full sm:w-auto text-xs font-bold justify-center ${
+                      game.isTimerPaused
+                        ? 'bg-emerald-500 hover:bg-emerald-400 text-black shadow-md shadow-emerald-500/20'
+                        : 'bg-amber-400/20 hover:bg-amber-400/30 text-amber-300 border border-amber-400/40'
+                    }`}
+                  >
+                    {game.isTimerPaused ? <Play size={13} className="mr-1.5 fill-current" /> : <Pause size={13} className="mr-1.5 fill-current" />}
+                    {game.isTimerPaused ? 'Resume Timer' : 'Pause Timer'}
+                  </Button>
+                )}
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={() => setIsEditingTimer(!isEditingTimer)}
+                  className="w-full sm:w-auto text-xs border-white/10 justify-center"
+                >
+                  <Edit3 size={13} className="mr-1.5 text-bwb-accent" />
+                  {isEditingTimer ? 'Close Timer Editor' : 'Edit Phase Timers'}
+                </Button>
+              </div>
             </div>
 
             {/* Inline Phase Timer Editor */}

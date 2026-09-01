@@ -1579,19 +1579,41 @@ export default function ProjectorPage() {
             </div>
 
             {/* Countdown Hero & Submissions Tracker in a Single Balanced Stadium Widget */}
-            <div className="w-full max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 p-4 sm:p-5 rounded-3xl stereo-card border border-bwb-accent/40 bg-gradient-to-r from-bwb-surface-2/95 via-bwb-surface/90 to-bwb-surface-2/95 shadow-2xl backdrop-blur-2xl">
+            <div className={`w-full max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 p-4 sm:p-5 rounded-3xl stereo-card border transition-all ${
+              game.isTimerPaused
+                ? 'border-amber-400/70 bg-gradient-to-r from-amber-950/50 via-bwb-surface/90 to-amber-950/50 shadow-[0_0_35px_rgba(251,191,36,0.2)]'
+                : 'border-bwb-accent/40 bg-gradient-to-r from-bwb-surface-2/95 via-bwb-surface/90 to-bwb-surface-2/95 shadow-2xl backdrop-blur-2xl'
+            }`}>
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-2xl bg-bwb-accent/15 text-bwb-accent border border-bwb-accent/30 flex items-center justify-center shrink-0 shadow-inner">
-                  <Clock size={24} className="animate-spin text-bwb-accent" />
+                <div className={`w-12 h-12 rounded-2xl border flex items-center justify-center shrink-0 shadow-inner ${
+                  game.isTimerPaused
+                    ? 'bg-amber-400/20 text-amber-300 border-amber-400/40 shadow-amber-400/15 shadow-lg'
+                    : 'bg-bwb-accent/15 text-bwb-accent border-bwb-accent/30'
+                }`}>
+                  {game.isTimerPaused ? (
+                    <Pause size={24} className="text-amber-300 fill-current" />
+                  ) : (
+                    <Clock size={24} className="animate-spin text-bwb-accent" />
+                  )}
                 </div>
                 <div>
-                  <span className="text-[10px] sm:text-[11px] font-mono font-black text-bwb-muted uppercase tracking-widest block mb-0.5">
-                    BUILD PHASE TIME REMAINING
-                  </span>
+                  <div className="flex items-center gap-2 mb-0.5">
+                    <span className="text-[10px] sm:text-[11px] font-mono font-black text-bwb-muted uppercase tracking-widest block">
+                      {game.isTimerPaused ? 'BUILD SPRINT ON HOLD' : 'BUILD PHASE TIME REMAINING'}
+                    </span>
+                    {game.isTimerPaused && (
+                      <span className="px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/50 text-[10px] font-mono font-black tracking-wider animate-pulse">
+                        ⏸️ PAUSED BY HOST
+                      </span>
+                    )}
+                  </div>
                   <CountdownTimer
-                    key={`proj-build-${currentRound}-${game.phaseExpiresAt}`}
+                    key={`proj-build-${currentRound}-${game.phaseExpiresAt}-${game.isTimerPaused}`}
                     targetTime={game.phaseExpiresAt}
                     initialSeconds={getPhaseDuration(game.id, currentRound, 'BUILDING', game.buildDurationMinutes)}
+                    running={!game.isTimerPaused}
+                    isPaused={game.isTimerPaused}
+                    pausedSeconds={game.timerPausedRemainingSeconds}
                     size="lg"
                     showExpired={false}
                   />

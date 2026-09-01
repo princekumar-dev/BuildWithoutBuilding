@@ -129,6 +129,8 @@ export interface Game {
   phaseStartedAt?: string | null
   phaseExpiresAt?: string | null
   phaseDurationSeconds?: number | null
+  isTimerPaused?: boolean
+  timerPausedRemainingSeconds?: number | null
   pitchStartedAt?: string | null
   pitchExpiresAt?: string | null
   pitchDurationSeconds?: number | null

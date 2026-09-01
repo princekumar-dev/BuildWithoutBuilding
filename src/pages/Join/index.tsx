@@ -13,7 +13,7 @@ import { Button } from '../../components/ui/Button'
 import { toast } from '../../components/ui/Toast'
 import { SoundFX } from '../../lib/soundEffects'
 import { useGameStore } from '../../store/gameStore'
-import { api } from '../../lib/api'
+import { api, getCachedGames } from '../../lib/api'
 import { WhatsAppGroupCard, WhatsAppIcon, OFFICIAL_WHATSAPP_GROUP_URL } from '../../components/ui/WhatsAppGroupCard'
 import type { Game, ParticipantSession } from '../../types'
 
@@ -27,7 +27,8 @@ export default function JoinPage() {
   // Tabs & Game Selection
   const [activeTab, setActiveTab] = useState<JoinTab>('register')
   const [code, setCode] = useState(searchParams.get('code') || game.code || '')
-  const [activeGames, setActiveGames] = useState<Game[]>([])
+  const [activeGames, setActiveGames] = useState<Game[]>(() => getCachedGames())
+  const [initialLoading, setInitialLoading] = useState(() => getCachedGames().length === 0)
 
   // Register Team State
   const [teamName, setTeamName] = useState('')
@@ -50,33 +51,41 @@ export default function JoinPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  // Auto-fetch active games and poll every 3 seconds for real-time room & registration updates
+  // Auto-fetch active games and poll every 2.5 seconds for real-time room & registration updates
   useEffect(() => {
+    let isMounted = true
     const fetchGames = () => {
       api.listGames().then((games) => {
+        if (!isMounted) return
         setActiveGames(games)
+        setInitialLoading(false)
         const openRooms = games.filter((g) => g.phase !== 'RESULTS' && g.isRegistrationOpen !== false)
         if (openRooms.length > 0) {
-          if (!code || !openRooms.some((g) => g.code === code)) {
+          if (!code || !games.some((g) => g.code === code)) {
             setCode(openRooms[openRooms.length - 1].code)
           }
         } else if (games.length > 0 && !code) {
           setCode(games[games.length - 1].code)
         }
-      }).catch(() => {})
+      }).catch(() => {
+        if (isMounted) setInitialLoading(false)
+      })
     }
     fetchGames()
-    const interval = setInterval(fetchGames, 3000)
-    return () => clearInterval(interval)
+    const interval = setInterval(fetchGames, 2500)
+    return () => {
+      isMounted = false
+      clearInterval(interval)
+    }
   }, [code])
 
   const openGames = activeGames.filter((g) => g.phase !== 'RESULTS' && g.isRegistrationOpen !== false)
-  const currentTargetGame = openGames.find((g) => g.code === code)
-    || (openGames.length > 0 ? openGames[openGames.length - 1] : (activeGames.find((g) => g.code === code) || (activeGames.length > 0 ? activeGames[activeGames.length - 1] : null)))
+  const currentTargetGame = activeGames.find((g) => g.code === code)
+    || (openGames.length > 0 ? openGames[openGames.length - 1] : (activeGames.length > 0 ? activeGames[activeGames.length - 1] : null))
   const roomMaxTeams = currentTargetGame ? (currentTargetGame.maxTeams || 16) : 16
   const roomRegisteredCount = currentTargetGame ? currentTargetGame.teams.length : 0
   const isRoomFull = currentTargetGame ? roomRegisteredCount >= roomMaxTeams : false
-  const isRegistrationClosedByHost = currentTargetGame ? currentTargetGame.isRegistrationOpen === false : (openGames.length === 0)
+  const isRegistrationClosedByHost = !initialLoading && (currentTargetGame ? currentTargetGame.isRegistrationOpen === false : (activeGames.length === 0))
   const slotsRemaining = Math.max(0, roomMaxTeams - roomRegisteredCount)
 
   const handleAddMember = () => {
@@ -321,10 +330,18 @@ export default function JoinPage() {
                 {/* Top Mini Bar: Status Tag, Room Selector, & PIN Badge */}
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="flex items-center gap-1.5">
-                    <span className={`inline-block w-2 h-2 rounded-full ${openGames.length === 0 ? 'bg-rose-400' : isRoomFull ? 'bg-amber-400' : 'bg-emerald-400'} animate-pulse shrink-0`} />
+                    <span className={`inline-block w-2 h-2 rounded-full ${
+                      !currentTargetGame || currentTargetGame.isRegistrationOpen === false
+                        ? 'bg-amber-400'
+                        : isRoomFull
+                        ? 'bg-rose-400'
+                        : 'bg-emerald-400'
+                    } animate-pulse shrink-0`} />
                     <span className="text-[10px] font-mono uppercase text-bwb-muted font-bold tracking-widest">
-                      {openGames.length === 0
-                        ? 'Registration Closed'
+                      {!currentTargetGame
+                        ? 'No Active Rooms'
+                        : currentTargetGame.isRegistrationOpen === false
+                        ? 'Registration Closed (Passcode Active)'
                         : isRoomFull
                         ? 'Room At Capacity'
                         : 'Active Event Arena'}
@@ -334,24 +351,24 @@ export default function JoinPage() {
                   {/* Room Code Badge */}
                   <div className="px-2.5 py-1 rounded-xl bg-bwb-surface-2 border border-bwb-accent/40 font-mono text-xs tracking-wider font-black text-bwb-accent shadow-sm flex items-center gap-1.5 select-all shrink-0">
                     <Radio size={12} className="text-bwb-accent animate-pulse shrink-0" />
-                    <span>{openGames.length > 0 ? (currentTargetGame?.code || code) : 'CLOSED'}</span>
+                    <span>{currentTargetGame ? currentTargetGame.code : (activeGames.length > 0 ? activeGames[0].code : 'CLOSED')}</span>
                   </div>
                 </div>
 
-                {/* Room Selector Dropdown: ONLY when 2 or more OPEN rooms exist */}
-                {openGames.length > 1 && (
+                {/* Room Selector Dropdown: Shows whenever 2 or more tournament rooms exist */}
+                {activeGames.length > 1 && (
                   <div className="pt-1">
                     <div className="flex items-center justify-between mb-1">
                       <label className="text-[10px] font-mono uppercase text-bwb-muted font-bold tracking-wider">
                         Select Tournament Room / Event:
                       </label>
                       <span className="text-[10px] font-mono text-emerald-400 font-bold">
-                        {openGames.length} Open {openGames.length === 1 ? 'Room' : 'Rooms'}
+                        {activeGames.length} {activeGames.length === 1 ? 'Room' : 'Rooms'} ({openGames.length} Open)
                       </span>
                     </div>
                     <div className="relative">
                       <select
-                        value={code}
+                        value={currentTargetGame?.code || code}
                         onChange={(e) => {
                           setCode(e.target.value)
                           setError('')
@@ -360,11 +377,13 @@ export default function JoinPage() {
                         aria-label="Select Tournament Room"
                         className="w-full pl-3 pr-8 py-2 rounded-xl bg-bwb-surface border border-emerald-500/30 text-bwb-text text-xs sm:text-sm font-semibold focus:border-bwb-accent outline-none appearance-none cursor-pointer"
                       >
-                        {openGames.map((g) => {
+                        {activeGames.map((g) => {
                           const openCount = Math.max(0, (g.maxTeams || 16) - g.teams.length)
+                          const isClosed = g.isRegistrationOpen === false
+                          const isFull = g.teams.length >= (g.maxTeams || 16)
                           return (
                             <option key={g.code} value={g.code} className="bg-bwb-bg text-bwb-text">
-                              {g.name} ({g.code}) — {g.teams.length}/{g.maxTeams || 16} Squads ({openCount} slots open)
+                              {g.name} ({g.code}) {isClosed ? `— [Registration Closed] (${g.teams.length}/${g.maxTeams || 16} Squads)` : isFull ? `— [Room Full] (${g.teams.length}/${g.maxTeams || 16} Squads)` : `— ${g.teams.length}/${g.maxTeams || 16} Squads (${openCount} slots open)`}
                             </option>
                           )
                         })}
@@ -379,21 +398,28 @@ export default function JoinPage() {
                 {/* Main Event Title */}
                 <div>
                   <h3 className="font-display text-base sm:text-lg font-black text-bwb-text tracking-tight truncate">
-                    {openGames.length === 0
-                      ? (activeGames.length === 1 ? `${activeGames[0].name} (Registration Closed)` : activeGames.length > 1 ? 'All Tournament Rooms Closed' : 'No Tournament Rooms Available')
-                      : (currentTargetGame?.name || 'Build Without Building Championship')}
+                    {currentTargetGame
+                      ? currentTargetGame.name
+                      : (activeGames.length > 0 ? activeGames[0].name : 'No Tournament Rooms Available')}
                   </h3>
                 </div>
 
                 {/* Bottom Meta Row: Capacity Quota, WhatsApp Link Preview & Round Tag */}
-                {openGames.length > 0 && currentTargetGame ? (
+                {currentTargetGame ? (
                   <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-white/5 text-xs font-mono">
                     <div className={`px-2.5 py-1 rounded-xl border flex items-center gap-1.5 text-xs ${
-                      isRoomFull
+                      currentTargetGame.isRegistrationOpen === false
+                        ? 'bg-amber-500/15 text-amber-300 border-amber-500/30 font-bold'
+                        : isRoomFull
                         ? 'bg-rose-500/15 text-rose-300 border-rose-500/30 font-bold'
                         : 'bg-bwb-surface-2/80 border-white/10 text-bwb-muted'
                     }`}>
-                      {isRoomFull ? (
+                      {currentTargetGame.isRegistrationOpen === false ? (
+                        <>
+                          <Lock size={12} className="text-amber-400 shrink-0" />
+                          <span className="text-amber-300 font-bold">Registration Closed ({roomRegisteredCount}/{roomMaxTeams})</span>
+                        </>
+                      ) : isRoomFull ? (
                         <>
                           <AlertTriangle size={12} className="text-rose-400 shrink-0" />
                           <span className="text-rose-300 font-bold">Room Full ({roomRegisteredCount}/{roomMaxTeams})</span>

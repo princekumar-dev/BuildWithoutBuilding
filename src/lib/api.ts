@@ -30,10 +30,41 @@ async function request<T>(path: string, options?: RequestInit, auth = false): Pr
   return data
 }
 
+const CACHE_KEY = 'bwb_cached_games'
+
+export function getCachedGames(): Game[] {
+  try {
+    const raw = localStorage.getItem(CACHE_KEY)
+    if (raw) {
+      const parsed = JSON.parse(raw)
+      if (Array.isArray(parsed)) return parsed
+    }
+  } catch {}
+  return []
+}
+
+export function setCachedGames(games: Game[]) {
+  try {
+    if (Array.isArray(games) && games.length > 0) {
+      localStorage.setItem(CACHE_KEY, JSON.stringify(games))
+    }
+  } catch {}
+}
+
 export const api = {
   login: (email: string, password: string) => request<{ token: string }>('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) }),
   judgeLogin: (pin: string) => request<{ token: string }>('/auth/judge/login', { method: 'POST', body: JSON.stringify({ pin }) }),
-  listGames: () => request<Game[]>('/games', undefined, true),
+  listGames: async () => {
+    try {
+      const games = await request<Game[]>('/games', undefined, true)
+      setCachedGames(games)
+      return games
+    } catch (err) {
+      const cached = getCachedGames()
+      if (cached.length > 0) return cached
+      throw err
+    }
+  },
   getGame: (idOrCode: string) => request<Game>(`/games/${encodeURIComponent(idOrCode)}`),
   createGame: (name: string, scheduledStartTime?: string | null, maxTeams?: number, whatsappGroupUrl?: string | null, isRegistrationOpen?: boolean) => request<Game>('/games', { method: 'POST', body: JSON.stringify({ name, scheduledStartTime, maxTeams, whatsappGroupUrl, isRegistrationOpen }) }, true),
   deleteGame: (gameId: string) => request<{ ok: boolean }>(`/games/${gameId}`, { method: 'DELETE' }, true),

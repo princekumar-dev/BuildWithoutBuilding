@@ -53,20 +53,25 @@ let dbCollection = null
 let dbArchiveCollection = null
 let dbBackupCollection = null
 
+let database = { games: [] }
+
 async function initMongo() {
   try {
-    mongoClient = new MongoClient(MONGO_URI)
+    mongoClient = new MongoClient(MONGO_URI, {
+      maxPoolSize: 20,
+      serverSelectionTimeoutMS: 5000,
+      connectTimeoutMS: 10000,
+    })
     await mongoClient.connect()
     const db = mongoClient.db(DB_NAME)
     dbCollection = db.collection(COLLECTION_NAME)
     dbArchiveCollection = db.collection(COLLECTION_NAME + '_archived')
     dbBackupCollection = db.collection(COLLECTION_NAME + '_backups')
 
-    // Load from MongoDB into local cache
+    // Load from MongoDB into in-memory cache
     const remoteGames = await dbCollection.find({}).toArray()
     let count = 0
     if (remoteGames && remoteGames.length > 0) {
-      const database = readDatabase()
       remoteGames.forEach((rg) => {
         const { _id, ...cleanGame } = rg
         const idx = database.games.findIndex((g) => g.id === cleanGame.id)
@@ -79,7 +84,6 @@ async function initMongo() {
       saveLocal(database)
       count = remoteGames.length
     } else {
-      const database = readDatabase()
       for (const game of database.games) {
         await dbCollection.replaceOne({ id: game.id }, game, { upsert: true })
       }
@@ -118,8 +122,6 @@ async function initMongo() {
     console.log(`======================================================\n`)
   }
 }
-
-initMongo()
 
 const ALL_TECH_DICTIONARY = {
   'IoT': { icon: '📡', category: 'Connectivity', description: 'Network of interconnected physical devices collecting and exchanging real-time telemetry.' },
@@ -316,6 +318,10 @@ function readDatabase() {
   return db
 }
 
+// Global in-memory source of truth for microsecond response times
+database = readDatabase()
+initMongo()
+
 function readArchivedDatabase() {
   if (existsSync(archivedFile)) {
     try {
@@ -346,7 +352,8 @@ function broadcastToClients(payload) {
   })
 }
 
-function saveLocal(database) {
+function saveLocal(db) {
+  if (db) database = db
   try {
     mkdirSync(root, { recursive: true })
     mkdirSync(backupsDir, { recursive: true })
@@ -377,7 +384,8 @@ function saveLocal(database) {
 }
 
 
-function save(database) {
+function save(db) {
+  if (db) database = db
   saveLocal(database)
   if (dbCollection) {
     Promise.all(database.games.map((g) => {
@@ -469,7 +477,27 @@ function json(response, status, body) { response.writeHead(status, { 'Content-Ty
 function gameFor(database, key) { return database.games.find((game) => game.id === key || game.code === key.toUpperCase()) }
 function id(prefix) { return `${prefix}_${crypto.randomUUID()}` }
 function code(database) { let value; do { value = `BWB-${Math.floor(100 + Math.random() * 900)}` } while (database.games.some((game) => game.code === value)); return value }
-async function body(request) { const chunks = []; for await (const chunk of request) chunks.push(chunk); return JSON.parse(Buffer.concat(chunks).toString() || '{}') }
+async function body(request) {
+  return new Promise((resolve) => {
+    const chunks = []
+    let totalSize = 0
+    request.on('data', (chunk) => {
+      totalSize += chunk.length
+      if (totalSize < 10 * 1024 * 1024) {
+        chunks.push(chunk)
+      }
+    })
+    request.on('end', () => {
+      try {
+        const raw = Buffer.concat(chunks).toString('utf8')
+        resolve(raw ? JSON.parse(raw) : {})
+      } catch {
+        resolve({})
+      }
+    })
+    request.on('error', () => resolve({}))
+  })
+}
 
 function drawProblemCards(problemId) {
   const stack = PROBLEM_CARD_STACKS[problemId] || PROBLEM_CARD_STACKS['p1']
@@ -739,9 +767,8 @@ function requireHostOrJudge(request, response) {
   return false
 }
 
-createServer(async (request, response) => {
+const server = createServer(async (request, response) => {
   const url = new URL(request.url, 'http://localhost')
-  const database = readDatabase()
 
   // Enable Universal CORS for Vercel <-> Render cross-origin communication
   response.setHeader('Access-Control-Allow-Origin', '*')
@@ -794,7 +821,12 @@ createServer(async (request, response) => {
   }
 
   if (request.method === 'GET' && url.pathname === '/api/events') {
-    response.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', Connection: 'keep-alive' });
+    response.writeHead(200, {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache, no-transform',
+      Connection: 'keep-alive',
+      'X-Accel-Buffering': 'no',
+    });
     response.write('data: {"type":"connected"}\n\n');
     const teamIdParam = url.searchParams.get('teamId');
     if (teamIdParam) {
@@ -808,9 +840,21 @@ createServer(async (request, response) => {
       });
     }
     clients.add(response);
-    clients.forEach((c) => c.write('data: {"type":"presence"}\n\n'));
+    clients.forEach((c) => {
+      try { c.write('data: {"type":"presence"}\n\n'); } catch {}
+    });
+
+    const heartbeat = setInterval(() => {
+      try {
+        response.write(': keep-alive\n\n');
+      } catch {
+        clearInterval(heartbeat);
+        clients.delete(response);
+      }
+    }, 15000);
 
     request.on('close', () => {
+      clearInterval(heartbeat);
       clients.delete(response);
       if (teamIdParam) {
         const stillConnected = [...clients].some((c) => c.teamId === teamIdParam);
@@ -824,7 +868,9 @@ createServer(async (request, response) => {
           });
         }
       }
-      clients.forEach((c) => c.write('data: {"type":"presence"}\n\n'));
+      clients.forEach((c) => {
+        try { c.write('data: {"type":"presence"}\n\n'); } catch {}
+      });
     });
     return;
   }
@@ -835,17 +881,6 @@ createServer(async (request, response) => {
     return json(response, 200, archivedDb.games.map(publicGame));
   }
   if (request.method === 'GET' && url.pathname === '/api/games') {
-    if (dbCollection) {
-      try {
-        const remoteGames = await dbCollection.find({}).toArray();
-        if (remoteGames && remoteGames.length > 0) {
-          database.games = remoteGames.map(({ _id, ...rest }) => rest);
-          saveLocal(database);
-        }
-      } catch (err) {
-        console.error('MongoDB fetch error:', err.message);
-      }
-    }
     return json(response, 200, database.games.map(publicGame));
   }
   if (request.method === 'POST' && url.pathname === '/api/games') {
@@ -1289,10 +1324,16 @@ createServer(async (request, response) => {
   }
 
   return json(response, 405, { error: 'Method not allowed.' })
-}).listen(PORT, '0.0.0.0', () => {
+})
+
+server.keepAliveTimeout = 65000
+server.headersTimeout = 66000
+
+server.listen(PORT, '0.0.0.0', () => {
   console.log(`\n======================================================`)
   console.log(`  ⚡ BUILD WITHOUT BUILDING — BACKEND API SERVER`)
   console.log(`  🌐 Listening on: http://0.0.0.0:${PORT}`)
+  console.log(`  🚀 High-Performance Mode (48+ Concurrent Participants)`)
   console.log(`======================================================`)
 })
 

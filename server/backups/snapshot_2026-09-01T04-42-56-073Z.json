@@ -467,7 +467,7 @@
       "isRegistrationOpen": true,
       "isFinalRound": false,
       "createdAt": "2026-08-25T10:00:00.000Z",
-      "updatedAt": "2026-09-01T04:48:53.482Z",
+      "updatedAt": "2026-09-01T04:42:24.883Z",
       "totalTeams": 16,
       "phaseStartedAt": null,
       "phaseDurationSeconds": null,
@@ -899,7 +899,7 @@
       "isRegistrationOpen": true,
       "isFinalRound": true,
       "createdAt": "2026-08-31T16:21:23.920Z",
-      "updatedAt": "2026-09-01T04:48:53.482Z",
+      "updatedAt": "2026-09-01T04:42:24.883Z",
       "totalTeams": 8,
       "phaseStartedAt": null,
       "phaseDurationSeconds": null,
@@ -923,7 +923,7 @@
       "id": "game_a1035cd7-9f9c-4241-8bbb-bc2e6a932133",
       "code": "BWB-243",
       "name": "try1",
-      "phase": "PROBLEM_REVEAL",
+      "phase": "LOBBY",
       "currentRound": 1,
       "finalistTeamIds": [],
       "teams": [
@@ -954,7 +954,7 @@
           "round3Score": 0,
           "rank": 1,
           "registeredAt": "2026-09-01T04:33:28.423Z",
-          "isOnline": false
+          "isOnline": true
         },
         {
           "id": "team_66d01887-e710-4180-a9eb-53ef08d7f435",
@@ -1094,7 +1094,7 @@
           "round3Score": 0,
           "rank": 6,
           "registeredAt": "2026-09-01T04:34:31.509Z",
-          "isOnline": false
+          "isOnline": true
         },
         {
           "id": "team_5f8aa6aa-d0db-4d6d-a203-942254a5468d",
@@ -1122,7 +1122,7 @@
           "round3Score": 0,
           "rank": 7,
           "registeredAt": "2026-09-01T04:34:42.689Z",
-          "isOnline": false
+          "isOnline": true
         },
         {
           "id": "team_915cbc38-2bb5-43d6-a415-00a1762a5788",
@@ -1150,7 +1150,7 @@
           "round3Score": 0,
           "rank": 8,
           "registeredAt": "2026-09-01T04:35:08.987Z",
-          "isOnline": false
+          "isOnline": true
         },
         {
           "id": "team_25f0633c-423e-4b04-b7f7-8382e85914c2",
@@ -1234,7 +1234,7 @@
           "round3Score": 0,
           "rank": 11,
           "registeredAt": "2026-09-01T04:38:34.791Z",
-          "isOnline": false
+          "isOnline": true
         },
         {
           "id": "team_172f23ab-a4fc-4106-936b-62cd99ede66e",
@@ -1290,90 +1290,6 @@
           "round3Score": 0,
           "rank": 13,
           "registeredAt": "2026-09-01T04:42:24.787Z",
-          "isOnline": false
-        },
-        {
-          "id": "team_d4caaaad-0495-459b-b7f0-88887b42a992",
-          "name": "demo2",
-          "passcode": "DEMO-468",
-          "gameCode": "BWB-243",
-          "gameId": "game_a1035cd7-9f9c-4241-8bbb-bc2e6a932133",
-          "leaderName": "keerthana",
-          "email": "demo@gmail.com",
-          "phone": "123456789",
-          "department": "AIDS",
-          "year": "2nd Year",
-          "section": "A",
-          "members": [
-            "keerthana",
-            "monisha"
-          ],
-          "memberCount": 2,
-          "technologies": [],
-          "selectedProblemId": null,
-          "revealedCards": [],
-          "score": 0,
-          "round1Score": 0,
-          "round2Score": 0,
-          "round3Score": 0,
-          "rank": 14,
-          "registeredAt": "2026-09-01T04:43:18.187Z",
-          "isOnline": true
-        },
-        {
-          "id": "team_09abe23e-d795-475c-aa3e-6597f72ea5d9",
-          "name": "demo7",
-          "passcode": "DEMO-227",
-          "gameCode": "BWB-243",
-          "gameId": "game_a1035cd7-9f9c-4241-8bbb-bc2e6a932133",
-          "leaderName": "r4wqer",
-          "email": "demo7@gmail.com",
-          "phone": "9087456458",
-          "department": "IT",
-          "year": "2nd Year",
-          "section": "B",
-          "members": [
-            "r4wqer",
-            "e4r"
-          ],
-          "memberCount": 2,
-          "technologies": [],
-          "selectedProblemId": null,
-          "revealedCards": [],
-          "score": 0,
-          "round1Score": 0,
-          "round2Score": 0,
-          "round3Score": 0,
-          "rank": 15,
-          "registeredAt": "2026-09-01T04:46:19.591Z",
-          "isOnline": true
-        },
-        {
-          "id": "team_b907aa52-8770-4788-bb63-e114a6776226",
-          "name": "demo8",
-          "passcode": "DEMO-324",
-          "gameCode": "BWB-243",
-          "gameId": "game_a1035cd7-9f9c-4241-8bbb-bc2e6a932133",
-          "leaderName": "harshi",
-          "email": "demo89@gmail.com",
-          "phone": "9054768494",
-          "department": "CSE",
-          "year": "2nd Year",
-          "section": "B",
-          "members": [
-            "harshi",
-            "hershi"
-          ],
-          "memberCount": 2,
-          "technologies": [],
-          "selectedProblemId": null,
-          "revealedCards": [],
-          "score": 0,
-          "round1Score": 0,
-          "round2Score": 0,
-          "round3Score": 0,
-          "rank": 16,
-          "registeredAt": "2026-09-01T04:47:22.089Z",
           "isOnline": true
         }
       ],
@@ -1468,11 +1384,8 @@
           "twist": "Citizen + Government — Your solution must allow both citizens and authorities to participate without creating duplicate reports."
         }
       ],
-      "updatedAt": "2026-09-01T04:48:53.482Z",
-      "totalTeams": 16,
-      "phaseStartedAt": null,
-      "phaseDurationSeconds": null,
-      "phaseExpiresAt": null
+      "updatedAt": "2026-09-01T04:42:24.883Z",
+      "totalTeams": 13
     }
   ]
 }

@@ -467,7 +467,7 @@
       "isRegistrationOpen": true,
       "isFinalRound": false,
       "createdAt": "2026-08-25T10:00:00.000Z",
-      "updatedAt": "2026-09-01T04:48:53.482Z",
+      "updatedAt": "2026-09-01T04:47:22.187Z",
       "totalTeams": 16,
       "phaseStartedAt": null,
       "phaseDurationSeconds": null,
@@ -899,7 +899,7 @@
       "isRegistrationOpen": true,
       "isFinalRound": true,
       "createdAt": "2026-08-31T16:21:23.920Z",
-      "updatedAt": "2026-09-01T04:48:53.482Z",
+      "updatedAt": "2026-09-01T04:47:22.187Z",
       "totalTeams": 8,
       "phaseStartedAt": null,
       "phaseDurationSeconds": null,
@@ -923,7 +923,7 @@
       "id": "game_a1035cd7-9f9c-4241-8bbb-bc2e6a932133",
       "code": "BWB-243",
       "name": "try1",
-      "phase": "PROBLEM_REVEAL",
+      "phase": "LOBBY",
       "currentRound": 1,
       "finalistTeamIds": [],
       "teams": [
@@ -1468,11 +1468,8 @@
           "twist": "Citizen + Government — Your solution must allow both citizens and authorities to participate without creating duplicate reports."
         }
       ],
-      "updatedAt": "2026-09-01T04:48:53.482Z",
-      "totalTeams": 16,
-      "phaseStartedAt": null,
-      "phaseDurationSeconds": null,
-      "phaseExpiresAt": null
+      "updatedAt": "2026-09-01T04:47:22.187Z",
+      "totalTeams": 16
     }
   ]
 }

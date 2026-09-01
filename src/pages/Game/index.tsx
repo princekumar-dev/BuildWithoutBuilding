@@ -41,10 +41,10 @@ export default function GamePage() {
 
   // Sync state if team already has submission
   useEffect(() => {
-    if (myTeam?.submission && !submission) {
+    if (myTeam?.submission) {
       setSubmission(myTeam.submission)
     }
-  }, [myTeam?.submission, submission, setSubmission])
+  }, [myTeam?.submission, setSubmission])
   
   // Guarantee 3 real technologies drawn from this problem's specific card stacks are always available
   const myTechs = (myTeam?.technologies && myTeam.technologies.length >= 3)
@@ -60,7 +60,11 @@ export default function GamePage() {
     if (!myTeam) return
     setSaving(true)
     try {
-      const submitted = { ...data, submittedAt: new Date().toISOString() }
+      const submitted = {
+        ...data,
+        round: game.currentRound || 1,
+        submittedAt: new Date().toISOString(),
+      }
       const updatedGame = await api.submit(game.id, myTeam.id, submitted)
       setGame(updatedGame)
       setSubmission(submitted)
@@ -74,8 +78,9 @@ export default function GamePage() {
   }
 
   const isPitchingPhase = game.phase === 'PITCHING' || game.phase === 'JUDGE_ATTACK'
-  const hasSubmitted = !!currentSubmission && !isEditing
-  const isFormLocked = hasSubmitted && !isEditing
+  const hasSubmittedThisRound = currentSubmission?.round === (game.currentRound || 1)
+  const hasSubmitted = hasSubmittedThisRound && !isEditing
+  const isFormLocked = (hasSubmitted || game.phase === 'SUBMISSION_LOCKED' || isPitchingPhase) && !isEditing
 
   return (
     <PageLayout fullWidth className="pb-8">

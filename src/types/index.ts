@@ -87,6 +87,7 @@ export interface Submission {
   presentationEmbedUrl?: string
   slides?: SlideItem[]
   submittedAt?: string
+  round?: number
 }
 
 export interface ScoreBreakdown {

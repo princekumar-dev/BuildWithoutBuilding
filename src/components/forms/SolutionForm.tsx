@@ -275,7 +275,10 @@ export function SolutionForm({ technologies, onSubmit, disabled, initial, submit
     solutionName: initial?.solutionName ?? '',
     whatItDoes: initial?.whatItDoes ?? '',
     howItWorks: initial?.howItWorks ?? '',
-    techUsage: initial?.techUsage ?? Object.fromEntries(technologies.map((t) => [t.id, ''])),
+    techUsage: {
+      ...Object.fromEntries(technologies.map((t) => [t.id, ''])),
+      ...(initial?.techUsage ?? {}),
+    },
     mainAdvantage: initial?.mainAdvantage ?? '',
     mainLimitation: initial?.mainLimitation ?? '',
     presentationUrl: initial?.presentationUrl ?? '',
@@ -296,7 +299,10 @@ export function SolutionForm({ technologies, onSubmit, disabled, initial, submit
         solutionName: initial.solutionName ?? '',
         whatItDoes: initial.whatItDoes ?? '',
         howItWorks: initial.howItWorks ?? '',
-        techUsage: initial.techUsage ?? Object.fromEntries(technologies.map((t) => [t.id, ''])),
+        techUsage: {
+          ...Object.fromEntries(technologies.map((t) => [t.id, ''])),
+          ...(initial.techUsage ?? {}),
+        },
         mainAdvantage: initial.mainAdvantage ?? '',
         mainLimitation: initial.mainLimitation ?? '',
         presentationUrl: initial.presentationUrl ?? '',

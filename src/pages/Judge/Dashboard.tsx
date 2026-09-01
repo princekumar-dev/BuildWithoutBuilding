@@ -14,6 +14,7 @@ import { TECHNOLOGIES, drawProblemCards } from '../../data/mockData'
 import { api } from '../../lib/api'
 import type { Problem } from '../../types'
 import { useRealtimeGame } from '../../hooks/useRealtimeGame'
+import { getRound3Finalists } from '../../lib/tournament'
 
 export default function JudgeDashboardPage() {
   useRealtimeGame()
@@ -31,14 +32,11 @@ export default function JudgeDashboardPage() {
   const is8TeamRoom = Number(game.maxTeams) === 8 || (game.teams.length <= 8 && (game.activeProblemIds?.length === 4 || game.activeProblems?.length === 4))
   const targetFinalists = is8TeamRoom ? 4 : 8
 
+  const activeProblems = (game.activeProblems && game.activeProblems.length > 0) ? game.activeProblems : (catalog.problems || [])
+
   // In Round 3, only qualified finalists are eligible to be called to pitch and scored
   const eligibleTeams = currentRound === 3
-    ? game.teams.filter((t) => {
-        if (game.finalistTeamIds && game.finalistTeamIds.length > 0) {
-          return game.finalistTeamIds.includes(t.id)
-        }
-        return t.isFinalist ?? ((t.rank ?? 99) <= targetFinalists)
-      })
+    ? getRound3Finalists(game.teams, activeProblems, game.finalistTeamIds)
     : game.teams
 
   const getTeamRoundScore = (team: typeof game.teams[0]) => {

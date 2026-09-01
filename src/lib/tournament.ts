@@ -60,6 +60,8 @@ export function getProblemDuels(teams: Team[], problems: Problem[]): ProblemDuel
 }
 
 export function getProblemWinners(teams: Team[], problems: Problem[]): string[] {
+  const is8Team = teams.length <= 8 || problems.length <= 4
+  const targetFinalists = is8Team ? 4 : 8
   const duels = getProblemDuels(teams, problems)
   const winnerIds: string[] = []
 
@@ -69,19 +71,36 @@ export function getProblemWinners(teams: Team[], problems: Problem[]): string[] 
     }
   })
 
-  // Fill up to 8 if fewer than 8 problem tracks are filled
-  if (winnerIds.length < 8) {
-    const remaining = [...teams]
-      .filter((t) => !winnerIds.includes(t.id))
-      .sort((a, b) => (b.score ?? 0) - (a.score ?? 0))
+  return winnerIds.slice(0, targetFinalists)
+}
 
-    while (winnerIds.length < 8 && remaining.length > 0) {
-      const nextTeam = remaining.shift()
-      if (nextTeam) winnerIds.push(nextTeam.id)
+export function getRound3Finalists(teams: Team[], problems: Problem[], finalistTeamIds?: string[]): Team[] {
+  const is8Team = teams.length <= 8 || problems.length <= 4
+  const targetFinalists = is8Team ? 4 : 8
+
+  if (finalistTeamIds && finalistTeamIds.length > 0) {
+    const list = teams.filter((t) => finalistTeamIds.includes(t.id))
+    if (list.length > 0) {
+      return list.slice(0, targetFinalists)
     }
   }
 
-  return winnerIds.slice(0, 8)
+  const duels = getProblemDuels(teams, problems)
+  const winners: Team[] = []
+  duels.forEach((duel) => {
+    if (duel.leader) {
+      winners.push(duel.leader)
+    }
+  })
+
+  if (winners.length > 0) {
+    return winners.slice(0, targetFinalists)
+  }
+
+  // Fallback: top scoring teams by Round 2 score
+  return [...teams]
+    .sort((a, b) => (b.round2Score ?? b.score ?? 0) - (a.round2Score ?? a.score ?? 0))
+    .slice(0, targetFinalists)
 }
 
 export function getOpponentTeam(myTeam: Team | undefined, allTeams: Team[]): Team | null {

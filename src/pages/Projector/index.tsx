@@ -351,6 +351,9 @@ export default function ProjectorPage() {
     return () => clearInterval(progressTimer)
   }, [totalBuildPages, isBuildPagePaused, currentPhase])
 
+  const is8TeamRoom = Number(game.maxTeams) === 8 || (game.teams.length <= 8 && (game.activeProblemIds?.length === 4 || game.activeProblems?.length === 4))
+  const targetFinalists = is8TeamRoom ? 4 : 8
+
   return (
     <div className="projector-mobile-view min-h-screen bg-bwb-bg grid-bg text-bwb-text flex flex-col select-none overflow-x-hidden font-sans">
       {/* Top HUD & Projectionist Bar */}
@@ -845,7 +848,7 @@ export default function ProjectorPage() {
                   <div className="flex items-center gap-3 mb-1">
                     <Users className="text-bwb-accent shrink-0" size={24} />
                     <h2 className="font-display text-xl sm:text-2xl font-bold text-bwb-text">
-                      {game.currentRound === 3 ? 'Grand Finalists (Top 8)' : `Registered Arena Teams (${lobbyTeams.length})`}
+                      {game.currentRound === 3 ? `Grand Finalists (Top ${targetFinalists})` : `Registered Arena Teams (${lobbyTeams.length})`}
                     </h2>
                   </div>
                   <div className="flex items-center gap-3 sm:gap-4 text-xs font-mono text-bwb-muted">
@@ -1224,7 +1227,7 @@ export default function ProjectorPage() {
                   {currentRound === 1
                     ? 'Round 1 · Open Qualifier (100 Pts)'
                     : currentRound === 2
-                    ? 'Round 2 · Problem Showdown (Top 8 Qualify)'
+                    ? `Round 2 · Problem Showdown (Top ${targetFinalists} Qualify)`
                     : 'Round 3 · Grand Finals (Top 4 Podium)'}
                 </span>
                 <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 flex items-center gap-1.5">
@@ -1549,7 +1552,7 @@ export default function ProjectorPage() {
                   {currentRound === 1
                     ? 'Round 1 · Open Qualifier (No Elimination)'
                     : currentRound === 2
-                    ? 'Round 2 · Problem Showdown (Top 8 Qualify)'
+                    ? `Round 2 · Problem Showdown (Top ${targetFinalists} Qualify)`
                     : 'Round 3 · Grand Finals (Top 4 Prized)'}
                 </span>
                 <span className="px-3.5 py-1 rounded-full text-xs font-mono font-bold bg-bwb-accent/20 text-bwb-accent border border-bwb-accent/40 shadow-sm">
@@ -2116,7 +2119,7 @@ export default function ProjectorPage() {
                   {currentRound === 1
                     ? 'Round 1 · Open Qualifier (No Elimination)'
                     : currentRound === 2
-                    ? 'Round 2 · Problem Showdown (Top 8 Qualify)'
+                    ? `Round 2 · Problem Showdown (Top ${targetFinalists} Qualify)`
                     : 'Round 3 · Grand Finals (Top 4 Prized)'}
                 </span>
                 <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-bwb-accent/20 text-bwb-accent border border-bwb-accent/30">

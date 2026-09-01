@@ -89,6 +89,10 @@ export default function HostGameControlPage() {
 
   useRealtimeGame()
 
+  const is8TeamRoom = Number(game.maxTeams) === 8 || (game.teams.length <= 8 && (game.activeProblemIds?.length === 4 || game.activeProblems?.length === 4))
+  const targetFinalists = is8TeamRoom ? 4 : 8
+  const trackCount = is8TeamRoom ? 4 : 8
+
   useEffect(() => {
     if (!gameId) return
     api.getGame(gameId).then(setGame).catch((reason) => setError(reason.message))
@@ -855,71 +859,71 @@ export default function HostGameControlPage() {
 
           {/* 3-ROUND TOURNAMENT CONTROLLER BAR */}
           <div className="stereo-card rounded-3xl p-4 sm:p-6 mb-6 sm:mb-8 border border-purple-500/30 bg-gradient-to-r from-purple-950/30 via-bwb-surface to-bwb-surface">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4 pb-3 border-b border-white/5">
-              <div>
-                <span className="text-[10px] font-mono uppercase tracking-widest text-purple-300 font-bold">
-                  TOURNAMENT FLOW CONTROLLER
-                </span>
-                <h2 className="font-display font-black text-lg sm:text-xl text-bwb-text flex items-center gap-2 flex-wrap mt-0.5">
-                  <span>Current: Round {currentRound}</span>
-                  <Badge variant="accent">
-                    {currentRound === 1 ? 'Open Qualifier' : currentRound === 2 ? 'Problem Showdown (8x2)' : 'Grand Finals (Top 8)'}
-                  </Badge>
-                </h2>
-              </div>
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4 pb-3 border-b border-white/5">
+                  <div>
+                    <span className="text-[10px] font-mono uppercase tracking-widest text-purple-300 font-bold">
+                      TOURNAMENT FLOW CONTROLLER
+                    </span>
+                    <h2 className="font-display font-black text-lg sm:text-xl text-bwb-text flex items-center gap-2 flex-wrap mt-0.5">
+                      <span>Current: Round {currentRound}</span>
+                      <Badge variant="accent">
+                        {currentRound === 1 ? 'Open Qualifier' : currentRound === 2 ? `Problem Showdown (${trackCount}x2)` : `Grand Finals (Top ${targetFinalists})`}
+                      </Badge>
+                    </h2>
+                  </div>
 
-              {/* Round Navigation Buttons */}
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full md:w-auto">
-                <div className="grid grid-cols-3 gap-2 w-full md:w-auto">
-                  <button
-                    type="button"
-                    onClick={() => handleSetRound(1)}
-                    className={`py-2 px-2.5 rounded-xl text-xs font-mono font-bold border transition-all text-center ${
-                      currentRound === 1
-                        ? 'bg-purple-600 text-white border-purple-400 shadow-lg shadow-purple-600/30'
-                        : 'bg-bwb-surface-2 text-bwb-muted hover:text-bwb-text border-white/5'
-                    }`}
-                  >
-                    Round 1 (Open)
-                  </button>
+                  {/* Round Navigation Buttons */}
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full md:w-auto">
+                    <div className="grid grid-cols-3 gap-2 w-full md:w-auto">
+                      <button
+                        type="button"
+                        onClick={() => handleSetRound(1)}
+                        className={`py-2 px-2.5 rounded-xl text-xs font-mono font-bold border transition-all text-center ${
+                          currentRound === 1
+                            ? 'bg-purple-600 text-white border-purple-400 shadow-lg shadow-purple-600/30'
+                            : 'bg-bwb-surface-2 text-bwb-muted hover:text-bwb-text border-white/5'
+                        }`}
+                      >
+                        Round 1 (Open)
+                      </button>
 
-                  <button
-                    type="button"
-                    onClick={() => handleSetRound(2)}
-                    className={`py-2 px-2 rounded-xl text-xs font-mono font-bold border transition-all text-center ${
-                      currentRound === 2
-                        ? 'bg-purple-600 text-white border-purple-400 shadow-lg shadow-purple-600/30'
-                        : 'bg-bwb-surface-2 text-bwb-muted hover:text-bwb-text border-white/5'
-                    }`}
-                  >
-                    Round 2 (8×2)
-                  </button>
+                      <button
+                        type="button"
+                        onClick={() => handleSetRound(2)}
+                        className={`py-2 px-2 rounded-xl text-xs font-mono font-bold border transition-all text-center ${
+                          currentRound === 2
+                            ? 'bg-purple-600 text-white border-purple-400 shadow-lg shadow-purple-600/30'
+                            : 'bg-bwb-surface-2 text-bwb-muted hover:text-bwb-text border-white/5'
+                        }`}
+                      >
+                        Round 2 ({trackCount}×2)
+                      </button>
 
-                  <button
-                    type="button"
-                    onClick={() => handleSetRound(3)}
-                    className={`py-2 px-2.5 rounded-xl text-xs font-mono font-bold border transition-all text-center ${
-                      currentRound === 3
-                        ? 'bg-purple-600 text-white border-purple-400 shadow-lg shadow-purple-600/30'
-                        : 'bg-bwb-surface-2 text-bwb-muted hover:text-bwb-text border-white/5'
-                    }`}
-                  >
-                    Round 3 (Finals)
-                  </button>
+                      <button
+                        type="button"
+                        onClick={() => handleSetRound(3)}
+                        className={`py-2 px-2.5 rounded-xl text-xs font-mono font-bold border transition-all text-center ${
+                          currentRound === 3
+                            ? 'bg-purple-600 text-white border-purple-400 shadow-lg shadow-purple-600/30'
+                            : 'bg-bwb-surface-2 text-bwb-muted hover:text-bwb-text border-white/5'
+                        }`}
+                      >
+                        Round 3 (Finals)
+                      </button>
+                    </div>
+
+                    {currentRound === 2 && (
+                      <Button
+                        size="sm"
+                        onClick={handleAdvanceTop8ToFinals}
+                        className="w-full md:w-auto bg-amber-400 hover:bg-amber-300 text-bwb-bg font-black text-xs shadow-md justify-center"
+                      >
+                        <Trophy size={13} className="mr-1" />
+                        Lock Top {targetFinalists} & Start Finals
+                      </Button>
+                    )}
+                  </div>
                 </div>
-
-                {currentRound === 2 && (
-                  <Button
-                    size="sm"
-                    onClick={handleAdvanceTop8ToFinals}
-                    className="w-full md:w-auto bg-amber-400 hover:bg-amber-300 text-bwb-bg font-black text-xs shadow-md justify-center"
-                  >
-                    <Trophy size={13} className="mr-1" />
-                    Lock Top 8 & Start Finals
-                  </Button>
-                )}
-              </div>
-            </div>
 
             {/* Phase Timer Duration Controls */}
             <div className="mt-4 pt-4 border-t border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -1190,7 +1194,7 @@ export default function HostGameControlPage() {
                       : currentRound === 1
                       ? 'Start Round 2 Lobby'
                       : currentRound === 2
-                      ? 'Lock Top 8 & Start Round 3 Lobby'
+                      ? `Lock Top ${targetFinalists} & Start Round 3 Lobby`
                       : 'Reveal Final Championship Results'
                     }
                   </Button>
@@ -1208,34 +1212,47 @@ export default function HostGameControlPage() {
                     ? 'grid-cols-2 sm:grid-cols-4 lg:grid-cols-7'
                     : 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-6'
 
+                const currentStageIdx = visibleStages.findIndex((s) => s.phase === game.phase)
+
                 return (
-                  <div className={`grid ${gridClass} gap-2 sm:gap-2.5`}>
+                  <div className={`grid ${gridClass} gap-2.5 sm:gap-3`}>
                     {visibleStages.map((stg, idx) => {
                       const isActive = game.phase === stg.phase
-                      const isLastOdd = totalCount % 2 !== 0 && idx === totalCount - 1
+                      const isCompleted = currentStageIdx > idx
+
                       return (
                         <button
                           key={stg.phase}
                           type="button"
-                          onClick={() => changePhase(stg.phase)}
-                          className={`p-2.5 sm:p-3.5 rounded-2xl border text-left transition-all duration-150 active:scale-[0.98] hover:scale-[1.01] relative flex flex-col justify-between min-h-[86px] sm:min-h-[105px] ${
-                            isLastOdd ? 'col-span-2 sm:col-span-1 md:col-span-1 lg:col-span-1' : ''
-                          } ${
+                          onClick={() => {
+                            if (game.phase !== stg.phase) {
+                              changePhase(stg.phase)
+                            }
+                          }}
+                          className={`p-3 rounded-2xl border text-left transition-all relative overflow-hidden group ${
                             isActive
-                              ? 'bg-bwb-accent text-bwb-bg font-bold shadow-xl shadow-bwb-accent/25 border-bwb-accent ring-2 ring-bwb-accent/40'
-                              : 'bg-bwb-surface-2/80 text-bwb-muted hover:text-bwb-text border-bwb-border hover:border-bwb-accent/40'
+                              ? 'bg-bwb-accent text-bwb-bg border-bwb-accent shadow-lg shadow-bwb-accent/30 font-bold scale-[1.02]'
+                              : isCompleted
+                              ? 'bg-bwb-surface-2 border-emerald-500/30 text-emerald-400 hover:border-emerald-500/50'
+                              : 'bg-bwb-surface border-white/5 text-bwb-muted hover:border-white/20 hover:text-bwb-text'
                           }`}
                         >
-                          <div>
-                            <div className="flex items-center justify-between text-xs mb-1">
-                              <span className="text-base sm:text-lg">{stg.icon}</span>
-                              <span className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-md ${
-                                isActive ? 'bg-bwb-bg text-bwb-accent' : 'bg-bwb-surface text-bwb-muted'
-                              }`}>
-                                Step {idx + 1}
-                              </span>
-                            </div>
-                            <p className={`font-display font-bold text-xs sm:text-sm leading-snug ${isActive ? 'text-bwb-bg' : 'text-bwb-text'}`}>
+                          <div className="flex items-center justify-between gap-1 mb-1">
+                            <span className={`text-[10px] font-mono font-black uppercase px-1.5 py-0.5 rounded-md ${
+                              isActive
+                                ? 'bg-bwb-bg/20 text-bwb-bg'
+                                : isCompleted
+                                ? 'bg-emerald-500/10 text-emerald-300'
+                                : 'bg-white/5 text-bwb-muted'
+                            }`}>
+                              0{idx + 1}
+                            </span>
+                            {isActive && <span className="w-2 h-2 rounded-full bg-bwb-bg animate-ping" />}
+                          </div>
+
+                          <div className="flex items-center gap-1.5 mt-1">
+                            <span className="text-base">{stg.icon}</span>
+                            <p className={`font-display font-black text-xs truncate ${isActive ? 'text-bwb-bg' : 'text-bwb-text'}`}>
                               {stg.title}
                             </p>
                           </div>

@@ -17,15 +17,20 @@ export default function HostLeaderboardPage() {
   useRealtimeGame()
 
   const currentRound = game.currentRound || (game.isFinalRound ? 3 : 1)
-  const sorted = [...game.teams].sort((a, b) => (b.score ?? 0) - (a.score ?? 0))
-  const top8 = sorted.slice(0, 8)
+  const is8TeamRoom = Number(game.maxTeams) === 8 || (game.teams.length <= 8 && (game.activeProblemIds?.length === 4 || game.activeProblems?.length === 4))
+  const targetFinalists = is8TeamRoom ? 4 : 8
+
+  const sorted = [...game.teams].sort((a, b) => (b.round3Score ?? b.score ?? 0) - (a.round3Score ?? a.score ?? 0))
+  const finalistIds = game.finalistTeamIds && game.finalistTeamIds.length > 0
+    ? game.finalistTeamIds
+    : [...game.teams].sort((a, b) => (b.round2Score ?? b.score ?? 0) - (a.round2Score ?? a.score ?? 0)).slice(0, targetFinalists).map((t) => t.id)
+  const qualifyingFinalists = game.teams.filter((t) => finalistIds.includes(t.id))
 
   const handleAdvanceToRound = async (roundNum: number) => {
     if (!game.id) return
     try {
       if (roundNum === 3) {
-        const top8Ids = top8.map((t) => t.id)
-        await api.setFinalists(game.id, top8Ids)
+        await api.setFinalists(game.id, finalistIds)
       }
       const updated = await api.setRound(game.id, roundNum, 'LOBBY')
       setGame(updated)
@@ -107,19 +112,19 @@ export default function HostLeaderboardPage() {
             <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
               <h3 className="font-display font-bold text-base sm:text-lg text-bwb-text flex items-center gap-2">
                 <Trophy className="text-amber-400" size={18} />
-                <span>Round 2 Complete · Advance Top 8 Finalists</span>
+                <span>Round 2 Complete · Advance Top {targetFinalists} Problem Champions</span>
               </h3>
               <span className="text-xs font-mono text-emerald-400 font-bold bg-emerald-500/10 px-2.5 py-0.5 rounded-lg border border-emerald-500/20">
-                {top8.length} Finalists Qualified
+                {qualifyingFinalists.length} Champions Qualified
               </span>
             </div>
             <p className="text-xs sm:text-sm text-bwb-muted mb-4 leading-relaxed">
-              The Top 8 squads below qualify for the Grand Finals (Round 3). In Round 3, the top 4 are awarded podium trophies: 1st Place (1), 2nd Place (1), and Dual 3rd Place (2).
+              The Top {targetFinalists} Problem Champions below qualify for the Grand Finals (Round 3). In Round 3, the top 4 are awarded podium trophies: 1st Place (1), 2nd Place (1), and Dual 3rd Place (2).
             </p>
             <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-4">
-              {top8.map((t, idx) => (
+              {qualifyingFinalists.map((t, idx) => (
                 <Badge key={t.id} variant={idx < 4 ? 'accent' : 'default'} className="text-[11px] font-mono py-1 px-2.5">
-                  #{idx + 1} {t.name} ({t.score ?? 0} pts)
+                  #{idx + 1} {t.name} ({t.round2Score ?? t.score ?? 0} pts)
                 </Badge>
               ))}
             </div>
@@ -128,7 +133,7 @@ export default function HostLeaderboardPage() {
               className="w-full sm:w-auto bg-amber-400 text-bwb-bg font-black hover:bg-amber-300 shadow-lg shadow-amber-400/20 justify-center"
             >
               <Trophy size={14} className="mr-1.5" />
-              <span>Launch Grand Finals (Round 3 Lobby) with Top 8</span>
+              <span>Launch Grand Finals (Round 3 Lobby) with Top {targetFinalists}</span>
             </Button>
           </Card>
         )}
@@ -145,16 +150,16 @@ export default function HostLeaderboardPage() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3 text-center text-xs font-mono">
               <div className="p-3.5 rounded-2xl bg-amber-500/15 border border-bwb-gold text-bwb-gold font-bold">
                 🥇 1st Place (1 Team)
-                <p className="text-bwb-text font-sans font-bold text-sm mt-1">{top8[0]?.name || 'Pending'}</p>
+                <p className="text-bwb-text font-sans font-bold text-sm mt-1">{sorted[0]?.name || 'Pending'}</p>
               </div>
               <div className="p-3.5 rounded-2xl bg-slate-500/15 border border-slate-400 text-slate-200 font-bold">
                 🥈 2nd Place (1 Team)
-                <p className="text-bwb-text font-sans font-bold text-sm mt-1">{top8[1]?.name || 'Pending'}</p>
+                <p className="text-bwb-text font-sans font-bold text-sm mt-1">{sorted[1]?.name || 'Pending'}</p>
               </div>
               <div className="p-3.5 rounded-2xl bg-amber-800/20 border border-amber-600 text-amber-400 font-bold">
                 🥉 3rd Place (2 Teams)
                 <p className="text-bwb-text font-sans font-bold text-xs mt-1">
-                  {[top8[2]?.name, top8[3]?.name].filter(Boolean).join(' & ') || 'Pending'}
+                  {[sorted[2]?.name, sorted[3]?.name].filter(Boolean).join(' & ') || 'Pending'}
                 </p>
               </div>
             </div>

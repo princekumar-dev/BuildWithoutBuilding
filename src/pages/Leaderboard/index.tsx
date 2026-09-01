@@ -13,7 +13,9 @@ export default function LeaderboardPage() {
   useRealtimeGame()
   const { game, session, demoPhase } = useGameStore()
   const isResults = demoPhase === 'RESULTS' || game.phase === 'RESULTS'
-  const currentRound = game.currentRound || (game.isFinalRound ? 3 : 1)
+  const currentRound = game.currentRound ?? 1
+  const is8TeamRoom = Number(game.maxTeams) === 8 || (game.teams.length <= 8 && (game.activeProblemIds?.length === 4 || game.activeProblems?.length === 4))
+  const targetFinalists = is8TeamRoom ? 4 : 8
 
   return (
     <PageLayout>
@@ -24,7 +26,7 @@ export default function LeaderboardPage() {
               {currentRound === 1
                 ? 'Round 1 · Open Qualifier (No Elimination)'
                 : currentRound === 2
-                ? 'Round 2 · Problem Showdown (Top 8 Qualify)'
+                ? `Round 2 · Problem Showdown (Top ${targetFinalists} Qualify)`
                 : 'Round 3 · Grand Finals (Top 4 Prized)'}
             </span>
             <PhaseIndicator phase={isResults ? 'RESULTS' : game.phase} />
@@ -54,11 +56,11 @@ export default function LeaderboardPage() {
         <Card padding="md" className="mt-6 text-center border-purple-500/20 bg-gradient-to-r from-bwb-surface via-bwb-surface-2 to-bwb-surface">
           {currentRound === 1 ? (
             <p className="text-xs sm:text-sm text-bwb-text">
-              ✨ <strong className="text-bwb-accent">Round 1 (No Elimination)</strong>: All registered teams advance to Round 2 to compete across the 8 Problem Statements (max 2 teams per problem).
+              ✨ <strong className="text-bwb-accent">Round 1 (No Elimination)</strong>: All registered teams advance to Round 2 to compete across the {targetFinalists} Problem Statements (max 2 teams per problem).
             </p>
           ) : currentRound === 2 ? (
             <p className="text-xs sm:text-sm text-bwb-text">
-              ⚡ <strong className="text-emerald-400">Round 2 Showdown</strong>: The <strong className="text-bwb-accent">Top 8 teams</strong> on this leaderboard advance to the Grand Finals (Round 3).
+              ⚡ <strong className="text-emerald-400">Round 2 Showdown</strong>: The <strong className="text-bwb-accent">Top {targetFinalists} Problem Champions</strong> on this leaderboard advance to the Grand Finals (Round 3).
             </p>
           ) : (
             <div className="flex flex-wrap items-center justify-center gap-4 text-xs font-mono font-bold text-bwb-text">

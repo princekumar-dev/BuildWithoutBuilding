@@ -663,7 +663,22 @@ function publicGame(game) {
   game.whatsappGroupUrl = game.whatsappGroupUrl || null;
   game.isRegistrationOpen = game.isRegistrationOpen !== false;
 
-  const ranked = [...game.teams].sort((a, b) => (b.score ?? 0) - (a.score ?? 0)).map((team, index) => {
+  const ranked = [...game.teams].sort((a, b) => {
+    if (game.currentRound === 2) {
+      const scoreA = a.round2Score ?? 0;
+      const scoreB = b.round2Score ?? 0;
+      if (scoreB !== scoreA) return scoreB - scoreA;
+    } else if (game.currentRound === 1) {
+      const scoreA = a.round1Score ?? a.score ?? 0;
+      const scoreB = b.round1Score ?? b.score ?? 0;
+      if (scoreB !== scoreA) return scoreB - scoreA;
+    } else if (game.currentRound === 3 && game.phase === 'RESULTS') {
+      const scoreA = a.round3Score ?? a.score ?? 0;
+      const scoreB = b.round3Score ?? b.score ?? 0;
+      if (scoreB !== scoreA) return scoreB - scoreA;
+    }
+    return (b.score ?? 0) - (a.score ?? 0);
+  }).map((team, index) => {
     const isFinalist = game.finalistTeamIds.length > 0
       ? game.finalistTeamIds.includes(team.id)
       : problemWinners.includes(team.id);

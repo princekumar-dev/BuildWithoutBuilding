@@ -467,7 +467,7 @@
       "isRegistrationOpen": true,
       "isFinalRound": false,
       "createdAt": "2026-08-25T10:00:00.000Z",
-      "updatedAt": "2026-08-31T23:53:45.013Z",
+      "updatedAt": "2026-09-01T00:00:28.042Z",
       "totalTeams": 16,
       "phaseStartedAt": null,
       "phaseDurationSeconds": null,
@@ -477,9 +477,18 @@
       "id": "game_91fd6ebb-e95b-4eed-bab2-56f907670205",
       "code": "BWB-170",
       "name": "trail 001",
-      "phase": "LEADERBOARD",
-      "currentRound": 2,
-      "finalistTeamIds": [],
+      "phase": "LOBBY",
+      "currentRound": 3,
+      "finalistTeamIds": [
+        "team_45ab5c8e-2d10-42f1-ada5-ce089d032bf9",
+        "team_f4726671-0072-42cf-8c9b-e7c207225437",
+        "team_4eeac8f0-8907-49d4-a926-e0e6e7668013",
+        "team_158f35ad-4a7c-4424-9d6d-ce72706a5438",
+        "team_dfa5e420-ae65-4b14-bea6-d9665b8f01cb",
+        "team_2c0c7bf2-f14e-4df7-995f-376cf8456590",
+        "team_a52329fa-a511-40c4-aa81-4f9ca74ad65f",
+        "team_63f2e9e9-a492-47e5-a1f7-709701a9e014"
+      ],
       "teams": [
         {
           "id": "team_f4726671-0072-42cf-8c9b-e7c207225437",
@@ -533,7 +542,7 @@
           "round3Score": 0,
           "rank": 1,
           "registeredAt": "2026-08-31T16:22:55.966Z",
-          "isOnline": true,
+          "isOnline": false,
           "currentSlideIndex": 3,
           "scoreBreakdown": {
             "problemUnderstanding": 10,
@@ -746,7 +755,7 @@
           "round3Score": 0,
           "rank": 8,
           "registeredAt": "2026-08-31T16:32:02.590Z",
-          "isOnline": false,
+          "isOnline": true,
           "scoreBreakdown": {
             "problemUnderstanding": 10,
             "creativity": 25,
@@ -800,9 +809,9 @@
       "scheduledStartTime": "2026-08-31T16:40:00.000Z",
       "whatsappGroupUrl": "https://chat.whatsapp.com/DHke2VBDQnbKxVBiLcpN5t?s=cl&p=a&ilr=1",
       "isRegistrationOpen": true,
-      "isFinalRound": false,
+      "isFinalRound": true,
       "createdAt": "2026-08-31T16:21:23.920Z",
-      "updatedAt": "2026-08-31T23:53:45.014Z",
+      "updatedAt": "2026-09-01T00:00:28.042Z",
       "totalTeams": 8,
       "phaseStartedAt": null,
       "phaseDurationSeconds": null,
@@ -812,10 +821,7 @@
       "pitchDurationSeconds": null,
       "pitchExpiresAt": null,
       "currentSlideIndex": 0,
-      "pitchedTeamIds": [
-        "team_f4726671-0072-42cf-8c9b-e7c207225437",
-        "team_45ab5c8e-2d10-42f1-ada5-ce089d032bf9"
-      ],
+      "pitchedTeamIds": [],
       "pitchedTeamIdsByRound": {
         "1": [],
         "2": [

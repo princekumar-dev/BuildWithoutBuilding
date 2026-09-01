@@ -692,7 +692,6 @@ function publicGame(game) {
     game.pitchedTeamIdsByRound = { 1: [], 2: [], 3: [] };
   }
 
-  const activeRound = game.currentRound;
   if (!game.pitchedTeamIdsByRound[activeRound]) {
     game.pitchedTeamIdsByRound[activeRound] = [];
   }

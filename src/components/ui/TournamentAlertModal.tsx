@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Trophy, Award, Sparkles, X, Eye } from 'lucide-react'
 import { useGameStore } from '../../store/gameStore'
@@ -7,6 +8,7 @@ import { ConfettiCanvas } from './ConfettiCanvas'
 import { SoundFX } from '../../lib/soundEffects'
 
 export function TournamentAlertModal() {
+  const navigate = useNavigate()
   const { game, session } = useGameStore()
   const [dismissedKey, setDismissedKey] = useState<string | null>(null)
 
@@ -62,7 +64,7 @@ export function TournamentAlertModal() {
               ? 'bg-gradient-to-b from-amber-950/40 via-bwb-surface-2 to-bwb-surface border-amber-600 shadow-amber-600/20'
               : isFinalist
               ? 'bg-gradient-to-b from-emerald-950/60 via-bwb-surface-2 to-bwb-surface border-emerald-500 shadow-emerald-500/20'
-              : 'bg-gradient-to-b from-red-950/30 via-bwb-surface-2 to-bwb-surface border-bwb-border shadow-2xl'
+              : 'bg-gradient-to-b from-purple-950/40 via-bwb-surface-2 to-bwb-surface border-purple-500/40 shadow-2xl shadow-purple-500/10'
           }`}
         >
           {/* Close button */}
@@ -85,7 +87,7 @@ export function TournamentAlertModal() {
             ) : isFinalist ? (
               <Sparkles size={40} className="text-emerald-400 animate-spin" />
             ) : (
-              <Trophy size={40} className="text-purple-400" />
+              <Award size={42} className="text-purple-300 animate-pulse" />
             )}
           </div>
 
@@ -133,16 +135,25 @@ export function TournamentAlertModal() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <Button
               size="lg"
-              onClick={() => setDismissedKey(triggerKey)}
-              className={isChampion || isFinalist ? 'bg-bwb-gold text-bwb-bg font-black' : 'bg-bwb-accent text-bwb-bg font-bold'}
+              onClick={() => {
+                setDismissedKey(triggerKey)
+                if (!isFinalist) {
+                  navigate('/leaderboard')
+                }
+              }}
+              className={`w-full sm:w-auto h-12 px-6 justify-center flex items-center gap-2 ${
+                isChampion || isFinalist ? 'bg-bwb-gold text-bwb-bg font-black' : 'bg-bwb-accent text-bwb-bg font-bold'
+              }`}
             >
-              {isFinalist ? 'Enter Round 3 Finals' : 'View Tournament Leaderboard'}
+              <Trophy size={16} />
+              <span>{isFinalist ? 'Enter Round 3 Finals' : 'View Leaderboard'}</span>
             </Button>
 
             {!isFinalist && (
-              <a href="/projector" target="_blank" rel="noreferrer">
-                <Button variant="secondary" size="lg">
-                  <Eye size={16} className="mr-1.5" /> Spectate Arena Live
+              <a href="/projector" target="_blank" rel="noreferrer" className="w-full sm:w-auto">
+                <Button variant="secondary" size="lg" className="w-full sm:w-auto h-12 px-6 justify-center flex items-center gap-2 border border-white/10">
+                  <Eye size={16} />
+                  <span>Spectate Arena Live</span>
                 </Button>
               </a>
             )}

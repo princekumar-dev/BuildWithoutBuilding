@@ -646,6 +646,7 @@ function publicGame(game) {
   ensureGameActiveProblems(game);
   const counts = {};
   const seenPasscodes = new Set();
+  const activeRound = game.currentRound || (game.isFinalRound ? 3 : 1);
 
   game.teams.forEach((team) => {
     assignTeamTechs(team);
@@ -662,9 +663,27 @@ function publicGame(game) {
     const isRecentlyActive = team.lastSeenAt && (Date.now() - new Date(team.lastSeenAt).getTime() < 30000);
     const isJustRegistered = team.registeredAt && (Date.now() - new Date(team.registeredAt).getTime() < 30000);
     team.isOnline = !!(hasActiveSse || isRecentlyActive || isJustRegistered);
+
+    // Maintain round-isolated submissions dictionary
+    if (!team.submissionsByRound) {
+      team.submissionsByRound = {};
+      if (team.submission) {
+        const r = Number(team.submission.round) || 1;
+        team.submissionsByRound[r] = team.submission;
+      }
+    }
+    if (team.round1Submission) team.submissionsByRound[1] = team.round1Submission;
+    if (team.round2Submission) team.submissionsByRound[2] = team.round2Submission;
+    if (team.round3Submission) team.submissionsByRound[3] = team.round3Submission;
+
+    team.round1Submission = team.submissionsByRound[1] || null;
+    team.round2Submission = team.submissionsByRound[2] || null;
+    team.round3Submission = team.submissionsByRound[3] || null;
+    // Current submission is strictly bound to the active round
+    team.submission = team.submissionsByRound[activeRound] || null;
   });
 
-  game.currentRound = game.currentRound || (game.isFinalRound ? 3 : 1);
+  game.currentRound = activeRound;
   const problemWinners = calculateProblemTrackWinners(game);
   
   game.finalistTeamIds = problemWinners;
@@ -1209,7 +1228,18 @@ const server = createServer(async (request, response) => {
   if (request.method === 'POST' && action === 'submissions') {
     const team = game.teams.find((item) => item.id === input.teamId);
     if (!team || !input.submission) return json(response, 400, { error: 'Team and submission are required.' });
-    team.submission = { ...input.submission, submittedAt: new Date().toISOString() };
+    const targetRound = Number(input.submission.round) || game.currentRound || 1;
+    const sub = {
+      ...input.submission,
+      round: targetRound,
+      submittedAt: new Date().toISOString(),
+    };
+    if (!team.submissionsByRound) team.submissionsByRound = {};
+    team.submissionsByRound[targetRound] = sub;
+    if (targetRound === 1) team.round1Submission = sub;
+    if (targetRound === 2) team.round2Submission = sub;
+    if (targetRound === 3) team.round3Submission = sub;
+    team.submission = sub;
     save(database);
     const pGame = publicGame(game);
     broadcastToClients({ type: 'games-updated', game: pGame });

@@ -48,8 +48,8 @@ export const useGameStore = create<GameStore>()(
               t.rank === gt.rank &&
               t.isOnline === gt.isOnline &&
               t.selectedProblemId === gt.selectedProblemId &&
-              t.currentSlideIndex === gt.currentSlideIndex &&
-              t.submission?.submittedAt === gt.submission?.submittedAt
+              t.submission?.submittedAt === gt.submission?.submittedAt &&
+              t.submission?.round === gt.submission?.round
             )
           })
         ) {

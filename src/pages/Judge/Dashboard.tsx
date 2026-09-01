@@ -176,7 +176,7 @@ export default function JudgeDashboardPage() {
                 const teamTechs = (team.technologies && team.technologies.length >= 3)
                   ? team.technologies
                   : (team.selectedProblemId ? drawProblemCards(team.selectedProblemId) : [TECHNOLOGIES[0], TECHNOLOGIES[1], TECHNOLOGIES[2]])
-                const submission = team.submission
+                const submission = team.submissionsByRound?.[currentRound] || (team.submission?.round === currentRound ? team.submission : null)
 
                 return (
                   <motion.div

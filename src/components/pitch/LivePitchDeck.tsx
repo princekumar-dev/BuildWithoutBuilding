@@ -38,7 +38,7 @@ export function LivePitchDeck({
     setProgress(0)
   }, [activeSlideIndex])
 
-  const submission = team.submission
+  const submission = team.submissionsByRound?.[round] || (team.submission?.round === round ? team.submission : team.submission)
   const embedUrl = submission?.presentationEmbedUrl || (submission?.presentationUrl?.includes('embed') ? submission.presentationUrl : null)
 
   // Construct slides matching current round (or fallback to round-specific generator)

@@ -28,8 +28,9 @@ export default function GamePage() {
   useRealtimeGame()
   usePhaseNavigation()
 
+  const currentRound = game.currentRound || 1
   const myTeam = game.teams.find((team) => team.id === session?.teamId)
-  const currentSubmission = myTeam?.submission ?? submission
+  const currentSubmission = myTeam?.submissionsByRound?.[currentRound] || (myTeam?.submission?.round === currentRound ? myTeam.submission : (submission?.round === currentRound ? submission : null))
   const [isEditing, setIsEditing] = useState(false)
   const [saving, setSaving] = useState(false)
 
@@ -39,12 +40,11 @@ export default function GamePage() {
     }
   }, [game.id, setGame])
 
-  // Sync state if team already has submission
+  // Sync state if team already has submission for this round
   useEffect(() => {
-    if (myTeam?.submission) {
-      setSubmission(myTeam.submission)
-    }
-  }, [myTeam?.submission, setSubmission])
+    const roundSub = myTeam?.submissionsByRound?.[currentRound] || (myTeam?.submission?.round === currentRound ? myTeam.submission : null)
+    setSubmission(roundSub || null)
+  }, [myTeam?.submission, myTeam?.submissionsByRound, currentRound, setSubmission])
   
   // Guarantee 3 real technologies drawn from this problem's specific card stacks are always available
   const myTechs = (myTeam?.technologies && myTeam.technologies.length >= 3)
@@ -62,7 +62,7 @@ export default function GamePage() {
     try {
       const submitted = {
         ...data,
-        round: game.currentRound || 1,
+        round: currentRound,
         submittedAt: new Date().toISOString(),
       }
       const updatedGame = await api.submit(game.id, myTeam.id, submitted)
@@ -78,7 +78,7 @@ export default function GamePage() {
   }
 
   const isPitchingPhase = game.phase === 'PITCHING' || game.phase === 'JUDGE_ATTACK'
-  const hasSubmittedThisRound = currentSubmission?.round === (game.currentRound || 1)
+  const hasSubmittedThisRound = !!currentSubmission
   const hasSubmitted = hasSubmittedThisRound && !isEditing
   const isFormLocked = (hasSubmitted || game.phase === 'SUBMISSION_LOCKED' || isPitchingPhase) && !isEditing
 

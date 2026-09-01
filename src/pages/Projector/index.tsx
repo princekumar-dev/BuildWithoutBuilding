@@ -17,7 +17,7 @@ import { useRealtimeGame } from '../../hooks/useRealtimeGame'
 import { api } from '../../lib/api'
 import { getPhaseDuration } from '../../lib/phaseTimers'
 import { drawProblemCards } from '../../data/mockData'
-import type { Game, GamePhase, Problem, Technology } from '../../types'
+import type { Game, GamePhase, Problem, Technology, Team } from '../../types'
 
 const LOBBY_ROUND_ANNOUNCEMENTS: Record<number, Array<{ icon: string; tag: string; text: string }>> = {
   1: [
@@ -283,11 +283,20 @@ export default function ProjectorPage() {
 
   const totalParticipants = game.teams.reduce((acc, t) => acc + (t.members?.length ?? 0), 0)
   const totalCardsRevealed = game.teams.reduce((acc, t) => acc + (t.revealedCards?.length ?? 0), 0)
-  const totalSubmissions = game.teams.filter((t) => !!t.submission).length
-  const isRoomFull = game.teams.length >= (game.maxTeams || 16)
-  const lobbyTeams = game.currentRound === 3 && (game.finalistTeamIds?.length ?? 0) > 0
+
+  // Competing teams for current round (in Round 3, only qualified finalists compete if finalists exist)
+  const competingTeams = currentRound === 3 && (game.finalistTeamIds?.length ?? 0) > 0
     ? game.teams.filter((team) => game.finalistTeamIds?.includes(team.id))
     : game.teams
+
+  const isTeamSubmittedForCurrentRound = (t: Team) => {
+    const sub = t.submissionsByRound?.[currentRound] || (t.submission?.round === currentRound ? t.submission : null)
+    return !!sub
+  }
+
+  const totalSubmissions = competingTeams.filter(isTeamSubmittedForCurrentRound).length
+  const isRoomFull = game.teams.length >= (game.maxTeams || 16)
+  const lobbyTeams = competingTeams
   const activeAnnouncements = LOBBY_ROUND_ANNOUNCEMENTS[currentRound] || LOBBY_ROUND_ANNOUNCEMENTS[1]
   const currentAnnouncement = activeAnnouncements[announcementIndex % activeAnnouncements.length]
 
@@ -297,9 +306,9 @@ export default function ProjectorPage() {
   const currentBatchTeams = lobbyTeams.slice(safeTeamPageIndex * TEAMS_PER_PAGE, (safeTeamPageIndex + 1) * TEAMS_PER_PAGE)
 
   const BUILD_TEAMS_PER_PAGE = 4
-  const totalBuildPages = Math.max(1, Math.ceil(game.teams.length / BUILD_TEAMS_PER_PAGE))
+  const totalBuildPages = Math.max(1, Math.ceil(competingTeams.length / BUILD_TEAMS_PER_PAGE))
   const safeBuildPageIndex = buildPageIndex % totalBuildPages
-  const currentBuildBatchTeams = game.teams.slice(safeBuildPageIndex * BUILD_TEAMS_PER_PAGE, (safeBuildPageIndex + 1) * BUILD_TEAMS_PER_PAGE)
+  const currentBuildBatchTeams = competingTeams.slice(safeBuildPageIndex * BUILD_TEAMS_PER_PAGE, (safeBuildPageIndex + 1) * BUILD_TEAMS_PER_PAGE)
 
   // Auto-cycle lobby teams every 7.5s with progress bar when > 8 teams
   useEffect(() => {
@@ -1595,13 +1604,13 @@ export default function ProjectorPage() {
                     <Activity className="text-bwb-accent animate-pulse" size={14} /> Live Submissions
                   </span>
                   <span className="text-bwb-accent font-black text-xs">
-                    {totalSubmissions} / {game.teams.length} ({game.teams.length > 0 ? Math.round((totalSubmissions / game.teams.length) * 100) : 0}%)
+                    {totalSubmissions} / {competingTeams.length} ({competingTeams.length > 0 ? Math.round((totalSubmissions / competingTeams.length) * 100) : 0}%)
                   </span>
                 </div>
                 <div className="w-full bg-white/5 rounded-full h-2 overflow-hidden border border-white/5">
                   <div
                     className="bg-gradient-to-r from-cyan-400 via-bwb-accent to-emerald-400 h-full transition-all duration-500 rounded-full shadow-lg"
-                    style={{ width: `${game.teams.length > 0 ? (totalSubmissions / game.teams.length) * 100 : 0}%` }}
+                    style={{ width: `${competingTeams.length > 0 ? (totalSubmissions / competingTeams.length) * 100 : 0}%` }}
                   />
                 </div>
               </div>
@@ -1618,7 +1627,7 @@ export default function ProjectorPage() {
                   <Users size={20} className="text-bwb-accent" />
                   <span>Live Team Challenges & Architectures</span>
                   <span className="text-xs font-mono text-cyan-300 font-bold bg-cyan-500/10 px-2.5 py-0.5 rounded-lg border border-cyan-500/20">
-                    {game.teams.length} Competing Squads
+                    {competingTeams.length} Competing Squads
                   </span>
                 </h3>
 
@@ -1710,7 +1719,7 @@ export default function ProjectorPage() {
                     const teamTechs = (team.technologies && team.technologies.length >= 3)
                       ? team.technologies
                       : (team.selectedProblemId ? drawProblemCards(team.selectedProblemId) : null)
-                    const isSubmitted = !!team.submission
+                    const isSubmitted = isTeamSubmittedForCurrentRound(team)
 
                     return (
                       <motion.div

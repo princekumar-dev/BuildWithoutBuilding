@@ -59,6 +59,10 @@ export interface Team {
   problemTrackOpponentId?: string
   problemTrackOpponentName?: string
   submission?: Submission
+  submissionsByRound?: Record<number, Submission>
+  round1Submission?: Submission
+  round2Submission?: Submission
+  round3Submission?: Submission
   scoreBreakdown?: ScoreBreakdown
   isOnline?: boolean
   lastSeenAt?: string

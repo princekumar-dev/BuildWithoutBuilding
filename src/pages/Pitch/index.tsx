@@ -49,7 +49,8 @@ export default function PitchPage() {
   const myTeam = game.teams.find((t) => t.id === session?.teamId)
   const pitchTeam = game.teams.find((t) => t.id === game.currentPitchTeamId)
   const isMyTeamOnStage = !!pitchTeam && !!myTeam && myTeam.id === pitchTeam.id
-  const submission = pitchTeam?.submission || myTeam?.submission
+  const stageTeam = pitchTeam || myTeam
+  const submission = stageTeam?.submissionsByRound?.[currentRound] || (stageTeam?.submission?.round === currentRound ? stageTeam.submission : stageTeam?.submission)
   const myScore = myTeam?.score ?? 0
   const myRank = myTeam?.rank
 

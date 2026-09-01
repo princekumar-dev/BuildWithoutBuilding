@@ -182,24 +182,27 @@ export default function JudgingPage() {
         </div>
 
         {/* My Team's Proposal Confirmation */}
-        {myTeam && (
-          <Card padding="lg" className="border-white/10 bg-bwb-surface-2/70">
-            <div className="flex items-center justify-between mb-3 pb-2 border-b border-white/5">
-              <span className="text-xs font-mono font-bold text-bwb-accent uppercase tracking-wider">
-                {currentRound === 1 ? 'Submitted Problem Analysis' : 'Submitted Architecture Strategy'}: {myTeam.name}
-              </span>
-              <span className="text-xs font-mono text-emerald-400 font-bold flex items-center gap-1">
-                <CheckCircle2 size={13} /> Under Review
-              </span>
-            </div>
-            <p className="font-display font-bold text-lg text-bwb-text mb-1">
-              {myTeam.submission?.solutionName || (currentRound === 1 ? 'Problem Understanding & Analysis' : 'Architecture Formulation')}
-            </p>
-            <p className="text-xs text-bwb-muted leading-relaxed">
-              {myTeam.submission?.whatItDoes || myTeam.submission?.howItWorks || (currentRound === 1 ? 'Problem understanding and root cause analysis sealed for jury evaluation.' : 'Solution architecture sealed for jury evaluation.')}
-            </p>
-          </Card>
-        )}
+        {myTeam && (() => {
+          const currentSub = myTeam.submissionsByRound?.[currentRound] || (myTeam.submission?.round === currentRound ? myTeam.submission : myTeam.submission)
+          return (
+            <Card padding="lg" className="border-white/10 bg-bwb-surface-2/70">
+              <div className="flex items-center justify-between mb-3 pb-2 border-b border-white/5">
+                <span className="text-xs font-mono font-bold text-bwb-accent uppercase tracking-wider">
+                  {currentRound === 1 ? 'Submitted Problem Analysis' : 'Submitted Architecture Strategy'}: {myTeam.name}
+                </span>
+                <span className="text-xs font-mono text-emerald-400 font-bold flex items-center gap-1">
+                  <CheckCircle2 size={13} /> Under Review
+                </span>
+              </div>
+              <p className="font-display font-bold text-lg text-bwb-text mb-1">
+                {currentSub?.solutionName || (currentRound === 1 ? 'Problem Understanding & Analysis' : 'Architecture Formulation')}
+              </p>
+              <p className="text-xs text-bwb-muted leading-relaxed">
+                {currentSub?.whatItDoes || currentSub?.howItWorks || (currentRound === 1 ? 'Problem understanding and root cause analysis sealed for jury evaluation.' : 'Solution architecture sealed for jury evaluation.')}
+              </p>
+            </Card>
+          )
+        })()}
       </div>
     </PageLayout>
   )

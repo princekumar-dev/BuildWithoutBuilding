@@ -36,6 +36,8 @@ export const useGameStore = create<GameStore>()(
           current.currentPitchTeamId === game.currentPitchTeamId &&
           current.currentSlideIndex === game.currentSlideIndex &&
           current.phaseExpiresAt === game.phaseExpiresAt &&
+          current.isTimerPaused === game.isTimerPaused &&
+          current.timerPausedRemainingSeconds === game.timerPausedRemainingSeconds &&
           current.pitchExpiresAt === game.pitchExpiresAt &&
           current.isRegistrationOpen === game.isRegistrationOpen &&
           current.teams?.length === game.teams?.length &&
@@ -74,6 +76,7 @@ export const useGameStore = create<GameStore>()(
       partialize: (state) => ({
         session: state.session,
         submission: state.submission,
+        selectedProblem: state.selectedProblem,
         game: state.game,
       }),
     }

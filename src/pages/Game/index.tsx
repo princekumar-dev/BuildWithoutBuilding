@@ -16,17 +16,23 @@ import { useGameStore } from '../../store/gameStore'
 import { usePhaseNavigation } from '../../hooks/usePhaseNavigation'
 import { useRealtimeGame } from '../../hooks/useRealtimeGame'
 import { drawProblemCards } from '../../data/mockData'
-import type { Submission } from '../../types'
+import type { Submission, Problem, Technology } from '../../types'
 import { api } from '../../lib/api'
 import { getPhaseDuration } from '../../lib/phaseTimers'
 
 export default function GamePage() {
   const navigate = useNavigate()
-  const { game, session, submission, setSubmission, setGame, selectedProblem } = useGameStore()
+  const { game, session, submission, setSubmission, setGame, selectedProblem, setSelectedProblem } = useGameStore()
 
   // Real-time synchronization & phase auto-navigation
   useRealtimeGame()
   usePhaseNavigation()
+
+  const [catalog, setCatalog] = useState<{ problems: Problem[]; technologies: Technology[] }>({ problems: [], technologies: [] })
+
+  useEffect(() => {
+    api.getCatalog().then(setCatalog).catch(() => {})
+  }, [])
 
   const currentRound = game.currentRound || 1
   const myTeam = game.teams.find((team) => team.id === session?.teamId)
@@ -45,13 +51,32 @@ export default function GamePage() {
     const roundSub = myTeam?.submissionsByRound?.[currentRound] || (myTeam?.submission?.round === currentRound ? myTeam.submission : null)
     setSubmission(roundSub || null)
   }, [myTeam?.submission, myTeam?.submissionsByRound, currentRound, setSubmission])
+
+  const allProblems = (game.activeProblems && game.activeProblems.length > 0)
+    ? game.activeProblems
+    : (game.activeProblemIds && game.activeProblemIds.length > 0
+      ? catalog.problems.filter((p) => game.activeProblemIds?.includes(p.id))
+      : catalog.problems)
+
+  const activeProblemId = myTeam?.selectedProblemId || selectedProblem?.id || (allProblems[0]?.id ?? 'p1')
+  const problem = allProblems.find((p) => p.id === activeProblemId)
+    || (game.activeProblems || []).find((p) => p.id === activeProblemId)
+    || (catalog.problems || []).find((p) => p.id === activeProblemId)
+    || selectedProblem
+    || game.currentProblem
+    || allProblems[0]
+
+  useEffect(() => {
+    if (problem && (!selectedProblem || selectedProblem.id !== problem.id)) {
+      setSelectedProblem(problem)
+    }
+  }, [problem, selectedProblem, setSelectedProblem])
   
   // Guarantee 3 real technologies drawn from this problem's specific card stacks are always available
   const myTechs = (myTeam?.technologies && myTeam.technologies.length >= 3)
     ? myTeam.technologies
-    : drawProblemCards(myTeam?.selectedProblemId || selectedProblem?.id || 'p1')
+    : drawProblemCards(activeProblemId)
 
-  const problem = selectedProblem ?? game.currentProblem
   const opponentTeam = myTeam?.selectedProblemId
     ? game.teams.find((t) => t.id !== myTeam.id && t.selectedProblemId === myTeam.selectedProblemId)
     : null

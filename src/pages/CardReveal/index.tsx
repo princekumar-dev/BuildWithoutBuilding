@@ -11,10 +11,16 @@ import { usePhaseNavigation } from '../../hooks/usePhaseNavigation'
 import { drawProblemCards } from '../../data/mockData'
 import { api } from '../../lib/api'
 import { SoundFX } from '../../lib/soundEffects'
+import type { Problem, Technology } from '../../types'
 
 export default function CardRevealPage() {
   usePhaseNavigation()
   const { game, session, setGame } = useGameStore()
+  const [catalog, setCatalog] = useState<{ problems: Problem[]; technologies: Technology[] }>({ problems: [], technologies: [] })
+
+  useEffect(() => {
+    api.getCatalog().then(setCatalog).catch(() => {})
+  }, [])
 
   useEffect(() => {
     if (game.id) {
@@ -23,11 +29,15 @@ export default function CardRevealPage() {
   }, [game.id, setGame])
 
   const myTeam = game.teams.find((t) => t.id === session?.teamId)
+  const activeProblemId = myTeam?.selectedProblemId || 'p1'
+  const problem = (game.activeProblems || []).find((p) => p.id === activeProblemId)
+    || catalog.problems.find((p) => p.id === activeProblemId)
+    || null
   
   // Ensure we always have 3 real technologies drawn from this problem's specific card stacks
   const myTechs = (myTeam?.technologies && myTeam.technologies.length >= 3)
     ? myTeam.technologies
-    : drawProblemCards(myTeam?.selectedProblemId || 'p1')
+    : drawProblemCards(activeProblemId)
 
   const serverRevealed = myTeam?.revealedCards ?? []
   const [localRevealed, setLocalRevealed] = useState<number[]>(serverRevealed)
@@ -84,6 +94,12 @@ export default function CardRevealPage() {
           <h2 className="font-display text-2xl sm:text-3xl font-bold mb-2">
             Reveal Your 3 Tech Cards
           </h2>
+          {problem && (
+            <div className="mb-4 p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 max-w-md mx-auto text-center">
+              <p className="text-[10px] font-mono uppercase text-amber-400 font-bold mb-0.5">Your Chosen Challenge Track</p>
+              <p className="font-display font-bold text-sm text-bwb-text">{problem.title} ({problem.category})</p>
+            </div>
+          )}
           <p className="text-bwb-muted text-xs sm:text-sm max-w-lg mx-auto mb-6">
             Click each mystery slot below to reveal your assigned technologies. Your team must incorporate all 3 into your final architecture!
           </p>

@@ -53,6 +53,9 @@ export default function PitchPage() {
   const submission = stageTeam?.submissionsByRound?.[currentRound] || (stageTeam?.submission?.round === currentRound ? stageTeam.submission : stageTeam?.submission)
   const myScore = myTeam?.score ?? 0
   const myRank = myTeam?.rank
+  const myTeamProblem = myTeam?.selectedProblemId
+    ? (problems.find((p) => p.id === myTeam.selectedProblemId) || (game.activeProblems || []).find((p) => p.id === myTeam.selectedProblemId))
+    : null
 
   const config = PHASE_CONFIG[phase] || PHASE_CONFIG.LOBBY
   const PhaseIcon = config.icon
@@ -238,8 +241,8 @@ export default function PitchPage() {
               {myTeam?.selectedProblemId ? (
                 <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-center">
                   <p className="text-[10px] font-mono uppercase text-amber-400 mb-1">Your Selected Challenge</p>
-                  <p className="font-display font-bold text-lg text-bwb-text">{game.currentProblem?.title || 'Challenge Locked'}</p>
-                  <p className="text-xs text-bwb-muted mt-1">{game.currentProblem?.category}</p>
+                  <p className="font-display font-bold text-lg text-bwb-text">{myTeamProblem?.title || game.currentProblem?.title || 'Challenge Locked'}</p>
+                  <p className="text-xs text-bwb-muted mt-1">{myTeamProblem?.category || game.currentProblem?.category}</p>
                 </div>
               ) : (
                 <div className="space-y-2">

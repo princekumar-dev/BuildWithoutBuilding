@@ -37,7 +37,31 @@ export function LeaderboardTable({
   const [duelPage, setDuelPage] = useState<0 | 1 | 2>(0) // 0: Tracks 1-4, 1: Tracks 5-8, 2: All 8
   const [isDuelAutoSwap, setIsDuelAutoSwap] = useState(true)
 
-  const sorted = [...teams].sort((a, b) => (a.rank ?? 99) - (b.rank ?? 99))
+  const is8Team = teams.length <= 8
+  const targetFinalists = is8Team ? 4 : 8
+
+  // In Round 3, only qualified finalists are eligible to appear on the leaderboard
+  const finalistPool = teams.filter((t) => t.isFinalist || (t.round3Score && t.round3Score > 0))
+  const eligibleTeams = round === 3
+    ? (finalistPool.length >= 2 ? finalistPool : teams).slice(0, targetFinalists)
+    : teams
+
+  const sorted = [...eligibleTeams].sort((a, b) => {
+    if (round === 3) {
+      const scoreA = a.round3Score ?? a.score ?? 0
+      const scoreB = b.round3Score ?? b.score ?? 0
+      if (scoreB !== scoreA) return scoreB - scoreA
+    } else if (round === 2) {
+      const scoreA = a.round2Score ?? 0
+      const scoreB = b.round2Score ?? 0
+      if (scoreB !== scoreA) return scoreB - scoreA
+    } else if (round === 1) {
+      const scoreA = a.round1Score ?? a.score ?? 0
+      const scoreB = b.round1Score ?? b.score ?? 0
+      if (scoreB !== scoreA) return scoreB - scoreA
+    }
+    return (a.rank ?? 99) - (b.rank ?? 99)
+  })
   const criteria = getScoringCriteriaForRound(round)
 
   // Group teams by problem statement for Round 2 Duels View
@@ -335,7 +359,7 @@ export function LeaderboardTable({
             </thead>
             <tbody>
               {sorted.map((team, i) => {
-                const rank = team.rank ?? i + 1
+                const rank = round === 3 ? i + 1 : (team.rank ?? i + 1)
                 const isHighlighted = team.id === highlightTeamId
                 const isFirst = rank === 1
                 const isSecond = rank === 2

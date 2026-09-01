@@ -331,14 +331,18 @@ export default function JoinPage() {
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="flex items-center gap-1.5">
                     <span className={`inline-block w-2 h-2 rounded-full ${
-                      !currentTargetGame || currentTargetGame.isRegistrationOpen === false
+                      initialLoading && activeGames.length === 0
+                        ? 'bg-bwb-accent'
+                        : !currentTargetGame || currentTargetGame.isRegistrationOpen === false
                         ? 'bg-amber-400'
                         : isRoomFull
                         ? 'bg-rose-400'
                         : 'bg-emerald-400'
                     } animate-pulse shrink-0`} />
                     <span className="text-[10px] font-mono uppercase text-bwb-muted font-bold tracking-widest">
-                      {!currentTargetGame
+                      {initialLoading && activeGames.length === 0
+                        ? 'Connecting to Arena...'
+                        : !currentTargetGame
                         ? 'No Active Rooms'
                         : currentTargetGame.isRegistrationOpen === false
                         ? 'Registration Closed (Passcode Active)'
@@ -351,7 +355,7 @@ export default function JoinPage() {
                   {/* Room Code Badge */}
                   <div className="px-2.5 py-1 rounded-xl bg-bwb-surface-2 border border-bwb-accent/40 font-mono text-xs tracking-wider font-black text-bwb-accent shadow-sm flex items-center gap-1.5 select-all shrink-0">
                     <Radio size={12} className="text-bwb-accent animate-pulse shrink-0" />
-                    <span>{currentTargetGame ? currentTargetGame.code : (activeGames.length > 0 ? activeGames[0].code : 'CLOSED')}</span>
+                    <span>{currentTargetGame ? currentTargetGame.code : (activeGames.length > 0 ? activeGames[0].code : initialLoading ? 'SYNCING...' : 'CLOSED')}</span>
                   </div>
                 </div>
 
@@ -400,7 +404,7 @@ export default function JoinPage() {
                   <h3 className="font-display text-base sm:text-lg font-black text-bwb-text tracking-tight truncate">
                     {currentTargetGame
                       ? currentTargetGame.name
-                      : (activeGames.length > 0 ? activeGames[0].name : 'No Tournament Rooms Available')}
+                      : (activeGames.length > 0 ? activeGames[0].name : initialLoading ? 'Connecting to Tournament Arena...' : 'No Tournament Rooms Available')}
                   </h3>
                 </div>
 
@@ -444,8 +448,8 @@ export default function JoinPage() {
                   </div>
                 ) : (
                   <div className="pt-2 border-t border-white/5 text-xs font-mono text-bwb-muted flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-rose-400 animate-pulse" />
-                    <span>Awaiting host to open tournament rooms for registration...</span>
+                    <span className={`w-2 h-2 rounded-full ${initialLoading ? 'bg-bwb-accent animate-spin' : 'bg-rose-400 animate-pulse'}`} />
+                    <span>{initialLoading ? 'Synchronizing live championship rooms from server...' : 'Awaiting host to open tournament rooms for registration...'}</span>
                   </div>
                 )}
               </div>
@@ -514,7 +518,27 @@ export default function JoinPage() {
               <AnimatePresence mode="wait" initial={false}>
                 {/* TAB 1: FULL TEAM REGISTRATION */}
                 {activeTab === 'register' && (
-                  isRegistrationClosedByHost ? (
+                  initialLoading && activeGames.length === 0 ? (
+                    <motion.div
+                      key="join-tab-loading"
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -6 }}
+                      className="p-8 sm:p-10 rounded-3xl bg-gradient-to-br from-bwb-accent/5 via-bwb-surface-2 to-bwb-bg border border-bwb-accent/20 text-center space-y-4 shadow-xl"
+                    >
+                      <div className="w-14 h-14 mx-auto rounded-2xl bg-bwb-accent/15 border border-bwb-accent/30 flex items-center justify-center text-bwb-accent shadow-lg shadow-bwb-accent/10">
+                        <Radio size={26} className="animate-spin" />
+                      </div>
+                      <div>
+                        <h3 className="font-display text-xl sm:text-2xl font-black text-bwb-text">
+                          Connecting to Tournament Arena...
+                        </h3>
+                        <p className="text-xs sm:text-sm text-bwb-muted mt-1.5 max-w-sm mx-auto">
+                          Synchronizing live championship event rooms and available team slots in real time.
+                        </p>
+                      </div>
+                    </motion.div>
+                  ) : isRegistrationClosedByHost ? (
                     /* NOTICE WHEN REGISTRATION IS CLOSED BY HOST */
                     <motion.div
                       key="join-tab-closed-by-host"

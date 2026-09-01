@@ -28,6 +28,18 @@ export default function JudgeDashboardPage() {
   }, [game.id, setGame])
 
   const currentRound = game.currentRound || (game.isFinalRound ? 3 : 1)
+  const is8TeamRoom = Number(game.maxTeams) === 8 || (game.teams.length <= 8 && (game.activeProblemIds?.length === 4 || game.activeProblems?.length === 4))
+  const targetFinalists = is8TeamRoom ? 4 : 8
+
+  // In Round 3, only qualified finalists are eligible to be called to pitch and scored
+  const eligibleTeams = currentRound === 3
+    ? game.teams.filter((t) => {
+        if (game.finalistTeamIds && game.finalistTeamIds.length > 0) {
+          return game.finalistTeamIds.includes(t.id)
+        }
+        return t.isFinalist ?? ((t.rank ?? 99) <= targetFinalists)
+      })
+    : game.teams
 
   const getTeamRoundScore = (team: typeof game.teams[0]) => {
     if (currentRound === 1) return team.round1Score ?? team.score ?? 0
@@ -36,8 +48,8 @@ export default function JudgeDashboardPage() {
     return 0
   }
 
-  const scoredTeamsCount = game.teams.filter((t) => getTeamRoundScore(t) > 0).length
-  const allScored = game.teams.length > 0 && scoredTeamsCount === game.teams.length
+  const scoredTeamsCount = eligibleTeams.filter((t) => getTeamRoundScore(t) > 0).length
+  const allScored = eligibleTeams.length > 0 && scoredTeamsCount === eligibleTeams.length
 
   const handleCallToPitch = async (teamId: string, teamName: string) => {
     if (!game.id) return
@@ -89,8 +101,8 @@ export default function JudgeDashboardPage() {
               {currentRound === 1
                 ? 'Round 1 (Open Qualifier · Zero Elimination) · Evaluate problem root cause understanding & landscape critique. All squads advance.'
                 : currentRound === 2
-                ? 'Round 2 (1v1 Problem Duel Showdown) · Head-to-head match per problem statement. The winner of each problem track advances as the Problem Champion (8 Finalists total).'
-                : 'Round 3 (Grand Finals) · 8 Problem Champions defend live on stage. Top 4 receive Championship Honors (🥇 1st, 🥈 2nd, 🥉 Dual 3rd).'}
+                ? `Round 2 (1v1 Problem Duel Showdown) · Head-to-head match per problem statement. The winner of each problem track advances as the Problem Champion (${targetFinalists} Finalists total).`
+                : `Round 3 (Grand Finals) · ${targetFinalists} Problem Champions defend live on stage. Top 4 receive Championship Honors (🥇 1st, 🥈 2nd, 🥉 Dual 3rd).`}
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -111,7 +123,7 @@ export default function JudgeDashboardPage() {
                 ROUND {currentRound} EVALUATION PROGRESS
               </p>
               <h2 className="font-display text-2xl sm:text-3xl font-black text-bwb-text">
-                {scoredTeamsCount} of {game.teams.length} Teams Scored
+                {scoredTeamsCount} of {eligibleTeams.length} {currentRound === 3 ? 'Finalists' : 'Teams'} Scored
               </h2>
               <p className="text-xs sm:text-sm text-bwb-muted mt-1">
                 {allScored
@@ -124,14 +136,14 @@ export default function JudgeDashboardPage() {
               <div className="flex items-center justify-between text-xs font-mono mb-1.5">
                 <span className="text-bwb-muted">Progress</span>
                 <span className="text-purple-300 font-bold">
-                  {game.teams.length > 0 ? Math.round((scoredTeamsCount / game.teams.length) * 100) : 0}%
+                  {eligibleTeams.length > 0 ? Math.round((scoredTeamsCount / eligibleTeams.length) * 100) : 0}%
                 </span>
               </div>
               <div className="w-full bg-bwb-bg rounded-full h-3 overflow-hidden">
                 <div
                   className="bg-gradient-to-r from-purple-500 to-bwb-accent h-full transition-all duration-500 rounded-full"
                   style={{
-                    width: `${game.teams.length > 0 ? (scoredTeamsCount / game.teams.length) * 100 : 0}%`,
+                    width: `${eligibleTeams.length > 0 ? (scoredTeamsCount / eligibleTeams.length) * 100 : 0}%`,
                   }}
                 />
               </div>
@@ -139,24 +151,23 @@ export default function JudgeDashboardPage() {
           </div>
         </div>
 
-
         {/* Competing Teams Evaluation Grid */}
         <div className="mb-10">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-display font-bold text-lg text-bwb-text flex items-center gap-2">
               <ClipboardList size={18} className="text-purple-400" />
-              Team Solution Portfolios
+              {currentRound === 3 ? 'Grand Finalist Solution Portfolios' : 'Team Solution Portfolios'}
             </h3>
-            <span className="text-xs font-mono text-bwb-muted">{game.teams.length} Teams</span>
+            <span className="text-xs font-mono text-bwb-muted">{eligibleTeams.length} {currentRound === 3 ? 'Finalists' : 'Teams'}</span>
           </div>
 
-          {game.teams.length === 0 ? (
+          {eligibleTeams.length === 0 ? (
             <Card padding="lg" className="text-center py-12">
-              <p className="text-bwb-muted">No teams in this game yet.</p>
+              <p className="text-bwb-muted">{currentRound === 3 ? 'No finalists qualified for Round 3 yet.' : 'No teams in this game yet.'}</p>
             </Card>
           ) : (
             <div className="grid md:grid-cols-2 gap-5">
-              {game.teams.map((team, idx) => {
+              {eligibleTeams.map((team, idx) => {
                 const currentRoundScore = getTeamRoundScore(team)
                 const isScored = currentRoundScore > 0
                 const roundPitchedIds = game.pitchedTeamIdsByRound?.[currentRound] || []

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Trophy, Medal, Crown, Sparkles } from 'lucide-react'
 import type { Team } from '../../types'
+import { getRound3Finalists } from '../../lib/tournament'
 
 interface TournamentPodiumProps {
   teams: Team[]
@@ -35,9 +36,8 @@ function CountUpNumber({ target }: { target: number }) {
 
 export function TournamentPodium({ teams }: TournamentPodiumProps) {
   // Filter contenders strictly to qualified finalists
-  const finalists = teams.filter((t) => t.isFinalist || (t.round3Score && t.round3Score > 0))
-  const pool = finalists.length >= 3 ? finalists : teams
-  const sorted = [...pool].sort((a, b) => {
+  const finalists = getRound3Finalists(teams, [])
+  const sorted = [...finalists].sort((a, b) => {
     const scoreA = a.round3Score ?? a.score ?? 0
     const scoreB = b.round3Score ?? b.score ?? 0
     return scoreB - scoreA

@@ -78,29 +78,51 @@ export function getRound3Finalists(teams: Team[], problems: Problem[], finalistT
   const is8Team = teams.length <= 8 || problems.length <= 4
   const targetFinalists = is8Team ? 4 : 8
 
-  if (finalistTeamIds && finalistTeamIds.length > 0) {
-    const list = teams.filter((t) => finalistTeamIds.includes(t.id))
-    if (list.length > 0) {
-      return list.slice(0, targetFinalists)
-    }
-  }
-
   const duels = getProblemDuels(teams, problems)
   const winners: Team[] = []
+  const eliminatedTeamIds = new Set<string>()
+
+  // 1. In every duel with 2 competing teams, the loser is strictly eliminated!
   duels.forEach((duel) => {
-    if (duel.leader) {
+    if (duel.teams.length >= 2) {
+      if (duel.leader) {
+        winners.push(duel.leader)
+      }
+      duel.teams.slice(1).forEach((t) => eliminatedTeamIds.add(t.id))
+    } else if (duel.teams.length === 1 && duel.leader) {
       winners.push(duel.leader)
     }
   })
 
-  if (winners.length > 0) {
-    return winners.slice(0, targetFinalists)
+  // Deduplicate winners
+  const uniqueWinners = Array.from(new Set(winners.map((w) => w.id)))
+    .map((id) => teams.find((t) => t.id === id)!)
+    .filter(Boolean)
+
+  if (finalistTeamIds && finalistTeamIds.length >= targetFinalists) {
+    const list = teams.filter((t) => finalistTeamIds.includes(t.id) && !eliminatedTeamIds.has(t.id))
+    if (list.length >= targetFinalists) {
+      return list.slice(0, targetFinalists)
+    }
   }
 
-  // Fallback: top scoring teams by Round 2 score
-  return [...teams]
-    .sort((a, b) => (b.round2Score ?? b.score ?? 0) - (a.round2Score ?? a.score ?? 0))
-    .slice(0, targetFinalists)
+  // 2. If fewer winners than target finalists, fill from remaining squads that were NOT eliminated in a 1v1 duel
+  if (uniqueWinners.length < targetFinalists) {
+    const remaining = teams
+      .filter((t) => !uniqueWinners.some((w) => w.id === t.id) && !eliminatedTeamIds.has(t.id))
+      .sort((a, b) => {
+        const scoreA = a.round2Score ?? a.score ?? 0
+        const scoreB = b.round2Score ?? b.score ?? 0
+        return scoreB - scoreA
+      })
+
+    while (uniqueWinners.length < targetFinalists && remaining.length > 0) {
+      const nextTeam = remaining.shift()
+      if (nextTeam) uniqueWinners.push(nextTeam)
+    }
+  }
+
+  return uniqueWinners.slice(0, targetFinalists)
 }
 
 export function getOpponentTeam(myTeam: Team | undefined, allTeams: Team[]): Team | null {

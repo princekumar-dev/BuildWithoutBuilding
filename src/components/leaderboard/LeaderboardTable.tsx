@@ -3,6 +3,7 @@ import { Swords, Layers, ChevronDown, ChevronUp, BarChart3, Sparkles, Target, Cr
 import { motion, AnimatePresence } from 'framer-motion'
 import type { Team } from '../../types'
 import { getScoringCriteriaForRound } from '../../data/mockData'
+import { getRound3Finalists } from '../../lib/tournament'
 
 interface LeaderboardTableProps {
   teams: Team[]
@@ -37,13 +38,9 @@ export function LeaderboardTable({
   const [duelPage, setDuelPage] = useState<0 | 1 | 2>(0) // 0: Tracks 1-4, 1: Tracks 5-8, 2: All 8
   const [isDuelAutoSwap, setIsDuelAutoSwap] = useState(true)
 
-  const is8Team = teams.length <= 8
-  const targetFinalists = is8Team ? 4 : 8
-
   // In Round 3, only qualified finalists are eligible to appear on the leaderboard
-  const finalistPool = teams.filter((t) => t.isFinalist || (t.round3Score && t.round3Score > 0))
   const eligibleTeams = round === 3
-    ? (finalistPool.length >= 2 ? finalistPool : teams).slice(0, targetFinalists)
+    ? getRound3Finalists(teams, [])
     : teams
 
   const sorted = [...eligibleTeams].sort((a, b) => {

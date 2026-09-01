@@ -547,7 +547,10 @@ function ensureGameActiveProblems(game) {
 }
 
 function calculateProblemTrackWinners(game) {
+  const is8Team = game.teams.length <= 8 || (game.activeProblemIds && game.activeProblemIds.length <= 4);
+  const targetFinalists = is8Team ? 4 : 8;
   const winners = [];
+  const eliminated = new Set();
   const problemIds = game.activeProblemIds && game.activeProblemIds.length > 0
     ? game.activeProblemIds
     : ['p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8'];
@@ -563,10 +566,29 @@ function calculateProblemTrackWinners(game) {
       });
       // Strictly only the #1 top-scoring squad per problem track advances as the finalist!
       winners.push(sorted[0].id);
+      if (sorted.length > 1) {
+        sorted.slice(1).forEach((t) => eliminated.add(t.id));
+      }
     }
   });
 
-  return winners;
+  // If fewer problem tracks were chosen than target finalists, fill from remaining squads that were NOT eliminated in a 1v1 duel
+  if (winners.length < targetFinalists) {
+    const remaining = [...game.teams]
+      .filter((t) => !winners.includes(t.id) && !eliminated.has(t.id))
+      .sort((a, b) => {
+        const scoreA = a.round2Score ?? a.score ?? 0;
+        const scoreB = b.round2Score ?? b.score ?? 0;
+        return scoreB - scoreA;
+      });
+
+    while (winners.length < targetFinalists && remaining.length > 0) {
+      const nextTeam = remaining.shift();
+      if (nextTeam) winners.push(nextTeam.id);
+    }
+  }
+
+  return winners.slice(0, targetFinalists);
 }
 
 function generateUniqueTeamPasscode(game, teamName) {
@@ -648,7 +670,18 @@ function publicGame(game) {
   game.isRegistrationOpen = game.isRegistrationOpen !== false;
 
   const ranked = [...game.teams].sort((a, b) => {
-    if (game.currentRound === 2) {
+    const isAFinalist = game.finalistTeamIds.includes(a.id);
+    const isBFinalist = game.finalistTeamIds.includes(b.id);
+    if (game.currentRound === 3) {
+      // Finalists always outrank eliminated non-finalists in Round 3
+      if (isAFinalist && !isBFinalist) return -1;
+      if (!isAFinalist && isBFinalist) return 1;
+
+      const scoreA = a.round3Score ?? 0;
+      const scoreB = b.round3Score ?? 0;
+      if (scoreB !== scoreA) return scoreB - scoreA;
+      return (b.round2Score ?? b.score ?? 0) - (a.round2Score ?? a.score ?? 0);
+    } else if (game.currentRound === 2) {
       const scoreA = a.round2Score ?? 0;
       const scoreB = b.round2Score ?? 0;
       if (scoreB !== scoreA) return scoreB - scoreA;
@@ -656,16 +689,10 @@ function publicGame(game) {
       const scoreA = a.round1Score ?? a.score ?? 0;
       const scoreB = b.round1Score ?? b.score ?? 0;
       if (scoreB !== scoreA) return scoreB - scoreA;
-    } else if (game.currentRound === 3 && game.phase === 'RESULTS') {
-      const scoreA = a.round3Score ?? a.score ?? 0;
-      const scoreB = b.round3Score ?? b.score ?? 0;
-      if (scoreB !== scoreA) return scoreB - scoreA;
     }
     return (b.score ?? 0) - (a.score ?? 0);
   }).map((team, index) => {
-    const isFinalist = game.finalistTeamIds.length > 0
-      ? game.finalistTeamIds.includes(team.id)
-      : problemWinners.includes(team.id);
+    const isFinalist = game.finalistTeamIds.includes(team.id);
 
     // Identify problem track head-to-head opponent
     const opponent = team.selectedProblemId

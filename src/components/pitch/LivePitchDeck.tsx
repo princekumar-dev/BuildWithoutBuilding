@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
-  ChevronLeft, ChevronRight, Sparkles, Zap, Shield, 
-  ExternalLink, Maximize2, Monitor, Radio, Play, Pause
+  Sparkles, Zap, Shield, 
+  ExternalLink, Maximize2, Monitor, Radio, Play, Pause, ArrowUp, ArrowDown
 } from 'lucide-react'
 import type { Team, SlideItem } from '../../types'
 import { generateNativeSlides } from '../forms/SolutionForm'
@@ -62,20 +62,39 @@ export function LivePitchDeck({
         round
       )
 
-  const maxIndex = slides.length - 1
-  const currentIndex = Math.max(0, Math.min(localIndex, maxIndex))
+  const currentIndex = isController ? localIndex : (activeSlideIndex ?? 0)
+  const maxIndex = Math.max(0, slides.length - 1)
   const currentSlide = slides[currentIndex] || slides[0]
 
-  const goToSlide = useCallback((newIdx: number) => {
-    const clamped = Math.max(0, Math.min(newIdx, maxIndex))
-    setLocalIndex(clamped)
-    setProgress(0)
-    if (onSlideChange) {
-      onSlideChange(clamped)
-    }
-  }, [maxIndex, onSlideChange])
+  const goToSlide = useCallback(
+    (index: number) => {
+      const clamped = Math.max(0, Math.min(index, maxIndex))
+      setLocalIndex(clamped)
+      setProgress(0)
+      if (onSlideChange) {
+        onSlideChange(clamped)
+      }
+    },
+    [maxIndex, onSlideChange]
+  )
 
-  // Auto-advance slides periodically across projector and presenter devices
+  // Keyboard navigation for controller (instantly skips and resets auto-advance)
+  useEffect(() => {
+    if (!isController) return
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (['ArrowRight', 'ArrowDown', 'Space', 'PageDown'].includes(e.code)) {
+        e.preventDefault()
+        goToSlide(currentIndex + 1)
+      } else if (['ArrowLeft', 'ArrowUp', 'PageUp'].includes(e.code)) {
+        e.preventDefault()
+        goToSlide(Math.max(0, currentIndex - 1))
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [isController, currentIndex, goToSlide])
+
+  // Auto-play timer for Smart Deck
   useEffect(() => {
     if (!isAutoPlay || slides.length <= 1) {
       if (progressTimerRef.current) clearInterval(progressTimerRef.current)
@@ -101,32 +120,25 @@ export function LivePitchDeck({
     }
   }, [isAutoPlay, currentIndex, maxIndex, slides.length, goToSlide])
 
-  // Keyboard navigation for controller (instantly skips and resets auto-advance)
-  useEffect(() => {
-    if (!isController) return
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (['ArrowRight', 'Space', 'PageDown'].includes(e.code)) {
-        e.preventDefault()
-        goToSlide((currentIndex + 1) % (maxIndex + 1))
-      } else if (['ArrowLeft', 'PageUp'].includes(e.code)) {
-        e.preventDefault()
-        goToSlide((currentIndex - 1 + (maxIndex + 1)) % (maxIndex + 1))
-      }
-    }
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [isController, currentIndex, maxIndex, goToSlide])
-
   // If user uploaded a PDF/Image file or provided a presentation URL
   const rawUrl = submission?.presentationUrl
   const isDataPdf = rawUrl?.startsWith('data:application/pdf')
   const isDataImage = rawUrl?.startsWith('data:image/')
 
   if (embedUrl || isDataPdf || isDataImage) {
-    const displaySrc = isDataPdf ? `${rawUrl}#page=${currentIndex + 1}&view=FitH` : (embedUrl || rawUrl)
+    const displaySrc = isDataPdf
+      ? `${rawUrl}#page=${currentIndex + 1}&view=FitH&toolbar=0&navpanes=0&scrollbar=0`
+      : (embedUrl || rawUrl)
 
     return (
-      <div className={`w-full rounded-3xl overflow-hidden bg-bwb-bg/90 border border-cyan-500/30 shadow-2xl space-y-3 p-4 sm:p-5 relative ${isFullscreen ? 'fixed inset-4 z-50 bg-black/95' : ''}`}>
+      <div 
+        className={`w-full rounded-3xl overflow-hidden bg-bwb-bg/95 border border-cyan-500/30 shadow-2xl space-y-3 p-4 sm:p-5 relative ${isFullscreen ? 'fixed inset-4 z-50 bg-black/95' : ''}`}
+        onWheel={(e) => {
+          if (!isController) return
+          if (e.deltaY > 20) goToSlide(currentIndex + 1)
+          else if (e.deltaY < -20) goToSlide(currentIndex - 1)
+        }}
+      >
         <div className="flex items-center justify-between px-2 text-xs font-mono">
           <div className="flex items-center gap-2 text-cyan-400">
             <Radio size={14} className="animate-pulse" />
@@ -145,7 +157,7 @@ export function LivePitchDeck({
             )}
             <button
               onClick={() => setIsFullscreen(!isFullscreen)}
-              className="p-1.5 rounded-lg bg-white/5 hover:bg-white/15 text-bwb-muted hover:text-white transition-colors"
+              className="p-1.5 rounded-lg bg-white/5 hover:bg-white/15 text-bwb-muted hover:text-white transition-colors cursor-pointer"
               title="Toggle Fullscreen"
             >
               <Maximize2 size={14} />
@@ -153,14 +165,15 @@ export function LivePitchDeck({
           </div>
         </div>
 
-        <div className="w-full aspect-video rounded-2xl overflow-hidden border border-white/10 relative bg-black shadow-inner flex items-center justify-center">
+        <div className="w-full h-[58vh] min-h-[460px] max-h-[750px] rounded-2xl overflow-hidden border border-white/10 relative bg-black shadow-inner flex items-center justify-center">
           {isDataImage ? (
             <img src={rawUrl} alt={`${team.name} Slide`} className="max-w-full max-h-full object-contain" />
           ) : (
             <iframe
+              key={`slide-frame-page-${currentIndex}`}
               src={displaySrc || ''}
               title={`${team.name} Pitch Deck`}
-              className="w-full h-full border-0"
+              className="w-full h-full border-0 rounded-2xl bg-white"
               allowFullScreen
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             />
@@ -168,27 +181,40 @@ export function LivePitchDeck({
         </div>
 
         {/* Presenter Remote Controls */}
-        <div className="pt-2 flex items-center justify-between border-t border-white/10 text-xs font-mono">
+        <div className="pt-2 flex flex-wrap items-center justify-between gap-3 border-t border-white/10 text-xs font-mono">
           <div className="flex items-center gap-2">
             <button
-              onClick={() => goToSlide(currentIndex - 1)}
+              onClick={() => goToSlide(Math.max(0, currentIndex - 1))}
               disabled={currentIndex <= 0}
-              className="px-3 py-1.5 rounded-xl bg-bwb-surface-2 hover:bg-white/15 text-bwb-text disabled:opacity-30 disabled:pointer-events-none border border-white/10 flex items-center gap-1 font-bold"
+              className="px-3.5 py-2 rounded-xl bg-bwb-surface-2 hover:bg-white/15 text-bwb-text disabled:opacity-30 disabled:pointer-events-none border border-white/10 flex items-center gap-1.5 font-bold cursor-pointer transition-all"
+              title="Previous Slide (Up / Left Arrow)"
             >
-              <ChevronLeft size={14} /> Prev Page
+              <ArrowUp size={14} className="text-cyan-400" />
+              <span>Prev Page</span>
             </button>
-            <span className="text-cyan-300 font-bold px-2">Page {currentIndex + 1}</span>
+
+            <span className="text-cyan-300 font-bold px-3 py-1.5 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-xs">
+              Page {currentIndex + 1}
+            </span>
+
             <button
               onClick={() => goToSlide(currentIndex + 1)}
-              className="px-3 py-1.5 rounded-xl bg-cyan-400 hover:bg-cyan-300 text-black font-black flex items-center gap-1 shadow-md"
+              className="px-4 py-2 rounded-xl bg-cyan-400 hover:bg-cyan-300 text-black font-black flex items-center gap-1.5 shadow-md cursor-pointer transition-all"
+              title="Next Slide (Down / Right Arrow / Space)"
             >
-              Next Page <ChevronRight size={14} />
+              <span>Next Page</span>
+              <ArrowDown size={14} className="text-black" />
             </button>
           </div>
 
-          <div className="text-[11px] text-emerald-300 font-bold hidden sm:flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-            <span>STADIUM PROJECTOR SYNCED</span>
+          <div className="flex items-center gap-3">
+            <span className="text-[11px] text-bwb-muted hidden md:inline">
+              Use <kbd className="px-1.5 py-0.5 rounded bg-black/60 text-white border border-white/15">▲ Up</kbd> / <kbd className="px-1.5 py-0.5 rounded bg-black/60 text-white border border-white/15">▼ Down</kbd> keys to change slides
+            </span>
+            <div className="text-[11px] text-emerald-300 font-bold flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+              <span>STADIUM PROJECTOR SYNCED</span>
+            </div>
           </div>
         </div>
       </div>

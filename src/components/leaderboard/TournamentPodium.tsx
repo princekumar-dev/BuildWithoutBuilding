@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import { Trophy, Medal, Crown, Sparkles, Award } from 'lucide-react'
+import { Trophy, Medal, Crown, Sparkles } from 'lucide-react'
 import type { Team } from '../../types'
 
 interface TournamentPodiumProps {
@@ -80,7 +80,7 @@ export function TournamentPodium({ teams }: TournamentPodiumProps) {
                 {second.name}
               </h3>
               <div className="text-sm sm:text-3xl font-black text-slate-200 font-display mt-0.5">
-                <CountUpNumber target={second.score ?? 0} />
+                <CountUpNumber target={second.round3Score ?? second.score ?? 0} />
                 <span className="text-[10px] sm:text-xs text-bwb-muted font-normal"> pts</span>
               </div>
             </div>
@@ -119,7 +119,7 @@ export function TournamentPodium({ teams }: TournamentPodiumProps) {
                 {first.name}
               </h2>
               <div className="text-base sm:text-5xl font-black text-bwb-gold font-display mt-0.5">
-                <CountUpNumber target={first.score ?? 0} />
+                <CountUpNumber target={first.round3Score ?? first.score ?? 0} />
                 <span className="text-[10px] sm:text-xs text-bwb-muted font-normal"> pts</span>
               </div>
             </div>
@@ -133,7 +133,7 @@ export function TournamentPodium({ teams }: TournamentPodiumProps) {
           </motion.div>
         ) : <div className="order-2" />}
 
-        {/* 3RD PLACE PRIZE A */}
+        {/* 3RD PLACE (DUAL BRONZE JOINT CHAMPIONS) */}
         {thirdA ? (
           <motion.div
             initial={{ opacity: 0, y: 50 }}
@@ -141,69 +141,72 @@ export function TournamentPodium({ teams }: TournamentPodiumProps) {
             transition={{ delay: 0.1, duration: 0.6, type: 'spring', stiffness: 170 }}
             className="flex flex-col items-center text-center order-3"
           >
-            <div className="relative mb-2 sm:mb-3 flex flex-col items-center">
-              <div className="w-11 h-11 sm:w-20 sm:h-20 rounded-2xl sm:rounded-3xl bg-amber-800/20 text-amber-500 border-2 border-amber-600/40 flex items-center justify-center text-lg sm:text-2xl shadow-xl">
-                <Medal size={22} className="sm:w-8 sm:h-8 text-amber-500" />
+            {thirdB ? (
+              /* DUAL 3RD PLACE TWIN SQUADS SIDE-BY-SIDE ON BRONZE PODIUM */
+              <div className="relative mb-2 sm:mb-3 flex items-start justify-center gap-1.5 sm:gap-3 w-full">
+                {/* 3rd Team A */}
+                <div className="flex flex-col items-center flex-1 min-w-0">
+                  <div className="w-9 h-9 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-amber-800/20 text-amber-500 border-2 border-amber-600/40 flex items-center justify-center text-sm sm:text-xl shadow-xl">
+                    <Medal size={18} className="sm:w-7 sm:h-7 text-amber-500" />
+                  </div>
+                  <span className="mt-1 text-[8px] sm:text-[11px] font-mono font-black text-amber-400 bg-amber-950/60 px-1 sm:px-2 py-0.5 rounded-full border border-amber-600/30 whitespace-nowrap">
+                    🥉 3RD #1
+                  </span>
+                  <h3 className="font-display font-bold text-[11px] sm:text-sm text-bwb-text truncate w-full mt-0.5" title={thirdA.name}>
+                    {thirdA.name}
+                  </h3>
+                  <div className="text-xs sm:text-xl font-black text-amber-400 font-display">
+                    <CountUpNumber target={thirdA.round3Score ?? thirdA.score ?? 0} />
+                    <span className="text-[9px] sm:text-xs text-bwb-muted font-normal"> pts</span>
+                  </div>
+                </div>
+
+                {/* 3rd Team B */}
+                <div className="flex flex-col items-center flex-1 min-w-0">
+                  <div className="w-9 h-9 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-amber-800/20 text-amber-500 border-2 border-amber-600/40 flex items-center justify-center text-sm sm:text-xl shadow-xl">
+                    <Medal size={18} className="sm:w-7 sm:h-7 text-amber-500" />
+                  </div>
+                  <span className="mt-1 text-[8px] sm:text-[11px] font-mono font-black text-amber-400 bg-amber-950/60 px-1 sm:px-2 py-0.5 rounded-full border border-amber-600/30 whitespace-nowrap">
+                    🥉 3RD #2
+                  </span>
+                  <h3 className="font-display font-bold text-[11px] sm:text-sm text-bwb-text truncate w-full mt-0.5" title={thirdB.name}>
+                    {thirdB.name}
+                  </h3>
+                  <div className="text-xs sm:text-xl font-black text-amber-400 font-display">
+                    <CountUpNumber target={thirdB.round3Score ?? thirdB.score ?? 0} />
+                    <span className="text-[9px] sm:text-xs text-bwb-muted font-normal"> pts</span>
+                  </div>
+                </div>
               </div>
-              <span className="mt-1 sm:mt-2 text-[9px] sm:text-xs font-mono font-bold text-amber-400 bg-amber-950/40 px-1.5 sm:px-2.5 py-0.5 rounded-full border border-amber-600/30">
-                🥉 3RD #1
-              </span>
-              <h3 className="font-display font-bold text-xs sm:text-lg text-bwb-text truncate max-w-[95px] sm:max-w-[220px] mt-1">
-                {thirdA.name}
-              </h3>
-              <div className="text-sm sm:text-3xl font-black text-amber-400 font-display mt-0.5">
-                <CountUpNumber target={thirdA.score ?? 0} />
-                <span className="text-[10px] sm:text-xs text-bwb-muted font-normal"> pts</span>
+            ) : (
+              /* SINGLE 3RD PLACE TEAM */
+              <div className="relative mb-2 sm:mb-3 flex flex-col items-center">
+                <div className="w-11 h-11 sm:w-20 sm:h-20 rounded-2xl sm:rounded-3xl bg-amber-800/20 text-amber-500 border-2 border-amber-600/40 flex items-center justify-center text-lg sm:text-2xl shadow-xl">
+                  <Medal size={22} className="sm:w-8 sm:h-8 text-amber-500" />
+                </div>
+                <span className="mt-1 sm:mt-2 text-[9px] sm:text-xs font-mono font-bold text-amber-400 bg-amber-950/40 px-1.5 sm:px-2.5 py-0.5 rounded-full border border-amber-600/30">
+                  🥉 3RD
+                </span>
+                <h3 className="font-display font-bold text-xs sm:text-lg text-bwb-text truncate max-w-[95px] sm:max-w-[220px] mt-1">
+                  {thirdA.name}
+                </h3>
+                <div className="text-sm sm:text-3xl font-black text-amber-400 font-display mt-0.5">
+                  <CountUpNumber target={thirdA.round3Score ?? thirdA.score ?? 0} />
+                  <span className="text-[10px] sm:text-xs text-bwb-muted font-normal"> pts</span>
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Pedestal */}
             <div className="w-full h-20 sm:h-36 rounded-t-2xl sm:rounded-t-3xl bg-gradient-to-b from-amber-900/30 via-amber-950/20 to-bwb-surface border-t-2 border-x-2 border-amber-600/40 p-1.5 sm:p-3 flex flex-col items-center justify-center shadow-2xl">
               <span className="font-display font-black text-2xl sm:text-5xl text-amber-600/60">3</span>
-              <p className="text-[9px] sm:text-xs text-amber-500 font-mono font-bold hidden sm:block mt-1">Bronze</p>
+              <p className="text-[9px] sm:text-xs text-amber-500 font-mono font-bold hidden sm:block mt-1">
+                {thirdB ? 'Dual Bronze' : 'Bronze Prize'}
+              </p>
             </div>
           </motion.div>
         ) : <div className="order-3" />}
       </div>
-
-
-      {/* DUAL 3RD PLACE JOINT WINNER CARD (Prize Winner #2 for 3rd Place) */}
-      {thirdB && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.8, duration: 0.5 }}
-          className="w-full max-w-2xl mt-2 p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-amber-950/40 via-bwb-surface-2 to-amber-950/40 border-2 border-amber-600/50 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4"
-        >
-          <div className="flex items-center gap-3.5">
-            <div className="w-12 h-12 rounded-2xl bg-amber-800/30 text-amber-400 border border-amber-500/40 flex items-center justify-center shrink-0 shadow-md">
-              <Award size={26} />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="px-2.5 py-0.5 rounded-md text-[10px] font-mono font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30">
-                  🥉 3RD PLACE (WINNER 2)
-                </span>
-                <span className="text-xs text-bwb-muted font-mono">Joint Bronze Laureate</span>
-              </div>
-              <h4 className="font-display font-bold text-lg text-bwb-text mt-0.5">
-                {thirdB.name}
-              </h4>
-              <p className="text-xs text-bwb-muted">
-                {thirdB.members?.join(', ')}
-              </p>
-            </div>
-          </div>
-
-          <div className="text-right shrink-0">
-            <p className="text-[10px] font-mono uppercase text-bwb-muted font-bold">Score</p>
-            <div className="text-2xl font-black text-amber-400 font-display">
-              <CountUpNumber target={thirdB.score ?? 0} />
-              <span className="text-xs text-bwb-muted font-normal"> pts</span>
-            </div>
-          </div>
-        </motion.div>
-      )}
     </div>
   )
 }
